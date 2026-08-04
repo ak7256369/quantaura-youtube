@@ -1,0 +1,152 @@
+# QuantAura channel pipeline configuration.
+# Secrets are NEVER here — they come from environment variables (see README).
+
+channel:
+  name: "QuantAura Signals"
+  symbol: "BTCUSDT"
+  asset_label: "Bitcoin"
+  timezone_note: "All times UTC"
+
+api:
+  # The public QuantAura API. /api/signals/stats needs no auth; /api/signals
+  # redacts confidence + per-model detail unless the caller is premium, which is
+  # why the pipeline logs in as a dedicated service account (QA_EMAIL/QA_PASSWORD).
+  base_url: "https://quantaura.tech"
+  timeout_seconds: 30
+  retries: 3
+  retry_backoff_seconds: 20
+
+market:
+  # Binance public REST — no key required, 1200 req/min unauthenticated.
+  klines_url: "https://api.binance.com/api/v3/klines"
+  chart_days: 7
+  chart_interval: "1h"
+  fear_greed_url: "https://api.alternative.me/fng/?limit=1"
+
+scoring:
+  # How a past call is graded, in plain terms the video can state out loud.
+  #
+  # This is DIRECTIONAL scoring on realised price change over the model's own
+  # forecast horizon. It is deliberately NOT the model's training label
+  # (a trend-regime label built from an EMA spread) — a viewer can verify a
+  # price move on any chart, but cannot verify an EMA-regime label. Grading on
+  # something the audience can check themselves is the whole point of the
+  # channel, so the simpler, harsher rule wins.
+  horizon_hours: 24
+  # |24h change| below this counts as a flat market: HOLD is right, BUY/SELL wrong.
+  flat_band_pct: 1.0
+
+script:
+  # Free-tier LLMs. Primary first; the pipeline falls through the list on
+  # quota/error so a single provider outage never costs a day's video.
+  providers:
+    - name: "gemini"
+      model: "gemini-2.5-flash"
+      endpoint: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+      api_key_env: "GEMINI_API_KEY"
+    - name: "groq"
+      model: "llama-3.3-70b-versatile"
+      endpoint: "https://api.groq.com/openai/v1/chat/completions"
+      api_key_env: "GROQ_API_KEY"
+  max_attempts_per_provider: 2
+  temperature: 0.7
+
+factcheck:
+  # A generated script that fails verification twice is discarded and no video
+  # is published. A missed day is invisible; a wrong number is permanent.
+  max_regenerations: 2
+  # Deterministic filter — these never reach a viewer regardless of what any
+  # model returns. Matched case-insensitively as whole phrases.
+  banned_phrases:
+    - "financial advice"
+    - "investment advice"
+    - "guaranteed"
+    - "guarantee"
+    - "risk-free"
+    - "riskless"
+    - "can't lose"
+    - "cannot lose"
+    - "sure thing"
+    - "you should buy"
+    - "you should sell"
+    - "buy now"
+    - "sell now"
+    - "get rich"
+    - "to the moon"
+    - "price target"
+    - "will hit"
+    - "will reach"
+    - "moonshot"
+    - "10x"
+    - "100x"
+
+disclaimer:
+  # Appended by CODE to every narration and description. Never model-generated,
+  # never optional.
+  narration: "This is an automated research project, not financial advice."
+  description: |
+    ---
+    QuantAura is a final-year research project: a four-model machine-learning
+    ensemble (LSTM, Transformer, XGBoost, KAN) that publishes a daily Bitcoin
+    regime call and its own running accuracy — wins and losses.
+
+    This video is generated automatically. The narration is AI-synthesised and
+    the script is written by an AI model from the ensemble's real output.
+
+    NOT FINANCIAL ADVICE. Nothing here is a recommendation to buy or sell any
+    asset. The model is frequently wrong; that is exactly why the scoreboard is
+    public. Do your own research.
+
+voice:
+  # Kokoro-82M voice id. af_* = American female, am_* = American male,
+  # bf_/bm_ = British. af_heart is the most natural of the v1.0 set.
+  voice_id: "af_heart"
+  speed: 1.02
+  lang: "en-us"
+  sentence_gap_seconds: 0.28
+  model_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
+  voices_url: "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
+
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  # Ken Burns drift, in pixels over the whole scene — small enough to read as
+  # polish rather than motion sickness.
+  drift_px: 26
+  max_seconds: 179   # Shorts must stay under 3 minutes
+  captions: true
+  # Optional one-time Veo assets. Missing files are skipped, not an error, so
+  # the pipeline runs before any branding exists.
+  intro: "assets/intro.mp4"
+  outro: "assets/outro.mp4"
+
+theme:
+  bg: "#0B0E11"
+  panel: "#151A21"
+  grid: "#1F2730"
+  text: "#EAECEF"
+  muted: "#848E9C"
+  up: "#16C784"
+  down: "#EA3943"
+  flat: "#F0B90B"
+  accent: "#5B8DEF"
+
+upload:
+  # Uploads start private on purpose: an unaudited YouTube API project has its
+  # uploads locked to private anyway, and the review tap doubles as the
+  # supervised rollout. Flip to "public" only after the audit is approved AND
+  # 14 consecutive clean days.
+  visibility: "private"
+  category_id: "25"          # News & Politics — the closest fit YouTube offers
+  made_for_kids: false
+  # YouTube policy: synthetic/altered content must be disclosed. The pipeline
+  # sets this on every upload as well as in the description.
+  contains_synthetic_media: true
+  base_tags:
+    - "bitcoin"
+    - "btc"
+    - "machine learning"
+    - "crypto"
+    - "algorithmic trading"
+    - "data science"

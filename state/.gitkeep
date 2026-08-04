@@ -1,0 +1,4 @@
+# The scoreboard lives here: predictions.jsonl (append-only calls),
+# scoreboard.json (derived summary), runs.jsonl (pipeline run log).
+# CI commits this directory after every run. It starts empty by design —
+# the record begins with the first real call, never with seeded history.

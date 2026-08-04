@@ -1,0 +1,259 @@
+"""Orchestrator: one run produces at most one video.
+
+    python channel/pipeline.py                 # full run, uploads per config.yaml
+    python channel/pipeline.py --no-upload     # build everything, publish nothing
+    python channel/pipeline.py --no-voice      # silent placeholder audio, fast render
+    python channel/pipeline.py --dry-run       # no LLM, no upload: plumbing check
+
+The governing rule is in the failure path, not the happy path: any stage that
+cannot complete *safely* raises PipelineAbort, which ends the run with a
+notification and no upload. A missed day is invisible to viewers. A video with
+a wrong number in it is permanent.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import traceback
+from datetime import datetime, timezone
+from pathlib import Path
+
+import fetch
+import factcheck
+import notify
+import render as render_mod
+import scoreboard
+import scriptwriter
+import thumbnail as thumb_mod
+import voice as voice_mod
+from common import BUILD_DIR, STATE_DIR, PipelineAbort, config, log, write_json
+
+RUNS_PATH = STATE_DIR / "runs.jsonl"
+
+
+# ── Run bookkeeping ───────────────────────────────────────────────────────────
+
+def _record_run(status: str, stage: str, detail: str, extra: dict | None = None) -> None:
+    row = {
+        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "status": status,
+        "stage": stage,
+        "detail": detail[:400],
+        **(extra or {}),
+    }
+    RUNS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(RUNS_PATH, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    # GitHub renders this under the workflow run, so a failure is legible
+    # without opening logs.
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        icon = {"published": "✅", "rendered": "⚠️", "skipped": "🚫", "crashed": "💥"}.get(status, "•")
+        with open(summary, "a", encoding="utf-8") as fh:
+            fh.write(f"### {icon} {status.title()} — {row['date']}\n\n"
+                     f"**Stage:** {stage}\n\n{detail[:600]}\n\n")
+            for k, v in (extra or {}).items():
+                fh.write(f"- **{k}**: {v}\n")
+
+
+def _dry_snapshot() -> dict:
+    """Synthetic data so --dry-run can exercise render/upload plumbing without
+    touching the live API or spending a single LLM token."""
+    import math
+    now = int(datetime.now(timezone.utc).timestamp() * 1000)
+    candles = []
+    for i in range(168):
+        p = 61000 + 1800 * math.sin(i / 19) + i * 6
+        candles.append([now - (168 - i) * 3600_000, p, p * 1.004, p * 0.996, p])
+    return {
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "symbol": "BTCUSDT", "asset_label": "Bitcoin",
+        "signal": "HOLD", "signal_raw": "BUY", "gated": True,
+        "confidence": 41.3,
+        "breakdown": {"BUY": 41.3, "HOLD": 38.2, "SELL": 20.5},
+        "per_model": {"lstm": "BUY", "transformer": "HOLD", "xgboost": "BUY", "kan": "SELL"},
+        "weights": {"lstm": 0.3, "transformer": 0.25, "xgboost": 0.25, "kan": 0.2},
+        "price": candles[-1][4], "price_str": f"${candles[-1][4]:,.0f}",
+        "change_24h_pct": -1.42, "change_7d_pct": 2.31,
+        "candles": candles, "indicators": {},
+        "fear_greed": {"value": 54, "classification": "Neutral"},
+        "ensemble_f1": 0.7593, "directional_accuracy_pct": 52.1,
+        "label_horizon_hours": 24, "confidence_threshold_pct": 45.0,
+        "models_updated_at": None,
+    }
+
+
+def _dry_script() -> dict:
+    return scriptwriter.validate({
+        "title": "BTC Model Call — HOLD (41%) · dry run",
+        "description": "Dry-run render. No live data, no upload.",
+        "tags": ["bitcoin", "machine learning"],
+        "sections": {
+            "hook": ["The ensemble split three ways today and the confidence gate "
+                     "stepped in."],
+            "call": ["The model produced a buy signal at 41.3 percent confidence.",
+                     "That sits below the 45 percent threshold, so the published call "
+                     "is hold.",
+                     "Bitcoin is trading around 61 thousand dollars, down 1.42 percent "
+                     "over the day."],
+            "why": ["The LSTM and the gradient boosted model both leaned bullish.",
+                    "The KAN disagreed outright and the transformer stayed neutral.",
+                    "Fear and greed sits at 54, squarely neutral."],
+            "score": ["This is a dry run, so no past call is being graded.",
+                      "The real scoreboard grades every call 24 hours after it is made."],
+        },
+        "overlays": {
+            "hook": "Gate blocks a split call",
+            "call": "HOLD · 41% confidence",
+            "why": ["LSTM + XGB bullish", "KAN disagrees", "Fear & Greed 54"],
+            "score": "dry run · no record",
+        },
+    })
+
+
+# ── Stages ────────────────────────────────────────────────────────────────────
+
+def build_script(snapshot: dict, score: dict) -> dict:
+    """Write and verify. Returns a script that passed every gate."""
+    facts = scriptwriter.build_facts(snapshot, score)
+    write_json(BUILD_DIR / "facts.json", facts)
+
+    max_regen = config()["factcheck"]["max_regenerations"]
+    feedback: list[str] = []
+
+    for attempt in range(1, max_regen + 2):
+        log.info(f"Writing script (attempt {attempt}/{max_regen + 1})...")
+        script = scriptwriter.write(facts, feedback=feedback)
+
+        log.info("Fact-checking...")
+        problems = factcheck.verify(script, facts)
+        if not problems:
+            write_json(BUILD_DIR / "script.json", script)
+            return script
+
+        feedback = problems
+        if attempt > max_regen:
+            raise PipelineAbort(
+                f"Script failed verification {attempt} times — publishing nothing. "
+                f"First problem: {problems[0][:200]}")
+
+    raise PipelineAbort("Unreachable: script loop exited without a result")
+
+
+def run(args: argparse.Namespace) -> int:
+    stage = "startup"
+    try:
+        # ── data ──
+        stage = "fetch"
+        if args.dry_run:
+            log.info("DRY RUN — using synthetic data, no live API calls")
+            snapshot = _dry_snapshot()
+        else:
+            snapshot = fetch.collect()
+        write_json(BUILD_DIR / "snapshot.json",
+                   {k: v for k, v in snapshot.items() if k != "candles"})
+
+        # ── scoreboard: grade what is due, then log today ──
+        stage = "scoreboard"
+        log.info("Updating scoreboard...")
+        if not args.dry_run:
+            scoreboard.resolve_due()
+            scoreboard.record(snapshot)
+        score = scoreboard.summary()
+        log.info(f"  Record: {score.get('hits', 0)}W/{score.get('misses', 0)}L "
+                 f"over {score.get('resolved_calls', 0)} graded calls")
+
+        # ── script ──
+        stage = "script"
+        script = _dry_script() if args.dry_run else build_script(snapshot, score)
+
+        # ── voice ──
+        stage = "voice"
+        log.info("Synthesising narration...")
+        sentences = voice_mod.sentences_from_script(
+            script, config()["disclaimer"]["narration"])
+        narration = voice_mod.synthesize(sentences, silent=args.no_voice or args.dry_run)
+
+        # ── render ──
+        stage = "render"
+        video = render_mod.render(snapshot, script, score, narration)
+        duration = render_mod.duration_of(video)
+        if duration:
+            log.info(f"  Duration: {duration:.1f}s")
+            if duration > config()["video"]["max_seconds"]:
+                log.warning(f"  Over the {config()['video']['max_seconds']}s Shorts "
+                            f"limit — it will publish as a regular video")
+
+        stage = "thumbnail"
+        thumb = thumb_mod.build(snapshot, score)
+
+        # ── publish ──
+        stage = "upload"
+        if args.no_upload or args.dry_run:
+            reason = "--dry-run" if args.dry_run else "--no-upload"
+            log.info(f"Skipping upload ({reason}). Video at {video}")
+            _record_run("rendered", stage, f"Built locally, not uploaded ({reason}).",
+                        {"video": str(video), "duration_s": round(duration or 0, 1)})
+            if not args.dry_run:
+                notify.rendered_only(snapshot, script, str(video), reason)
+            return 0
+
+        try:
+            import upload as upload_mod
+            _vid, url = upload_mod.upload(video, thumb, script, snapshot, score)
+        except PipelineAbort as e:
+            # The video is good; only delivery failed. Keep it as an artifact
+            # so the day can still be published by hand.
+            log.error(f"Upload failed: {e}")
+            _record_run("rendered", "upload", str(e), {"video": str(video)})
+            notify.rendered_only(snapshot, script, str(video), str(e))
+            return 0
+
+        visibility = config()["upload"]["visibility"]
+        _record_run("published", "upload", script["title"],
+                    {"url": url, "visibility": visibility,
+                     "signal": snapshot["signal"],
+                     "duration_s": round(duration or 0, 1)})
+        notify.success(snapshot, score, script, url, visibility)
+        log.info(f"Done: {url}")
+        return 0
+
+    except PipelineAbort as e:
+        log.error(f"Aborted at '{stage}': {e}")
+        _record_run("skipped", stage, str(e))
+        notify.skipped(str(e), stage)
+        return 0                      # a deliberate skip is not a build failure
+
+    except Exception as e:                                       # noqa: BLE001
+        detail = f"{type(e).__name__}: {e}"
+        log.error(f"Crashed at '{stage}': {detail}")
+        traceback.print_exc()
+        _record_run("crashed", stage, detail)
+        notify.crashed(f"{detail}\n\n{traceback.format_exc()[-600:]}", stage)
+        return 1
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(description="QuantAura daily channel pipeline")
+    p.add_argument("--no-upload", action="store_true",
+                   help="build the video but do not publish it")
+    p.add_argument("--no-voice", action="store_true",
+                   help="use silent placeholder audio (fast render iteration)")
+    p.add_argument("--dry-run", action="store_true",
+                   help="synthetic data, no API calls, no upload")
+    args = p.parse_args()
+
+    log.info("=" * 60)
+    log.info(f"QuantAura channel pipeline · {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC}")
+    log.info("=" * 60)
+    return run(args)
+
+
+if __name__ == "__main__":
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    raise SystemExit(main())

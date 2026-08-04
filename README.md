@@ -1,0 +1,151 @@
+# QuantAura Channel Pipeline
+
+Generates and publishes one YouTube Short per day from the QuantAura ensemble's
+live Bitcoin call, plus the model's own public accuracy record.
+
+Runs unattended on GitHub Actions. Total running cost: **$0/month** — free API
+tiers, an open-source voice model, and a renderer that draws real charts instead
+of generating them.
+
+```
+fetch → grade past calls → write script → fact-check → voice → render → upload → notify
+```
+
+## Why it is built this way
+
+| Decision | Reason |
+|---|---|
+| Charts drawn with matplotlib, not a video model | The content *is* the numbers. A generative model cannot be trusted to render a price or a percentage correctly. |
+| Kokoro-82M for voice | No quota, no per-character cost, Apache-2.0 — the only TTS that stays free at one video a day forever. |
+| Two LLM providers | Free tiers hit quota walls. A provider outage must not cost a day. |
+| Fact-check before publish | Nothing unattended should be able to state a number it cannot source. |
+| Skip the day on doubt | A missing video is invisible. A wrong one is permanent. |
+| Scoreboard in git | Calls are written down before outcomes are knowable, and never edited. |
+
+## Local setup
+
+```bash
+pip install -r channel/requirements.txt
+```
+
+ffmpeg must be on PATH:
+
+```bash
+winget install Gyan.FFmpeg
+```
+
+Check the plumbing end to end without touching a live API or spending a token:
+
+```bash
+python channel/pipeline.py --dry-run
+```
+
+That writes `channel/build/video.mp4`. Watch it — this is the template every
+future video inherits.
+
+Then a real build with live data, no upload:
+
+```bash
+python channel/pipeline.py --no-upload
+```
+
+### Flags
+
+| Flag | Effect |
+|---|---|
+| `--dry-run` | Synthetic data, no API calls, no LLM, silent audio, no upload |
+| `--no-voice` | Silent placeholder audio — fast iteration on the visual template |
+| `--no-upload` | Build everything from live data, publish nothing |
+
+## Secrets
+
+All secrets come from environment variables. Nothing is ever committed.
+Locally, export them or use a `.env`-style shell; in CI they are repository
+secrets (Settings → Secrets and variables → Actions).
+
+| Secret | Needed for | How to get it |
+|---|---|---|
+| `QA_EMAIL`, `QA_PASSWORD` | Full model output | Register an account on quantaura.tech, then grant it premium from the admin panel. Free-tier callers do not receive confidence or per-model votes. |
+| `GEMINI_API_KEY` | Script writing | [aistudio.google.com](https://aistudio.google.com) → Get API key. Free tier. |
+| `GROQ_API_KEY` | Script fallback | [console.groq.com](https://console.groq.com) → API keys. Free tier. |
+| `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` | Upload | See below |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Notifications | `@BotFather` → `/newbot`; get the chat id from `@userinfobot` |
+
+Only the Gemini key is needed to try the pipeline. Everything else degrades
+gracefully or is upload-only.
+
+### YouTube credentials (one-time)
+
+1. [Google Cloud Console](https://console.cloud.google.com) → new project.
+2. APIs & Services → Library → enable **YouTube Data API v3**.
+3. OAuth consent screen → External → add your own Google account as a test user.
+4. Credentials → Create credentials → OAuth client ID → **Desktop app** →
+   download `client_secret.json`.
+5. Mint the refresh token on your own machine:
+
+```bash
+python channel/get_youtube_token.py client_secret.json
+```
+
+It prints the three secrets to paste into GitHub. Treat the refresh token like
+a password.
+
+> **Uploads start private.** An unaudited YouTube API project has its uploads
+> locked to private by Google regardless of what the pipeline requests. That is
+> deliberate here too — `config.yaml` sets `upload.visibility: private` so the
+> supervised rollout and the platform's own restriction line up. Flip it to
+> `public` only after the API audit is approved **and** 14 consecutive clean days.
+
+## YouTube Studio settings (one-time)
+
+- Settings → Channel → Advanced → set the channel default for **altered or
+  synthetic content** disclosure. Every description also states it, but the
+  channel-level flag is the one YouTube's policy checks.
+- Upload defaults → category, language, and a base description.
+
+## Files
+
+| File | Job |
+|---|---|
+| `pipeline.py` | Orchestrator. Owns the failure policy. |
+| `fetch.py` | ml-api call, Binance klines, Fear & Greed |
+| `scoreboard.py` | Append-only prediction log, grading, running accuracy |
+| `scriptwriter.py` | Facts → narration JSON, schema-validated |
+| `factcheck.py` | Banned phrases, numeric grounding, adversarial LLM review |
+| `llm.py` | Gemini → Groq fallback, defensive JSON parsing |
+| `voice.py` | Kokoro TTS with per-sentence timings |
+| `render.py` | Scene drawing, captions, ffmpeg assembly |
+| `thumbnail.py` | Pillow text over an optional AI background |
+| `upload.py` | YouTube Data API v3 |
+| `notify.py` | Telegram operator messages |
+| `state/` | The scoreboard. Committed after every run. |
+
+## The scoring rule
+
+A call is graded on the realised price move over the model's forecast horizon
+(24h by default):
+
+- **BUY** is right if the move is above `+flat_band_pct`
+- **SELL** is right if the move is below `-flat_band_pct`
+- **HOLD** is right if the move stays inside the band
+
+This is deliberately *not* the model's training label (a trend-regime label
+built from an EMA spread). A viewer can verify a price move on any chart; they
+cannot verify an EMA regime. Grading on something the audience can check is the
+entire point of the channel — so the simpler, harsher rule wins.
+
+Both numbers are in `config.yaml` under `scoring`, and both are stated on screen
+and in every description.
+
+## Failure policy
+
+| Failure | Behaviour |
+|---|---|
+| ml-api down, or serving a TA fallback | Skip the day, notify |
+| Gemini quota or outage | Automatic Groq fallback |
+| Script fails fact-check twice | Skip the day, notify |
+| Render or ffmpeg error | Skip the day, notify with the log excerpt |
+| Upload fails | Keep the mp4 as a CI artifact (7 days), notify for manual upload |
+| Actions outage | `workflow_dispatch` — trigger by hand from a phone |
+
+A skipped day still commits its graded outcomes and the run log.

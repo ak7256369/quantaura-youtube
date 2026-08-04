@@ -1,0 +1,17 @@
+# Channel pipeline dependencies. Deliberately small: everything here is either
+# free-tier API access or a local renderer — no paid services.
+requests>=2.31
+PyYAML>=6.0
+numpy>=1.24
+matplotlib>=3.7
+Pillow>=10.0
+
+# TTS. kokoro-onnx runs the 82M Kokoro model on CPU (Apache-2.0, no quota, no
+# per-character cost). soundfile writes the wav the renderer muxes in.
+kokoro-onnx>=0.4.0
+soundfile>=0.12
+
+# YouTube Data API v3 upload
+google-api-python-client>=2.100
+google-auth>=2.23
+google-auth-oauthlib>=1.1

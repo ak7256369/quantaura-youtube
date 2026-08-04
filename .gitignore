@@ -1,0 +1,11 @@
+# Kokoro weights (~350MB) — downloaded on demand, cached by CI, never committed.
+models/
+
+# Per-run render artifacts. The mp4 is a build output; the scoreboard in
+# state/ is the thing worth keeping.
+build/
+
+# Local secrets. CI uses repository secrets; nothing here is ever committed.
+.env
+client_secret*.json
+token.json
