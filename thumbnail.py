@@ -75,8 +75,10 @@ def build(snapshot: dict, score: dict, out_name: str = "thumbnail.jpg") -> Path:
     sig = snapshot["signal"]
     sig_color = {"BUY": _hex(t["up"]), "SELL": _hex(t["down"])}.get(sig, _hex(t["flat"]))
 
+    # Brand left, date right, nothing between them. A centre label here
+    # collided with the brand word at its real rendered width — the same
+    # mistake the video header had.
     d.text((64, 52), "QUANTAURA", font=_font(38, True), fill=_hex(t["accent"]))
-    d.text((300, 56), "MODEL SCOREBOARD", font=_font(32), fill=_hex(t["muted"]))
     d.text((TW - 64, 56), snapshot["date"], font=_font(32), fill=_hex(t["muted"]), anchor="ra")
 
     d.text((64, 150), "TODAY'S CALL", font=_font(34), fill=_hex(t["muted"]))
