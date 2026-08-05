@@ -1,0 +1,1 @@
+{"at": "2026-08-05T15:05:37+00:00", "date": "2026-08-05", "status": "skipped", "stage": "fetch", "detail": "The signals API returned a free-tier response (no confidence or per-model votes). Set QA_EMAIL/QA_PASSWORD to a premium account."}
