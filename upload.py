@@ -19,7 +19,10 @@ from pathlib import Path
 
 from common import PipelineAbort, config, env, log
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.readonly",
+]
 WATCH_URL = "https://www.youtube.com/watch?v={vid}"
 
 
@@ -97,6 +100,17 @@ def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
             "embeddable": True,
         },
     }
+
+    # Log the destination on every run. If a token is ever re-minted against
+    # the wrong channel, this line is where it shows up — before the video
+    # does, and in a log that is kept.
+    try:
+        items = service.channels().list(part="snippet", mine=True).execute().get("items", [])
+        if items:
+            log.info(f"  Channel: {items[0]['snippet'].get('title')} "
+                     f"({items[0]['snippet'].get('customUrl') or items[0].get('id')})")
+    except Exception as e:                                       # noqa: BLE001
+        log.warning(f"  Could not read the bound channel ({e}) — continuing")
 
     log.info(f"Uploading to YouTube ({cfg['visibility']})...")
     media = MediaFileUpload(str(video), chunksize=4 << 20, resumable=True,
