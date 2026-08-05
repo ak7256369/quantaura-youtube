@@ -8,10 +8,14 @@ autonomous.
 Two policy points are enforced in code rather than left to the operator:
   * `selfDeclaredMadeForKids` is set explicitly (YouTube rejects uploads that
     leave it unset on some channels).
-  * The synthetic-content disclosure is written into the description on every
-    upload. The API's altered-content flag is set at the channel level in
-    Studio, which the README covers; the description line is the part this
-    pipeline can guarantee.
+  * `containsSyntheticMedia` carries the altered/synthetic-content disclosure,
+    so it is never a per-video click in Studio. Note the field means
+    *realistic* synthetic content — a real person appearing to say something
+    they did not, altered footage of a real event, a realistic scene that never
+    happened. A drawn chart narrated by a generic synthetic voice does not meet
+    that bar, so `upload.contains_synthetic_media` is a judgement call rather
+    than an obligation; it ships as true because a channel whose whole premise
+    is disclosure should over-disclose rather than under-disclose.
 """
 from __future__ import annotations
 
@@ -96,6 +100,7 @@ def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
         "status": {
             "privacyStatus": cfg["visibility"],
             "selfDeclaredMadeForKids": bool(cfg["made_for_kids"]),
+            "containsSyntheticMedia": bool(cfg["contains_synthetic_media"]),
             "license": "youtube",
             "embeddable": True,
         },

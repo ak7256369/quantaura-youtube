@@ -152,8 +152,16 @@ upload:
   visibility: "private"
   category_id: "25"          # News & Politics — the closest fit YouTube offers
   made_for_kids: false
-  # YouTube policy: synthetic/altered content must be disclosed. The pipeline
-  # sets this on every upload as well as in the description.
+  # Sent as status.containsSyntheticMedia on every upload, so the "AI use"
+  # question is never a manual click in Studio.
+  #
+  # YouTube's bar for this flag is *realistic* altered/synthetic content: a
+  # real person appearing to say something they did not, altered footage of a
+  # real event, a realistic scene that never occurred. A drawn chart narrated
+  # by a generic synthetic voice meets none of those, and AI writing assistance
+  # is explicitly excluded — so strictly this could be false. It ships true
+  # because a channel whose premise is disclosure should err toward disclosing.
+  # Set false for the strict reading; nothing else changes.
   contains_synthetic_media: true
   base_tags:
     - "bitcoin"
