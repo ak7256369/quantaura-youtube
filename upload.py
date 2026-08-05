@@ -80,9 +80,17 @@ def build_description(script: dict, snapshot: dict, score: dict) -> str:
     return "\n".join(parts)[:4900]
 
 
-def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
-           score: dict) -> tuple[str, str]:
-    """Returns (video_id, watch_url). Raises PipelineAbort on failure."""
+def publish(video: Path, thumb: Path | None, *, title: str, description: str,
+            tags: list[str]) -> tuple[str, str]:
+    """Upload one video with the channel's standard status flags.
+
+    The single place a video leaves this pipeline: the daily upload and any
+    one-off (intro videos, weekly recaps) all pass through here, so the
+    disclosure flags, kids declaration, and destination-channel logging can
+    never diverge between video types.
+
+    Returns (video_id, watch_url). Raises PipelineAbort on failure.
+    """
     cfg = config()["upload"]
     service = _service()
 
@@ -90,9 +98,9 @@ def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
 
     body = {
         "snippet": {
-            "title": script["title"][:95],
-            "description": build_description(script, snapshot, score),
-            "tags": script["tags"],
+            "title": title[:95],
+            "description": description[:4900],
+            "tags": tags,
             "categoryId": str(cfg["category_id"]),
             "defaultLanguage": "en",
             "defaultAudioLanguage": "en",
@@ -147,3 +155,13 @@ def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
             log.warning(f"  Thumbnail not set ({e}) — video is live regardless")
 
     return vid, url
+
+
+def upload(video: Path, thumb: Path | None, script: dict, snapshot: dict,
+           score: dict) -> tuple[str, str]:
+    """Daily-video entry point: builds the metadata from the day's script and
+    snapshot, then hands off to publish()."""
+    return publish(video, thumb,
+                   title=script["title"],
+                   description=build_description(script, snapshot, score),
+                   tags=script["tags"])

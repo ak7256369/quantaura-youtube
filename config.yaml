@@ -35,6 +35,10 @@ scoring:
   horizon_hours: 24
   # |24h change| below this counts as a flat market: HOLD is right, BUY/SELL wrong.
   flat_band_pct: 1.0
+  # A daily cron records each call minutes after it starts, so yesterday's call
+  # comes due minutes after today's run begins. If a call is due within this
+  # window, the run waits for it instead of letting grading slip a whole day.
+  wait_for_due_minutes: 20
 
 script:
   # Free-tier LLMs. Primary first; the pipeline falls through the list on

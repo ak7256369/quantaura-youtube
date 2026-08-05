@@ -117,9 +117,32 @@ def _grade(signal: str, change_pct: float, band: float) -> bool:
 
 
 def resolve_due() -> int:
-    """Grade every call whose horizon has elapsed. Returns how many were graded."""
+    """Grade every call whose horizon has elapsed. Returns how many were graded.
+
+    If a call comes due within the next few minutes, wait for it. This is not a
+    nicety: the daily cron fires at 13:00 and records its call a few minutes
+    later, so yesterday's call is due minutes AFTER today's run starts — a
+    fixed cadence is structurally always just short. Without the wait, every
+    call's grading would slip a full extra day (or worse, come and go with
+    cron jitter). The price is a few idle runner-minutes; the horizon stays
+    exactly 24h because grading prices at the historical due-minute candle.
+    """
     rows = _load()
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+
+    wait_cap_ms = int(config()["scoring"].get("wait_for_due_minutes", 20)) * 60_000
+    pending_due = [r["made_at_ms"] + r.get("horizon_hours", 24) * 3600_000
+                   for r in rows if not r.get("resolved")]
+    soon = [d for d in pending_due if 0 < d - now_ms <= wait_cap_ms]
+    if soon:
+        # +90s so the 1-minute candle covering the due instant has closed.
+        wait_s = (min(soon) - now_ms) / 1000 + 90
+        log.info(f"  Next call due in {wait_s / 60:.1f} min — waiting to grade it "
+                 f"at its exact 24h mark")
+        import time
+        time.sleep(wait_s)
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+
     graded = 0
 
     for r in rows:

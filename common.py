@@ -35,6 +35,14 @@ def get_logger(name: str) -> logging.Logger:
     if log.handlers:
         return log
     log.setLevel(logging.INFO)
+    # Windows consoles often run cp1252, which cannot encode the arrows and
+    # dashes these logs use. Without this, every such line raises a noisy
+    # "--- Logging error ---" traceback from inside the logging module itself.
+    # CI runners are UTF-8 and unaffected.
+    try:
+        sys.stdout.reconfigure(errors="replace")
+    except Exception:                                            # noqa: BLE001
+        pass
     h = logging.StreamHandler(sys.stdout)
     h.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s",
                                      datefmt="%H:%M:%S"))
