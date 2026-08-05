@@ -1,32 +1,41 @@
 {
-  "updated_at": "2026-08-05T17:52:11+00:00",
-  "total_calls": 1,
-  "resolved_calls": 0,
-  "pending_calls": 1,
-  "hits": 0,
-  "misses": 0,
-  "accuracy_pct": null,
+  "updated_at": "2026-08-05T18:54:53+00:00",
+  "total_calls": 2,
+  "resolved_calls": 2,
+  "pending_calls": 0,
+  "hits": 1,
+  "misses": 1,
+  "accuracy_pct": 50.0,
   "accuracy_30d_pct": null,
   "resolved_30d": 0,
   "streak": {
-    "kind": null,
-    "length": 0
+    "kind": "miss",
+    "length": 1
   },
   "by_signal": {
     "BUY": {
-      "n": 0,
-      "accuracy_pct": null
+      "n": 1,
+      "accuracy_pct": 0.0
     },
     "HOLD": {
-      "n": 0,
-      "accuracy_pct": null
+      "n": 1,
+      "accuracy_pct": 100.0
     },
     "SELL": {
       "n": 0,
       "accuracy_pct": null
     }
   },
-  "last_resolved": null,
+  "last_resolved": {
+    "date": "2026-08-06",
+    "made_at_ms": 2,
+    "symbol": "BTCUSDT",
+    "signal": "BUY",
+    "resolved": true,
+    "correct": false,
+    "change_pct": -2.0,
+    "price": 100
+  },
   "flat_band_pct": 1.0,
   "horizon_hours": 24
 }

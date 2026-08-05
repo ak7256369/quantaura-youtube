@@ -16,7 +16,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from common import STATE_DIR, config, get_json, log, write_json
+from prices import price_at as _price_at
+from common import STATE_DIR, config, log, write_json
 
 LOG_PATH = STATE_DIR / "predictions.jsonl"
 SUMMARY_PATH = STATE_DIR / "scoreboard.json"
@@ -105,19 +106,6 @@ def record(snapshot: dict) -> None:
 
 
 # ── Grading ───────────────────────────────────────────────────────────────────
-
-def _price_at(symbol: str, ms: int) -> float | None:
-    """Close of the 1-minute candle covering `ms`."""
-    res = get_json(config()["market"]["klines_url"],
-                   params={"symbol": symbol, "interval": "1m", "startTime": ms, "limit": 1},
-                   retries=2, label="binance/price_at")
-    if not res.ok or not res.data:
-        return None
-    try:
-        return float(res.data[0][4])
-    except Exception:                                            # noqa: BLE001
-        return None
-
 
 def _grade(signal: str, change_pct: float, band: float) -> bool:
     """BUY wants a rise beyond the flat band, SELL a fall, HOLD neither."""

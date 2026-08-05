@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+import prices
 from common import (PipelineAbort, config, env, fmt_price, get_json, log,
                     post_json)
 
@@ -84,17 +85,6 @@ def _stats() -> dict:
     return (res.data or {}).get("data") or {}
 
 
-def klines(symbol: str, interval: str, limit: int) -> list[list]:
-    """Raw Binance klines: [open_time, o, h, l, c, v, close_time, ...]."""
-    m = config()["market"]
-    res = get_json(m["klines_url"],
-                   params={"symbol": symbol, "interval": interval, "limit": limit},
-                   label="binance/klines")
-    if not res.ok or not isinstance(res.data, list):
-        raise PipelineAbort(f"Could not fetch price history: {res.error}")
-    return res.data
-
-
 def _fear_greed() -> dict | None:
     res = get_json(config()["market"]["fear_greed_url"], retries=1, label="fear&greed")
     if not res.ok:
@@ -118,8 +108,8 @@ def collect() -> dict:
 
     # 7 days of hourly candles for the chart.
     days = cfg["market"]["chart_days"]
-    candles = klines(symbol, cfg["market"]["chart_interval"], days * 24)
-    closes = [float(c[4]) for c in candles]
+    rows = prices.candles(symbol, cfg["market"]["chart_interval"], days * 24)
+    closes = [c[4] for c in rows]
     price = float(sig.get("price") or closes[-1])
 
     def pct_from(hours_ago: int) -> float | None:
@@ -153,8 +143,7 @@ def collect() -> dict:
         "price_str": fmt_price(price),
         "change_24h_pct": pct_from(24),
         "change_7d_pct": pct_from(days * 24 - 1),
-        "candles": [[int(c[0]), float(c[1]), float(c[2]), float(c[3]), float(c[4])]
-                    for c in candles],
+        "candles": rows,
         "indicators": sig.get("indicators") or {},
         "fear_greed": _fear_greed(),
 
