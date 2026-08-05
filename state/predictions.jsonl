@@ -1,1 +1,1 @@
-{"date": "2026-08-05", "made_at": "2026-08-05T19:05:17+00:00", "made_at_ms": 1785956717000, "symbol": "BTCUSDT", "signal": "HOLD", "signal_raw": "HOLD", "gated": false, "confidence": 50.3, "price": 64906.47, "horizon_hours": 24, "flat_band_pct": 1.0, "resolved": false}
+{"date": "2026-08-05", "made_at": "2026-08-05T19:21:05+00:00", "made_at_ms": 1785957665000, "symbol": "BTCUSDT", "signal": "HOLD", "signal_raw": "HOLD", "gated": false, "confidence": 50.3, "price": 64868.01, "horizon_hours": 24, "flat_band_pct": 1.0, "resolved": false}
