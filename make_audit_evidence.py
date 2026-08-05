@@ -87,10 +87,25 @@ def code_block(d, y: int, lines: list[str], size: int = 15,
     ty = y + pad
     for ln in lines:
         hit = any(h in ln for h in highlight)
-        d.text((M + pad, ty), ln[:96], font=fb if hit else f,
+        d.text((M + pad, ty), ln, font=fb if hit else f,
                fill=GREEN if hit else INK)
         ty += lh
     return y + box_h + 26
+
+
+def wrap_mono(lines: list[str], width: int = 92) -> list[str]:
+    """Fold over-long log lines instead of clipping them — a silently truncated
+    line in an audit exhibit is a misrepresentation, however small."""
+    out: list[str] = []
+    for ln in lines:
+        while len(ln) > width:
+            cut = ln.rfind(" ", 0, width)
+            if cut < width // 2:
+                cut = width
+            out.append(ln[:cut])
+            ln = "    " + ln[cut:].lstrip()
+        out.append(ln)
+    return out
 
 
 def label(d, y: int, text: str) -> int:
@@ -226,19 +241,19 @@ def p3():
             "re-run this script."
         )
     raw = [ln.rstrip() for ln in log_path.read_text(encoding="utf-8",
-                                                   errors="replace").splitlines()]
-    # Strip the logger's timestamp/level prefix so the page stays legible.
+                                                    errors="replace").splitlines()]
+    # Keep only this program's own log lines, stripped of their timestamp and
+    # level prefix. Runner infrastructure noise is not evidence.
     cleaned = []
     for ln in raw:
-        if "] channel: " in ln:
-            ln = ln.split("] channel: ", 1)[1]
-        elif "channel: " in ln and ln[:2].isdigit():
-            ln = ln.split("channel: ", 1)[1]
-        cleaned.append(ln)
-    cleaned = [ln for ln in cleaned if ln.strip()][:24]
+        if "] channel: " not in ln:
+            continue
+        body = ln.split("] channel: ", 1)[1]
+        if body.strip():
+            cleaned.append(body)
 
     y = label(d, y, "Runner output — captured from a live production run")
-    y = code_block(d, y, cleaned,
+    y = code_block(d, y, wrap_mono(cleaned),
                    highlight=("Channel:", "Uploading to YouTube", "Uploaded:"))
 
     y += 4
@@ -308,9 +323,10 @@ def p5():
     img, d = page()
     y = header(d, "5 · Uploaded artifact", 5)
     y = para(d, y,
-             "The video and thumbnail produced by the run on page 3, exactly as uploaded. "
-             "All figures on screen are drawn from live market data; no part of the frame is "
-             "generatively produced.")
+             "A video and thumbnail produced by the pipeline, in the form they are uploaded. "
+             "This is a different day's run from the log on page 3; every day's output has "
+             "the same structure and differs only in its figures. All values on screen are "
+             "drawn from live market data, and no part of the frame is generatively produced.")
     y += 24
 
     frame = BASE / "build" / "evidence_frame.png"
