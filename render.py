@@ -93,6 +93,25 @@ def _signal_color(signal: str) -> str:
     return {"BUY": t["up"], "SELL": t["down"]}.get(signal, t["flat"])
 
 
+def _fit_text(fig, ax, y: float, s: str, size: int, max_w: float = W - 140, **kw):
+    """Centred text, shrunk until its MEASURED width fits.
+
+    Wrapping by character count cannot do this job: DejaVu glyph widths vary
+    enough that "Unanimous Buy Signal" passed a 22-char wrap and still clipped
+    its first and last letters at 64pt. The canvas draws at 100 dpi, so display
+    pixels and canvas coordinates coincide and the extent is directly usable.
+    """
+    txt = _text(ax, W / 2, y, s, size=size, ha="center", **kw)
+    renderer = fig.canvas.get_renderer()
+    while size > 30:
+        w = txt.get_window_extent(renderer=renderer).width
+        if w <= max_w:
+            break
+        size = int(size * max_w / w) - 1
+        txt.set_fontsize(size)
+    return txt
+
+
 def _wrap(s: str, width: int) -> list[str]:
     words, lines, cur = s.split(), [], ""
     for w_ in words:
@@ -144,7 +163,7 @@ def scene_hook(snapshot: dict, script: dict, path: Path) -> Path:
 
     headline = script["overlays"].get("hook") or script["title"]
     for i, line in enumerate(_wrap(headline, 22)[:3]):
-        _text(ax, W / 2, 990 + i * 84, line, size=64, weight="bold", ha="center")
+        _fit_text(fig, ax, 990 + i * 84, line, 64, weight="bold")
 
     _panel(ax, 64, 1210, W - 128, 190)
     _text(ax, 110, 1272, "PRICE", size=30, color=t["muted"])

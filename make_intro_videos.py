@@ -38,22 +38,8 @@ import voice as V                                                  # noqa: E402
 # ── Scene painters (reuse the daily renderer's canvas + theme) ────────────────
 
 def _fit(fig, ax, y: float, s: str, size: int, **kw) -> None:
-    """Draw centred text, then measure and shrink until it actually fits.
-
-    Estimating DejaVu's width by character count is how the first render
-    clipped "CALLS BITCOIN" off both edges — measure the real extent instead.
-    """
-    txt = R._text(ax, R.W / 2, y, s, size=size, ha="center", **kw)
-    renderer = fig.canvas.get_renderer()
-    max_w = R.W - 140
-    while size > 40:
-        # Extent is in display units; the canvas is drawn at 100 dpi so display
-        # pixels and our coordinate pixels coincide.
-        w = txt.get_window_extent(renderer=renderer).width
-        if w <= max_w:
-            break
-        size = int(size * max_w / w) - 1
-        txt.set_fontsize(size)
+    """Measured text fitting — shared with the daily renderer."""
+    R._fit_text(fig, ax, y, s, size, **kw)
 
 
 def title_card(label: str, big: str, sub: str, path: Path) -> Path:
