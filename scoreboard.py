@@ -25,19 +25,38 @@ SUMMARY_PATH = STATE_DIR / "scoreboard.json"
 # ── Log I/O ───────────────────────────────────────────────────────────────────
 
 def _load() -> list[dict]:
+    """Parse the log, keeping exactly one row per date.
+
+    The de-duplication is not paranoia. `channel/state/.gitattributes` sets
+    these files to union-merge so concurrent CI and local appends cannot
+    conflict, and the cost of that is a row can legitimately appear twice.
+    Counting one call twice would corrupt the one number the channel exists to
+    report, so a resolved row always wins over an unresolved one for the same
+    date, and the later write wins between equals.
+    """
     if not LOG_PATH.exists():
         return []
-    rows = []
+
+    import json
+    by_date: dict[str, dict] = {}
     for line in LOG_PATH.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line:
             continue
         try:
-            import json
-            rows.append(json.loads(line))
+            row = json.loads(line)
         except Exception:                                        # noqa: BLE001
             log.warning(f"  Skipping malformed scoreboard row: {line[:80]}")
-    return rows
+            continue
+
+        key = row.get("date")
+        if key is None:
+            continue
+        prev = by_date.get(key)
+        if prev is None or (row.get("resolved") and not prev.get("resolved")):
+            by_date[key] = row
+
+    return sorted(by_date.values(), key=lambda r: r.get("made_at_ms", 0))
 
 
 def _save(rows: list[dict]) -> None:

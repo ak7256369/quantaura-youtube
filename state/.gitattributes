@@ -1,0 +1,10 @@
+# The scoreboard logs are append-only, and two writers touch them: the CI run
+# and any local run. Git's default merge treats concurrent appends as a
+# conflict, which in CI means the "Commit scoreboard" step's rebase retry can
+# never succeed on its own — a day's graded outcomes would sit unpushed until
+# someone resolved it by hand.
+#
+# union takes both sides' lines instead. Order is not meaningful in these files
+# (every row carries its own timestamp) and scoreboard.py de-duplicates by date
+# on load, so a row appearing twice cannot double-count in the accuracy stats.
+*.jsonl merge=union
