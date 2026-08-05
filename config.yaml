@@ -40,8 +40,20 @@ script:
   # Free-tier LLMs. Primary first; the pipeline falls through the list on
   # quota/error so a single provider outage never costs a day's video.
   providers:
+    # A floating alias leads deliberately. Google retires pinned ids out from
+    # under free keys — gemini-2.5-flash still appears in the models list but
+    # 404s for keys created after its cutoff, which is precisely the failure a
+    # daily unattended pipeline must not have. Behaviour drift is the lesser
+    # risk here because every output is schema-validated and fact-checked
+    # downstream regardless of which model produced it.
     - name: "gemini"
-      model: "gemini-2.5-flash"
+      model: "gemini-flash-latest"
+      endpoint: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+      api_key_env: "GEMINI_API_KEY"
+    # Pinned second: free-tier quota is metered per model, so a 429 on the
+    # alias does not imply a 429 here.
+    - name: "gemini"
+      model: "gemini-3.6-flash"
       endpoint: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
       api_key_env: "GEMINI_API_KEY"
     - name: "groq"

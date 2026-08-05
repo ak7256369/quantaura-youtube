@@ -1,6 +1,11 @@
 # Kokoro weights (~350MB) — downloaded on demand, cached by CI, never committed.
 models/
 
+# Local dev environment. CI builds its own from requirements.txt. Kept separate
+# from quantaura-ml/.venv so installing onnxruntime here cannot disturb the
+# environment the models are trained in.
+.venv/
+
 # Per-run render artifacts. The mp4 is a build output; the scoreboard in
 # state/ is the thing worth keeping.
 build/

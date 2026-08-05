@@ -19,10 +19,18 @@ Turn the JSON facts below into a tight ~70-second narration script plus metadata
 3. **Never predict a price.** No targets, no "will hit", no "heading to".
 4. **Never claim skill the scoreboard doesn't show.** If accuracy is near 50%, say so
    plainly. A losing streak is stated out loud, not softened.
-5. **No emojis, no hashtags, no ALL-CAPS shouting in the narration.** The narration is
-   read aloud by a text-to-speech voice, so write it to be *spoken*: short sentences,
-   no symbols, no markdown, no parentheses. Write "62 thousand dollars" style numbers
-   ONLY if the facts give that value — otherwise write the figure exactly as given.
+5. **Write for the ear, not the page.** A text-to-speech voice reads this aloud, so:
+   - No emojis, hashtags, markdown, parentheses or ALL-CAPS.
+   - No symbols where a word is meant: write `64,718 dollars`, not `$64,718`; write
+     `1.17 percent`, not `1.17%`. The digits themselves must still match FACTS exactly.
+   - Write model names as they are said out loud: `the L S T M`, `the transformer`,
+     `the gradient boosted model` (for xgboost), `the K A N`. Never write `lstm` or
+     `xgboost` in narration — a speech model mangles them.
+6. **Never state the same fact twice.** If a sentence has already given a number, later
+   sentences refer back to it in words, not by repeating it. "Zero resolved calls" and
+   "zero hits and zero misses" are the same fact written twice; pick one.
+7. **Every sentence must add something.** Cut any sentence that only rephrases its
+   neighbour. Fewer, denser sentences beat filler.
 6. **Say the word "model" often.** The subject is always the model's call, never
    "Bitcoin will do X".
 
@@ -36,8 +44,13 @@ narrator of a sports statistics segment. Short declarative sentences. No filler 
 
 Four spoken sections. Keep the total narration between 130 and 190 words.
 
-- `hook` (1 sentence): the most striking true fact of the day. Often the call itself,
-  or a surprising disagreement between models, or a losing streak.
+- `hook` (1 sentence): the most striking *specific* fact of the day — not a summary of
+  the video. Reach for whichever is true today: a split vote, a confidence gate firing,
+  an unusual probability skew, a losing or winning streak, a call that contradicts
+  yesterday's outcome.
+  - Weak: "The machine learning system sits at a deadlock today with a HOLD call."
+    (says nothing a viewer could not guess from the title)
+  - Strong: "Two of the four models wanted to buy this morning. They lost the vote."
 - `call` (2-3 sentences): what the model output today — the signal, its confidence, and
   the current price with its 24-hour move. If `gated` is true, explain that the model
   produced a directional call but confidence fell below the threshold, so it was

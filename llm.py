@@ -36,16 +36,17 @@ def _call_gemini(spec: dict, prompt: str, temperature: float) -> str:
         label="gemini",
     )
     if not res.ok:
-        raise LLMUnavailable(f"gemini: {res.error}")
+        raise LLMUnavailable(f"{spec['model']}: {res.error}")
     try:
         cands = res.data["candidates"]
         if not cands:
-            raise LLMUnavailable("gemini returned no candidates (likely a safety block)")
+            raise LLMUnavailable(
+                f"{spec['model']} returned no candidates (likely a safety block)")
         return "".join(p.get("text", "") for p in cands[0]["content"]["parts"])
     except LLMUnavailable:
         raise
     except Exception as e:                                       # noqa: BLE001
-        raise LLMUnavailable(f"gemini: unexpected response shape ({e})")
+        raise LLMUnavailable(f"{spec['model']}: unexpected response shape ({e})")
 
 
 def _call_groq(spec: dict, prompt: str, temperature: float) -> str:
