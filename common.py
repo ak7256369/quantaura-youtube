@@ -186,3 +186,39 @@ def fmt_pct(v: float, signed: bool = True) -> str:
 
 def prompt(name: str) -> str:
     return (PROMPTS_DIR / name).read_text(encoding="utf-8")
+
+
+# ── Run bookkeeping ───────────────────────────────────────────────────────────
+# Shared by the daily pipeline and the weekly recap: both append to the same
+# committed log so the channel's whole operational history reads in one place.
+
+RUNS_PATH = STATE_DIR / "runs.jsonl"
+
+
+def record_run(status: str, stage: str, detail: str, extra: dict | None = None,
+               kind: str = "daily") -> None:
+    from datetime import datetime, timezone
+    row = {
+        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "kind": kind,
+        "status": status,
+        "stage": stage,
+        "detail": detail[:400],
+        **(extra or {}),
+    }
+    RUNS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(RUNS_PATH, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    # GitHub renders this under the workflow run, so a failure is legible
+    # without opening logs.
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        icon = {"published": "✅", "rendered": "⚠️", "skipped": "🚫",
+                "crashed": "💥"}.get(status, "•")
+        with open(summary, "a", encoding="utf-8") as fh:
+            fh.write(f"### {icon} {status.title()} ({kind}) — {row['date']}\n\n"
+                     f"**Stage:** {stage}\n\n{detail[:600]}\n\n")
+            for k, v in (extra or {}).items():
+                fh.write(f"- **{k}**: {v}\n")

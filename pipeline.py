@@ -13,8 +13,6 @@ a wrong number in it is permanent.
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import sys
 import traceback
 from datetime import datetime, timezone
@@ -28,36 +26,8 @@ import scoreboard
 import scriptwriter
 import thumbnail as thumb_mod
 import voice as voice_mod
-from common import BUILD_DIR, STATE_DIR, PipelineAbort, config, log, write_json
-
-RUNS_PATH = STATE_DIR / "runs.jsonl"
-
-
-# ── Run bookkeeping ───────────────────────────────────────────────────────────
-
-def _record_run(status: str, stage: str, detail: str, extra: dict | None = None) -> None:
-    row = {
-        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "status": status,
-        "stage": stage,
-        "detail": detail[:400],
-        **(extra or {}),
-    }
-    RUNS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(RUNS_PATH, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-
-    # GitHub renders this under the workflow run, so a failure is legible
-    # without opening logs.
-    summary = os.environ.get("GITHUB_STEP_SUMMARY")
-    if summary:
-        icon = {"published": "✅", "rendered": "⚠️", "skipped": "🚫", "crashed": "💥"}.get(status, "•")
-        with open(summary, "a", encoding="utf-8") as fh:
-            fh.write(f"### {icon} {status.title()} — {row['date']}\n\n"
-                     f"**Stage:** {stage}\n\n{detail[:600]}\n\n")
-            for k, v in (extra or {}).items():
-                fh.write(f"- **{k}**: {v}\n")
+from common import (BUILD_DIR, PipelineAbort, config, log,
+                    record_run as _record_run, write_json)
 
 
 def _dry_snapshot() -> dict:

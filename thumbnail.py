@@ -122,3 +122,54 @@ def build(snapshot: dict, score: dict, out_name: str = "thumbnail.jpg") -> Path:
     img.save(out, "JPEG", quality=90)
     log.info(f"  Thumbnail: {out.name}")
     return out
+
+
+def build_weekly(facts: dict, out_name: str = "weekly_thumbnail.jpg") -> Path:
+    """Thumbnail for the Sunday recap — the one video type where a custom
+    thumbnail is actually shown, so it leads with the week's record."""
+    t = config()["theme"]
+    img = _background()
+    d = ImageDraw.Draw(img)
+
+    d.text((64, 52), "QUANTAURA", font=_font(38, True), fill=_hex(t["accent"]))
+    d.text((TW - 64, 56), f"WEEK {facts['week_number']}", font=_font(32),
+           fill=_hex(t["muted"]), anchor="ra")
+
+    hits, res = facts["week_hits"], facts["week_resolved"]
+    acc = facts.get("week_accuracy_pct")
+    good = acc is not None and acc >= 50
+    d.text((64, 140), "THIS WEEK", font=_font(34), fill=_hex(t["muted"]))
+    d.text((58, 180), f"{hits} OF {res}", font=_font(170, True),
+           fill=_hex(t["up"] if good else t["down"]))
+    d.text((64, 400), "CALLS CORRECT", font=_font(56, True), fill=_hex(t["text"]))
+
+    # The week's outcomes as oversized dots — legible at feed size, which is
+    # the entire job of a thumbnail.
+    x, y, dot, gap = 68, 520, 58, 18
+    for day in facts["days"]:
+        colour = _hex(t["up"] if day["correct"] else t["down"])
+        d.ellipse([x, y, x + dot, y + dot], fill=colour)
+        mark = "✓" if day["correct"] else "✗"
+        d.text((x + dot / 2, y + dot / 2), mark, font=_font(34, True),
+               fill=_hex(t["bg"]), anchor="mm")
+        x += dot + gap
+
+    alltime = facts.get("alltime_accuracy_pct")
+    if alltime is not None:
+        bx, by, bw, bh = TW - 420, 190, 356, 260
+        d.rounded_rectangle([bx, by, bx + bw, by + bh], radius=26, fill=_hex(t["panel"]))
+        d.text((bx + bw / 2, by + 40), "ALL-TIME", font=_font(30),
+               fill=_hex(t["muted"]), anchor="ma")
+        d.text((bx + bw / 2, by + 86), f"{alltime:.0f}%", font=_font(110, True),
+               fill=_hex(t["up"] if alltime >= 50 else t["down"]), anchor="ma")
+        d.text((bx + bw / 2, by + 212),
+               f"{facts.get('alltime_resolved', 0)} graded calls",
+               font=_font(28), fill=_hex(t["text"]), anchor="ma")
+
+    d.text((64, TH - 62), "Automated research project · not financial advice",
+           font=_font(28), fill=_hex(t["muted"]))
+
+    out = BUILD_DIR / out_name
+    img.save(out, "JPEG", quality=90)
+    log.info(f"  Weekly thumbnail: {out.name}")
+    return out

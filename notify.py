@@ -56,6 +56,21 @@ def success(snapshot: dict, score: dict, script: dict, video_url: str | None,
     _send("\n".join(lines))
 
 
+def weekly_published(title: str, url: str, facts: dict, visibility: str) -> None:
+    _send("\n".join([
+        "<b>📅 Weekly recap published</b>",
+        f"<b>{_esc(title)}</b>",
+        "",
+        f"Week: {_esc(facts.get('week_hits'))}/{_esc(facts.get('week_resolved'))} correct",
+        f"All-time: {_esc(facts.get('alltime_hits'))}/{_esc(facts.get('alltime_resolved'))} "
+        f"({_esc(facts.get('alltime_accuracy_pct'))}%)",
+        "",
+        f"🔗 {url}",
+        f"Visibility: <b>{_esc(visibility)}</b>"
+        + (" — review and set public" if visibility == "private" else ""),
+    ]))
+
+
 def rendered_only(snapshot: dict, script: dict, path: str, reason: str) -> None:
     _send("\n".join([
         "<b>⚠️ Video rendered but not uploaded</b>",

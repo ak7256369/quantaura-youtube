@@ -128,7 +128,9 @@ def validate(script: dict) -> dict:
 
 
 def all_sentences(script: dict) -> list[str]:
-    return [s for sec in SECTIONS for s in script["sections"][sec]]
+    # Iterates the script's own sections rather than the daily SECTIONS tuple:
+    # the fact-checker runs over weekly scripts too, whose sections differ.
+    return [s for sec in script["sections"].values() for s in sec]
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

@@ -61,13 +61,14 @@ def _theme() -> dict:
     return config()["theme"]
 
 
-def _canvas():
-    """A 1080x1920 figure addressed in pixel coordinates."""
+def _canvas(w: int = W, h: int = H):
+    """A figure addressed in pixel coordinates. Portrait (the daily Short) by
+    default; the weekly recap passes 1920x1080."""
     t = _theme()
-    fig = plt.figure(figsize=(W / 100, H / 100), dpi=100, facecolor=t["bg"])
+    fig = plt.figure(figsize=(w / 100, h / 100), dpi=100, facecolor=t["bg"])
     ax = fig.add_axes([0, 0, 1, 1])
-    ax.set_xlim(0, W)
-    ax.set_ylim(0, H)
+    ax.set_xlim(0, w)
+    ax.set_ylim(0, h)
     ax.invert_yaxis()                    # y grows downward, like a design tool
     ax.axis("off")
     ax.set_facecolor(t["bg"])
@@ -93,7 +94,8 @@ def _signal_color(signal: str) -> str:
     return {"BUY": t["up"], "SELL": t["down"]}.get(signal, t["flat"])
 
 
-def _fit_text(fig, ax, y: float, s: str, size: int, max_w: float = W - 140, **kw):
+def _fit_text(fig, ax, y: float, s: str, size: int, max_w: float = W - 140,
+              x: float = W / 2, **kw):
     """Centred text, shrunk until its MEASURED width fits.
 
     Wrapping by character count cannot do this job: DejaVu glyph widths vary
@@ -101,7 +103,7 @@ def _fit_text(fig, ax, y: float, s: str, size: int, max_w: float = W - 140, **kw
     its first and last letters at 64pt. The canvas draws at 100 dpi, so display
     pixels and canvas coordinates coincide and the extent is directly usable.
     """
-    txt = _text(ax, W / 2, y, s, size=size, ha="center", **kw)
+    txt = _text(ax, x, y, s, size=size, ha="center", **kw)
     renderer = fig.canvas.get_renderer()
     while size > 30:
         w = txt.get_window_extent(renderer=renderer).width
@@ -421,32 +423,38 @@ def _ass_time(sec: float) -> str:
     return f"{h}:{m:02d}:{s:05.2f}"
 
 
-def build_captions(narration: Narration, path: Path) -> Path:
+def build_captions(narration: Narration, path: Path, w: int = W, h: int = H,
+                   fontsize: int = 58, margin_v: int = 210,
+                   wrap_chars: int = 26) -> Path:
     """Burned-in captions. Shorts are largely watched muted, so these are not
-    an accessibility extra — without them the video does not communicate."""
+    an accessibility extra — without them the video does not communicate.
+
+    The landscape recap passes its own geometry: a 58pt caption 210px off the
+    bottom is right for a phone held vertically and wrong everywhere else.
+    """
     t = _theme()
 
     def ass_colour(hexstr: str) -> str:
-        h = hexstr.lstrip("#")
-        return f"&H00{h[4:6]}{h[2:4]}{h[0:2]}"                     # ASS is BGR
+        hx = hexstr.lstrip("#")
+        return f"&H00{hx[4:6]}{hx[2:4]}{hx[0:2]}"                  # ASS is BGR
 
     head = f"""[Script Info]
 ScriptType: v4.00+
-PlayResX: {W}
-PlayResY: {H}
+PlayResX: {w}
+PlayResY: {h}
 WrapStyle: 2
 ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,DejaVu Sans,58,{ass_colour(t['text'])},{ass_colour(t['text'])},&H00000000,&HB4000000,-1,0,0,0,100,100,0,0,3,14,0,2,70,70,210,1
+Style: Cap,DejaVu Sans,{fontsize},{ass_colour(t['text'])},{ass_colour(t['text'])},&H00000000,&HB4000000,-1,0,0,0,100,100,0,0,3,14,0,2,70,70,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
     for seg in narration.segments:
-        text = "\\N".join(_wrap(seg.text, 26)[:3])
+        text = "\\N".join(_wrap(seg.text, wrap_chars)[:3])
         lines.append(f"Dialogue: 0,{_ass_time(seg.start)},{_ass_time(seg.end)},"
                      f"Cap,,0,0,0,,{text}")
     path.write_text(head + "\n".join(lines) + "\n", encoding="utf-8")
@@ -455,7 +463,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 # ── Assembly ──────────────────────────────────────────────────────────────────
 
-def _still_clip(png: Path, duration: float, out: Path, drift: bool = True) -> Path:
+def _still_clip(png: Path, duration: float, out: Path, drift: bool = True,
+                w: int = W, h: int = H) -> Path:
     """A still image as a clip, with a slow drift so it does not read as a
     frozen slide.
 
@@ -471,25 +480,27 @@ def _still_clip(png: Path, duration: float, out: Path, drift: bool = True) -> Pa
         # min(...,1) keeps the window inside the frame if ffmpeg emits a final
         # timestamp fractionally past the requested duration.
         prog = f"min(t/{max(duration, 0.001):.3f},1)"
-        vf = (f"scale={W + px}:{H + px},"
-              f"crop={W}:{H}:x='(iw-ow)*{prog}':y='(ih-oh)*{prog}',"
+        vf = (f"scale={w + px}:{h + px},"
+              f"crop={w}:{h}:x='(iw-ow)*{prog}':y='(ih-oh)*{prog}',"
               f"fps={fps}")
     else:
-        vf = f"scale={W}:{H},fps={fps}"
+        vf = f"scale={w}:{h},fps={fps}"
     _run(["-loop", "1", "-i", str(png), "-t", f"{duration:.3f}", "-vf", vf, *_ENC, str(out)],
          f"still clip {png.name}")
     return out
 
 
-def _sequence_clip(pattern: str, out: Path) -> Path:
+def _sequence_clip(pattern: str, out: Path, w: int = W, h: int = H) -> Path:
     fps = config()["video"]["fps"]
-    _run(["-framerate", str(fps), "-i", pattern, "-vf", f"scale={W}:{H}", *_ENC, str(out)],
+    _run(["-framerate", str(fps), "-i", pattern, "-vf", f"scale={w}:{h}", *_ENC, str(out)],
          "chart reveal")
     return out
 
 
 def _concat(clips: list[Path], out: Path) -> Path:
-    listing = BUILD_DIR / "concat.txt"
+    # Listing file named after the output: two assemblies in one build dir
+    # (daily + weekly) must not clobber each other's manifest.
+    listing = out.with_suffix(".concat.txt")
     listing.write_text("\n".join(f"file '{c.as_posix()}'" for c in clips), encoding="utf-8")
     _run(["-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(out)], "concat")
     return out

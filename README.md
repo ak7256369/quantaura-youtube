@@ -1,7 +1,18 @@
 # QuantAura Channel Pipeline
 
-Generates and publishes one YouTube Short per day from the QuantAura ensemble's
-live Bitcoin call, plus the model's own public accuracy record.
+Generates and publishes the channel's content automatically:
+
+- **Daily Short** (13:00 UTC, `daily-video.yml`) — the ensemble's live Bitcoin
+  call plus the public accuracy record.
+- **Weekly recap** (Sunday 15:00 UTC, `weekly-video.yml`) — every graded call of
+  the week reviewed in a 1080p long-form video: the call table, the week on the
+  chart, a rotating research segment, and the watchlist teaser. Skips the week
+  if fewer than `weekly.min_resolved_calls` calls were graded — a recap of one
+  call is filler. Run locally with `python weekly.py --dry-run`.
+
+Both share one publish path (`upload.publish`), one voice, one theme, and one
+state log, and their workflows share a concurrency group so state commits never
+race.
 
 Runs unattended on GitHub Actions. Total running cost: **$0/month** — free API
 tiers, an open-source voice model, and a renderer that draws real charts instead

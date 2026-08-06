@@ -149,6 +149,19 @@ video:
   intro: "assets/intro.mp4"
   outro: "assets/outro.mp4"
 
+weekly:
+  # The Sunday long-form recap (weekly-video.yml, 15:00 UTC — two hours after
+  # the daily, and in the same concurrency group so state commits never race).
+  width: 1920
+  height: 1080
+  # Fewer graded calls than this and the recap skips the week: a "recap" of one
+  # call is filler, and filler is what the mass-produced-content policy demotes.
+  min_resolved_calls: 3
+  max_seconds: 480
+  caption_fontsize: 46
+  caption_margin_v: 84
+  # Research segments rotate by ISO week number — content lives in weekly.py.
+
 theme:
   bg: "#0B0E11"
   panel: "#151A21"
