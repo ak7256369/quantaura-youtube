@@ -41,7 +41,7 @@ import render as R                                                 # noqa: E402
 import scoreboard                                                  # noqa: E402
 import voice as V                                                  # noqa: E402
 from common import (BUILD_DIR, PipelineAbort, config, log,          # noqa: E402
-                    record_run, write_json)
+                    published_today, record_run, write_json)
 from llm import complete_json                                      # noqa: E402
 from common import prompt as load_prompt                           # noqa: E402
 
@@ -530,6 +530,11 @@ def run(args: argparse.Namespace) -> int:
     stage = "startup"
     now = datetime.now(timezone.utc)
     try:
+        publishing = not (args.dry_run or args.no_upload)
+        if publishing and not args.force and published_today("weekly"):
+            log.info("A weekly recap was already published today — nothing to do.")
+            return 0
+
         stage = "collect"
         if args.dry_run:
             log.info("DRY RUN — synthetic week, no live calls")
@@ -636,6 +641,8 @@ def main() -> int:
     p.add_argument("--no-upload", action="store_true")
     p.add_argument("--no-voice", action="store_true")
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--force", action="store_true",
+                   help="publish even if a recap already went out today")
     args = p.parse_args()
     log.info("=" * 60)
     log.info(f"QuantAura weekly recap · {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC}")

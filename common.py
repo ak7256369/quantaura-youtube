@@ -195,6 +195,41 @@ def prompt(name: str) -> str:
 RUNS_PATH = STATE_DIR / "runs.jsonl"
 
 
+def published_today(kind: str = "daily") -> bool:
+    """Has a video of this kind already gone out for today's UTC date?
+
+    The daily schedule runs twice (13:00 and a 16:00 catch-up) because
+    GitHub's cron is best-effort and silently drops runs under load — on
+    2026-08-06 the 13:00 slot never fired at all. Two chances at publishing
+    only helps if the second is a no-op when the first succeeded, so this is
+    the guard that makes the retry safe.
+
+    Reads the committed run log, which CI checks out fresh, so a successful
+    earlier run is visible to a later one. The residual risk is narrow: if a
+    run published but then failed to push its log, the catch-up would post a
+    second video. The push has three rebase attempts and the log union-merges,
+    so that requires a sustained git outage.
+    """
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if not RUNS_PATH.exists():
+        return False
+    for line in RUNS_PATH.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except Exception:                                        # noqa: BLE001
+            continue
+        # Rows written before `kind` existed are all daily runs.
+        if (row.get("date") == today
+                and row.get("kind", "daily") == kind
+                and row.get("status") == "published"):
+            return True
+    return False
+
+
 def record_run(status: str, stage: str, detail: str, extra: dict | None = None,
                kind: str = "daily") -> None:
     from datetime import datetime, timezone

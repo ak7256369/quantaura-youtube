@@ -26,7 +26,7 @@ import scoreboard
 import scriptwriter
 import thumbnail as thumb_mod
 import voice as voice_mod
-from common import (BUILD_DIR, PipelineAbort, config, log,
+from common import (BUILD_DIR, PipelineAbort, config, log, published_today,
                     record_run as _record_run, write_json)
 
 
@@ -118,6 +118,13 @@ def build_script(snapshot: dict, score: dict) -> dict:
 def run(args: argparse.Namespace) -> int:
     stage = "startup"
     try:
+        # The catch-up schedule exists because GitHub drops cron runs; this is
+        # what stops it publishing a second video when the first slot worked.
+        publishing = not (args.dry_run or args.no_upload)
+        if publishing and not args.force and published_today("daily"):
+            log.info("A daily video was already published today — nothing to do.")
+            return 0
+
         # ── data ──
         stage = "fetch"
         if args.dry_run:
@@ -216,6 +223,8 @@ def main() -> int:
                    help="use silent placeholder audio (fast render iteration)")
     p.add_argument("--dry-run", action="store_true",
                    help="synthetic data, no API calls, no upload")
+    p.add_argument("--force", action="store_true",
+                   help="publish even if a video already went out today")
     args = p.parse_args()
 
     log.info("=" * 60)
