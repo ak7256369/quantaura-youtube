@@ -231,7 +231,10 @@ def scene_call(snapshot: dict, script: dict, path: Path, reveal: float = 1.0) ->
     conf = snapshot.get("confidence")
     if conf is not None:
         _text(ax, W - 110, 322, "CONFIDENCE", size=30, color=t["muted"], ha="right")
-        _text(ax, W - 110, 400, f"{conf:.1f}%", size=86, weight="bold", ha="right")
+        # Counts up alongside the chart draw. This costs nothing: the reveal
+        # already re-renders this scene once per frame, so the number simply
+        # reads `reveal` instead of ignoring it.
+        _text(ax, W - 110, 400, f"{conf * reveal:.1f}%", size=86, weight="bold", ha="right")
 
     _draw_chart(ax, snapshot, reveal)
 
@@ -492,6 +495,55 @@ def _concat(clips: list[Path], out: Path) -> Path:
     return out
 
 
+def _crossfade(clips: list[Path], durations: list[float], out: Path) -> Path:
+    """Chain scene clips with crossfades, preserving the narration timeline.
+
+    The timing is the whole difficulty. An xfade of length f shortens the join
+    by f, so naively crossfading five scenes would pull the picture 1.6s ahead
+    of the voice by the end. Instead every clip is rendered f seconds longer
+    than its narration section (see `render`), and each transition is centred
+    on the section boundary — offset = boundary - f/2. Net effect: scene i
+    still occupies exactly its own span of the timeline, and the cut happens
+    as the sentence changes rather than after it.
+
+    Offsets accumulate in the OUTPUT timeline, which after each xfade equals
+    offset + length(next clip); tracking the running boundary gives that
+    directly.
+    """
+    cfg = config()["video"]
+    f = float(cfg["transition_seconds"])
+    if len(clips) < 2:
+        return _still_passthrough(clips[0], out)
+
+    args: list[str] = []
+    for c in clips:
+        args += ["-i", str(c)]
+
+    kind = cfg.get("transition", "fadeblack")
+    steps, prev, boundary = [], "0:v", 0.0
+    for i in range(1, len(clips)):
+        boundary += durations[i - 1]
+        offset = max(boundary - f / 2, 0.05)
+        label = f"x{i}"
+        steps.append(f"[{prev}][{i}:v]xfade=transition={kind}:"
+                     f"duration={f:.3f}:offset={offset:.3f}[{label}]")
+        prev = label
+
+    total = sum(durations) + f / 2
+    fin, fout = float(cfg["fade_in_seconds"]), float(cfg["fade_out_seconds"])
+    steps.append(f"[{prev}]fade=t=in:st=0:d={fin:.2f},"
+                 f"fade=t=out:st={max(total - fout, 0):.3f}:d={fout:.2f}[vout]")
+
+    _run([*args, "-filter_complex", ";".join(steps), "-map", "[vout]", *_ENC, str(out)],
+         "crossfade")
+    return out
+
+
+def _still_passthrough(clip: Path, out: Path) -> Path:
+    shutil.copy(clip, out)
+    return out
+
+
 def _normalise(src: Path, out: Path) -> Path:
     """Bring a hand-made asset (Veo intro/outro) to the pipeline's exact
     format, so concatenation cannot fail on a parameter mismatch."""
@@ -528,15 +580,27 @@ def render(snapshot: dict, script: dict, score: dict, narration: Narration,
     FRAMES_DIR.mkdir(parents=True, exist_ok=True)
 
     log.info("Rendering scenes...")
+    # Every scene clip is rendered `xf` seconds longer than the narration it
+    # covers, so the crossfades can overlap without stealing time from the
+    # voice track. `durations` keeps the true, un-padded lengths.
+    xf = float(cfg["transition_seconds"])
+    # Spans tile the entire narration, so the picture never ends before the
+    # voice does — see Narration.section_spans.
+    spans = narration.section_spans(["hook", "call", "why", "score", "outro"])
     clips: list[Path] = []
+    durations: list[float] = []
+
+    def add(clip: Path, d: float) -> None:
+        clips.append(clip)
+        durations.append(d)
 
     # ── hook ──
-    d = narration.section_duration("hook") + config()["voice"]["sentence_gap_seconds"]
+    d = max(spans.get("hook", 0.0), 2.0)
     png = scene_hook(snapshot, script, BUILD_DIR / "scene_hook.png")
-    clips.append(_still_clip(png, max(d, 2.0), BUILD_DIR / "clip_0_hook.mp4"))
+    add(_still_clip(png, d + xf, BUILD_DIR / "clip_0_hook.mp4"), d)
 
-    # ── call: chart draws itself in, then holds ──
-    d_call = max(narration.section_duration("call"), 4.0)
+    # ── call: chart draws itself in while the confidence counts up, then holds ──
+    d_call = max(spans.get("call", 0.0), 4.0)
     reveal_secs = min(1.6, d_call * 0.35)
     n_frames = max(6, int(reveal_secs * fps))
     log.info(f"  Drawing chart reveal ({n_frames} frames)...")
@@ -546,29 +610,32 @@ def render(snapshot: dict, script: dict, score: dict, narration: Narration,
         # rather than a metronome.
         eased = 1 - (1 - frac) ** 2
         scene_call(snapshot, script, FRAMES_DIR / f"call_{i:04d}.png", reveal=max(eased, 0.05))
-    clips.append(_sequence_clip(str(FRAMES_DIR / "call_%04d.png"),
-                                BUILD_DIR / "clip_1a_call.mp4"))
-    hold = max(d_call - reveal_secs, 0.6)
-    clips.append(_still_clip(FRAMES_DIR / f"call_{n_frames - 1:04d}.png", hold,
-                             BUILD_DIR / "clip_1b_call.mp4"))
+    reveal_clip = _sequence_clip(str(FRAMES_DIR / "call_%04d.png"),
+                                 BUILD_DIR / "clip_1a_call.mp4")
+    hold_clip = _still_clip(FRAMES_DIR / f"call_{n_frames - 1:04d}.png",
+                            max(d_call - reveal_secs, 0.6) + xf,
+                            BUILD_DIR / "clip_1b_call.mp4")
+    # The reveal and its hold are one continuous shot — joined hard, so the
+    # crossfade chain sees a single "call" scene and never fades mid-draw.
+    add(_concat([reveal_clip, hold_clip], BUILD_DIR / "clip_1_call.mp4"), d_call)
 
     # ── why ──
+    d = max(spans.get("why", 0.0), 3.0)
     png = scene_why(snapshot, script, BUILD_DIR / "scene_why.png")
-    clips.append(_still_clip(png, max(narration.section_duration("why"), 3.0),
-                             BUILD_DIR / "clip_2_why.mp4"))
+    add(_still_clip(png, d + xf, BUILD_DIR / "clip_2_why.mp4"), d)
 
     # ── score ──
+    d = max(spans.get("score", 0.0), 3.0)
     png = scene_score(snapshot, script, score, BUILD_DIR / "scene_score.png")
-    clips.append(_still_clip(png, max(narration.section_duration("score"), 3.0),
-                             BUILD_DIR / "clip_3_score.mp4"))
+    add(_still_clip(png, d + xf, BUILD_DIR / "clip_3_score.mp4"), d)
 
     # ── outro (drawn card; a Veo asset, if present, is appended after) ──
+    d = max(spans.get("outro", 0.0), 2.5)
     png = scene_outro(snapshot, BUILD_DIR / "scene_outro.png")
-    clips.append(_still_clip(png, max(narration.section_duration("outro"), 2.5),
-                             BUILD_DIR / "clip_4_outro.mp4", drift=False))
+    add(_still_clip(png, d + xf, BUILD_DIR / "clip_4_outro.mp4", drift=False), d)
 
     log.info("Assembling body...")
-    body = _concat(clips, BUILD_DIR / "body_silent.mp4")
+    body = _crossfade(clips, durations, BUILD_DIR / "body_silent.mp4")
 
     # Captions + narration onto the body.
     body_av = BUILD_DIR / "body.mp4"

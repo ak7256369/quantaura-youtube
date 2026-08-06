@@ -234,18 +234,26 @@ def build_one(spec: dict) -> Path:
     sentences.append(("outro", config()["disclaimer"]["narration"]))
     narration = V.synthesize(sentences, out_name=f"{slug}.wav")
 
-    gap = config()["voice"]["sentence_gap_seconds"]
+    # Clips run `xf` longer than their narration so the crossfades overlap
+    # without pulling the picture ahead of the voice — see render._crossfade.
+    xf = float(config()["video"]["transition_seconds"])
+    order = [sec for sec, _, _ in spec["scenes"]] + ["outro"]
+    spans = narration.section_spans(order)
     clips: list[Path] = []
+    durations: list[float] = []
     for i, (sec, painter, kwargs) in enumerate(spec["scenes"]):
         png = painter(**kwargs, path=BUILD_DIR / f"{slug}_{sec}.png")
-        dur = max(narration.section_duration(sec) + gap, 2.0)
-        clips.append(R._still_clip(png, dur, BUILD_DIR / f"{slug}_clip{i}.mp4"))
+        dur = max(spans.get(sec, 0.0), 2.0)
+        clips.append(R._still_clip(png, dur + xf, BUILD_DIR / f"{slug}_clip{i}.mp4"))
+        durations.append(dur)
 
     outro_png = R.scene_outro({"date": ""}, BUILD_DIR / f"{slug}_outro.png")
-    clips.append(R._still_clip(outro_png, max(narration.section_duration("outro"), 2.5),
+    outro_dur = max(spans.get("outro", 0.0), 2.5)
+    clips.append(R._still_clip(outro_png, outro_dur + xf,
                                BUILD_DIR / f"{slug}_clip_outro.mp4", drift=False))
+    durations.append(outro_dur)
 
-    body = R._concat(clips, BUILD_DIR / f"{slug}_silent.mp4")
+    body = R._crossfade(clips, durations, BUILD_DIR / f"{slug}_silent.mp4")
     ass = R.build_captions(narration, BUILD_DIR / f"{slug}.ass")
     final = BUILD_DIR / f"{slug}.mp4"
     escaped = ass.as_posix().replace(":", r"\:")

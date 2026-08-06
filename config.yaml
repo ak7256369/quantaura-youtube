@@ -130,6 +130,18 @@ video:
   # Ken Burns drift, in pixels over the whole scene — small enough to read as
   # polish rather than motion sickness.
   drift_px: 26
+  # Transition between scenes, centred on the narration boundary so the picture
+  # changes as the sentence does. Clips are rendered longer by this amount so
+  # the overlap does not shorten the video out of sync with the voice.
+  #
+  # fadeblack, not fade: these cards are dense with text, and a straight
+  # cross-dissolve ghosts two full layouts over each other — at the midpoint
+  # every heading and number appears twice, offset. Dipping through black
+  # keeps exactly one card legible at any instant.
+  transition: "fadeblack"
+  transition_seconds: 0.4
+  fade_in_seconds: 0.5
+  fade_out_seconds: 0.6
   max_seconds: 179   # Shorts must stay under 3 minutes
   captions: true
   # Optional one-time Veo assets. Missing files are skipped, not an error, so

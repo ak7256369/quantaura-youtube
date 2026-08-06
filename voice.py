@@ -40,6 +40,31 @@ class Narration:
         segs = [s for s in self.segments if s.section == section]
         return (segs[-1].end - segs[0].start) if segs else 0.0
 
+    def section_spans(self, sections: list[str]) -> dict[str, float]:
+        """Durations that tile the whole track, leaving nothing over.
+
+        section_duration measures first-sentence-start to last-sentence-end,
+        so it omits the pause that follows each section. Building a video from
+        those leaves the picture shorter than the voice — by about a second
+        across five sections — and ffmpeg's -shortest then trims the audio to
+        match, cutting the closing words of the disclaimer.
+
+        These spans run start-of-section to start-of-next instead, with the
+        last section extending to the end of the audio, so the sum is the full
+        narration length by construction.
+        """
+        starts = {}
+        for s in sections:
+            segs = [g for g in self.segments if g.section == s]
+            if segs:
+                starts[s] = segs[0].start
+        present = [s for s in sections if s in starts]
+        spans = {}
+        for i, s in enumerate(present):
+            end = starts[present[i + 1]] if i + 1 < len(present) else self.duration
+            spans[s] = max(end - starts[s], 0.1)
+        return spans
+
     def section_bounds(self, section: str) -> tuple[float, float]:
         segs = [s for s in self.segments if s.section == section]
         return (segs[0].start, segs[-1].end) if segs else (0.0, 0.0)
