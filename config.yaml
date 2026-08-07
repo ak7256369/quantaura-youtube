@@ -156,7 +156,9 @@ weekly:
   height: 1080
   # Fewer graded calls than this and the recap skips the week: a "recap" of one
   # call is filler, and filler is what the mass-produced-content policy demotes.
-  min_resolved_calls: 3
+  # Lowered 3 → 2 on 2026-08-07 so the first Sunday recap runs while the
+  # scoreboard is still young; raise it back once the log has depth.
+  min_resolved_calls: 2
   max_seconds: 480
   caption_fontsize: 46
   caption_margin_v: 84
