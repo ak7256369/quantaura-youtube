@@ -139,7 +139,7 @@ def synthesize(sentences: list[tuple[str, str]], *, out_name: str = "narration.w
         from kokoro_onnx import Kokoro
     except ImportError as e:
         raise PipelineAbort(
-            f"kokoro-onnx is not installed ({e}). Run: pip install -r channel/requirements.txt")
+            f"kokoro-onnx is not installed ({e}). Run: pip install -r requirements.txt")
 
     model_path, voices_path = ensure_model()
     log.info(f"  Synthesising {len(sentences)} sentences with Kokoro ({cfg['voice_id']})...")

@@ -1,9 +1,9 @@
 """Orchestrator: one run produces at most one video.
 
-    python channel/pipeline.py                 # full run, uploads per config.yaml
-    python channel/pipeline.py --no-upload     # build everything, publish nothing
-    python channel/pipeline.py --no-voice      # silent placeholder audio, fast render
-    python channel/pipeline.py --dry-run       # no LLM, no upload: plumbing check
+    python pipeline.py                 # full run, uploads per config.yaml
+    python pipeline.py --no-upload     # build everything, publish nothing
+    python pipeline.py --no-voice      # silent placeholder audio, fast render
+    python pipeline.py --dry-run       # no LLM, no upload: plumbing check
 
 The governing rule is in the failure path, not the happy path: any stage that
 cannot complete *safely* raises PipelineAbort, which ends the run with a

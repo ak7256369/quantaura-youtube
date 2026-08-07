@@ -1,0 +1,131 @@
+name: Daily channel video
+
+on:
+  schedule:
+    # 13:00 UTC — US breakfast, UK afternoon, 6pm in Pakistan.
+    - cron: '0 13 * * *'
+    # 16:00 UTC catch-up. GitHub's cron is best-effort: runs are delayed under
+    # load and dropped outright when the queue is congested, and on 2026-08-06
+    # the 13:00 slot never fired at all. The pipeline refuses to publish twice
+    # in a UTC day (see common.published_today), so on a normal day this second
+    # run exits in seconds having done nothing.
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      no_upload:
+        description: 'Build the video but do not publish it'
+        type: boolean
+        default: false
+      force:
+        description: 'Publish even if a video already went out today'
+        type: boolean
+        default: false
+      no_voice:
+        description: 'Silent placeholder audio (fast render check)'
+        type: boolean
+        default: false
+      dry_run:
+        description: 'Synthetic data, no API calls, no upload'
+        type: boolean
+        default: false
+
+# The scoreboard is append-only state in git. Two concurrent runs would race
+# on the same file and one would lose its call.
+concurrency:
+  group: daily-video
+  cancel-in-progress: false
+
+permissions:
+  contents: write        # commit the updated scoreboard back to main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Cache Kokoro voice model
+        uses: actions/cache@v4
+        with:
+          # ~350MB of ONNX weights. Downloading these daily would be the
+          # slowest step in the pipeline by a wide margin.
+          path: models
+          key: kokoro-v1.0
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          # Model + market data (premium service account — /api/signals redacts
+          # confidence and per-model votes for free-tier callers)
+          QA_EMAIL: ${{ secrets.QA_EMAIL }}
+          QA_PASSWORD: ${{ secrets.QA_PASSWORD }}
+          # Script writing, with automatic fallback between providers
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          # Publishing
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          # Operator notifications
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          ARGS=""
+          [ "${{ inputs.no_upload }}" = "true" ] && ARGS="$ARGS --no-upload"
+          [ "${{ inputs.no_voice }}"  = "true" ] && ARGS="$ARGS --no-voice"
+          [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"
+          [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
+          python pipeline.py $ARGS
+
+      - name: Commit scoreboard
+        # Runs even when the pipeline skipped the day: a graded outcome and the
+        # run log are worth keeping regardless of whether a video shipped.
+        if: always()
+        run: |
+          set -e
+          if [ -z "$(git status --porcelain state)" ]; then
+            echo "No scoreboard changes to commit."
+            exit 0
+          fi
+          git config user.name  "quantaura-channel[bot]"
+          git config user.email "channel@quantaura.tech"
+          git add state
+          git commit -m "scoreboard $(date -u +%F)"
+          # This repo has no other writers on a normal day, but the weekly
+          # workflow shares the concurrency group and a manual dispatch can
+          # land close — keep the rebase-and-retry.
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push rejected — rebasing on origin/main (attempt $i)"
+            git pull --rebase origin main
+          done
+          echo "Could not push the scoreboard after 3 attempts."
+          exit 1
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ github.run_number }}
+          # If the upload step failed, the mp4 here is the fallback: download
+          # it and publish by hand rather than losing the day's work.
+          path: |
+            build/*.mp4
+            build/*.jpg
+            build/*.json
+            build/*.ass
+          retention-days: 7
+          if-no-files-found: ignore

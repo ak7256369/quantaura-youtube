@@ -14,3 +14,9 @@ build/
 .env
 client_secret*.json
 token.json
+
+# Python bytecode (was covered by the monorepo's root .gitignore before the
+# 2026-08-07 split into this standalone repo).
+__pycache__/
+*.py[cod]
+

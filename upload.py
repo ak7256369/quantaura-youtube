@@ -37,7 +37,7 @@ def _service():
     except ImportError as e:
         raise PipelineAbort(
             f"Google API client not installed ({e}). "
-            f"Run: pip install -r channel/requirements.txt")
+            f"Run: pip install -r requirements.txt")
 
     creds = Credentials(
         token=None,

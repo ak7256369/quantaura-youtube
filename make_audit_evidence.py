@@ -271,11 +271,11 @@ def p4():
     img, d = page()
     y = header(d, "4 · Upload implementation", 4)
     y = para(d, y,
-             "The complete videos.insert request body, from channel/upload.py in the "
+             "The complete videos.insert request body, from upload.py in the "
              "applicant's repository. Policy-relevant fields are highlighted.")
     y += 20
 
-    y = label(d, y, "channel/upload.py — request body")
+    y = label(d, y, "upload.py — request body")
     y = code_block(d, y, [
         "body = {",
         "    \"snippet\": {",

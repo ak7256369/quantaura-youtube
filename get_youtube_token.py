@@ -4,7 +4,7 @@ Run this ONCE on your own machine. It opens a browser, you approve the channel,
 and it prints a refresh token to paste into the GitHub secret YT_REFRESH_TOKEN.
 CI never runs this — a consent screen cannot be answered by a cron job.
 
-    python channel/get_youtube_token.py path/to/client_secret.json
+    python get_youtube_token.py path/to/client_secret.json
 
 The client_secret.json comes from Google Cloud Console:
     APIs & Services → Credentials → Create credentials → OAuth client ID
@@ -38,7 +38,7 @@ def main() -> int:
     try:
         from google_auth_oauthlib.flow import InstalledAppFlow
     except ImportError:
-        print("Install dependencies first:  pip install -r channel/requirements.txt")
+        print("Install dependencies first:  pip install -r requirements.txt")
         return 1
 
     flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)

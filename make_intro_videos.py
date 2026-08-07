@@ -285,7 +285,7 @@ def main() -> int:
         results.append((spec, video))
 
     if args.no_upload:
-        log.info("Render-only run. Videos in channel/build/ — watch them, then "
+        log.info("Render-only run. Videos in build/ — watch them, then "
                  "re-run without --no-upload.")
         return 0
 

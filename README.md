@@ -36,7 +36,7 @@ fetch → grade past calls → write script → fact-check → voice → render 
 ## Local setup
 
 ```bash
-pip install -r channel/requirements.txt
+pip install -r requirements.txt
 ```
 
 ffmpeg must be on PATH:
@@ -48,16 +48,16 @@ winget install Gyan.FFmpeg
 Check the plumbing end to end without touching a live API or spending a token:
 
 ```bash
-python channel/pipeline.py --dry-run
+python pipeline.py --dry-run
 ```
 
-That writes `channel/build/video.mp4`. Watch it — this is the template every
+That writes `build/video.mp4`. Watch it — this is the template every
 future video inherits.
 
 Then a real build with live data, no upload:
 
 ```bash
-python channel/pipeline.py --no-upload
+python pipeline.py --no-upload
 ```
 
 ### Flags
@@ -95,7 +95,7 @@ gracefully or is upload-only.
 5. Mint the refresh token on your own machine:
 
 ```bash
-python channel/get_youtube_token.py client_secret.json
+python get_youtube_token.py client_secret.json
 ```
 
 It prints the three secrets to paste into GitHub. Treat the refresh token like

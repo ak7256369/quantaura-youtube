@@ -56,7 +56,7 @@ def source_pages(path: Path, first_page_no: int, title: str) -> list:
         n = first_page_no + len(pages)
         cont = " (continued)" if pages else ""
         y = header(d, f"{n} · {title}{cont}", n)
-        y = label(d, y, f"channel/{path.name} — verbatim source, "
+        y = label(d, y, f"{path.name} — verbatim source, "
                         f"lines {i + 1}–{i + len(chunk)}")
         code_block(d, y, chunk, size=13,
                    highlight=("videos().insert", "thumbnails().set",
@@ -101,9 +101,9 @@ def p_overview():
 
     y = label(d, y, "Where each piece lives")
     y = code_block(d, y, [
-        "channel/upload.py        the videos.insert implementation (p2-p4)",
-        "channel/pipeline.py      daily orchestrator; calls upload.publish",
-        "channel/weekly.py        Sunday recap; calls the same publish()",
+        "upload.py        the videos.insert implementation (p2-p4)",
+        "pipeline.py      daily orchestrator; calls upload.publish",
+        "weekly.py        Sunday recap; calls the same publish()",
         ".github/workflows/       cron triggers: daily 13:00 UTC (+16:00",
         "  daily-video.yml        catch-up), weekly Sunday 15:00 UTC",
         "",
@@ -194,7 +194,7 @@ def p_screencast(n: int):
 
 def main() -> None:
     pages = [p_overview()]
-    pages += source_pages(BASE / "upload.py", 2, "channel/upload.py")
+    pages += source_pages(BASE / "upload.py", 2, "upload.py")
     n = len(pages) + 1
     pages.append(p_invocation(n))
     pages.append(p_screencast(n + 1))

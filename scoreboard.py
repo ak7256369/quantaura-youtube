@@ -6,7 +6,7 @@ Design rules that keep the scoreboard trustworthy:
     receives these numbers as input and is forbidden from computing its own.
   * Losses are graded the same way as wins and are shown with equal prominence.
 
-State lives in two files under channel/state/, committed to the `channel-data`
+State lives in two files under state/, committed to the `channel-data`
 branch after every run:
     predictions.jsonl  — append-only log, one call per line
     scoreboard.json    — derived summary, safe to delete and rebuild
@@ -28,7 +28,7 @@ SUMMARY_PATH = STATE_DIR / "scoreboard.json"
 def _load() -> list[dict]:
     """Parse the log, keeping exactly one row per date.
 
-    The de-duplication is not paranoia. `channel/state/.gitattributes` sets
+    The de-duplication is not paranoia. `state/.gitattributes` sets
     these files to union-merge so concurrent CI and local appends cannot
     conflict, and the cost of that is a row can legitimately appear twice.
     Counting one call twice would corrupt the one number the channel exists to
