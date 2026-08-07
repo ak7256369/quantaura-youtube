@@ -164,6 +164,17 @@ weekly:
   caption_margin_v: 84
   # Research segments rotate by ISO week number — content lives in weekly.py.
 
+portfolio:
+  # The paper portfolio: a virtual $10,000 traded mechanically on the model's
+  # own committed calls, fees included, next to buy-and-hold. Published even
+  # though the tradeability report says it probably does NOT beat holding
+  # after fees — publishing that anyway is the whole brand. Never real money
+  # (real-money auto-trading is deliberately rejected; see the product docs).
+  start_usd: 10000
+  # Per side, so 0.30% round trip — the same cost the tradeability report
+  # and the site's honesty page already state.
+  fee_pct_per_side: 0.15
+
 theme:
   bg: "#0B0E11"
   panel: "#151A21"

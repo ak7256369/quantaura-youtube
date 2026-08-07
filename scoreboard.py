@@ -175,6 +175,83 @@ def resolve_due() -> int:
     return graded
 
 
+# ── Paper portfolio ───────────────────────────────────────────────────────────
+
+def _portfolio(rows: list[dict]) -> dict | None:
+    """A virtual $10,000 traded mechanically on the committed calls.
+
+    Policy: BUY → fully long, SELL → fully in cash, HOLD → unchanged.
+    Long-flat only — no leverage, no shorting: it mirrors what a viewer with a
+    spot account could actually have done by following the calls. Fees are
+    charged per side on every position change. Marks at each call's committed
+    price, so the whole curve is arithmetic over rows that were written down
+    before their outcomes were knowable — same trust rule as the scoreboard.
+
+    Published next to buy-and-hold even though the tradeability report says it
+    probably loses to holding after fees. That is not a bug in the page; it is
+    the page.
+    """
+    cfg = config().get("portfolio") or {}
+    start = float(cfg.get("start_usd", 10000))
+    fee_rate = float(cfg.get("fee_pct_per_side", 0.15)) / 100.0
+
+    priced = [r for r in rows if r.get("price")]
+    if not priced:
+        return None
+
+    first_price = float(priced[0]["price"])
+    cash, btc = start, 0.0
+    fees_paid, trades = 0.0, 0
+    curve = []
+
+    for r in priced:
+        p = float(r["price"])
+        sig = r.get("signal")
+        if sig == "BUY" and btc == 0.0:
+            fee_usd = cash * fee_rate
+            btc = (cash - fee_usd) / p
+            cash = 0.0
+            fees_paid += fee_usd
+            trades += 1
+        elif sig == "SELL" and btc > 0.0:
+            gross = btc * p
+            fee_usd = gross * fee_rate
+            cash = gross - fee_usd
+            btc = 0.0
+            fees_paid += fee_usd
+            trades += 1
+        curve.append({
+            "date": r["date"],
+            "value": round(cash + btc * p, 2),
+            "hold": round(start * p / first_price, 2),
+            "price": p,
+            "signal": sig,
+        })
+
+    last_price = float(priced[-1]["price"])
+    value = cash + btc * last_price
+    hold_value = start * last_price / first_price
+    ret = (value / start - 1) * 100
+    hold_ret = (hold_value / start - 1) * 100
+
+    return {
+        "start_usd": start,
+        "fee_pct_per_side": round(fee_rate * 100, 3),
+        "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
+        "since": priced[0]["date"],
+        "days": len(priced),
+        "value_usd": round(value, 2),
+        "return_pct": round(ret, 2),
+        "hold_value_usd": round(hold_value, 2),
+        "hold_return_pct": round(hold_ret, 2),
+        "vs_hold_pct": round(ret - hold_ret, 2),
+        "fees_paid_usd": round(fees_paid, 2),
+        "trades": trades,
+        "position": "BTC" if btc > 0 else "cash",
+        "curve": curve,
+    }
+
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 
 def _streak(resolved: list[dict]) -> dict:
@@ -225,6 +302,7 @@ def summary() -> dict:
         "last_resolved": resolved[-1] if resolved else None,
         "flat_band_pct": config()["scoring"]["flat_band_pct"],
         "horizon_hours": config()["scoring"]["horizon_hours"],
+        "portfolio": _portfolio(rows),
     }
     write_json(SUMMARY_PATH, out)
     return out
