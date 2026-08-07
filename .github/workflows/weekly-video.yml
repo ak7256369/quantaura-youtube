@@ -89,10 +89,40 @@ jobs:
           git config user.email "channel@quantaura.tech"
           git add state
           git commit -m "weekly run $(date -u +%F)"
+          # Shares the daily-video concurrency group, so contention here is the
+          # expected case, not the rare one.
           for i in 1 2 3; do
-            if git push; then exit 0; fi
-            echo "Push rejected — rebasing on origin/main (attempt $i)"
-            git pull --rebase origin main
+            if git push; then
+              echo "State pushed on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected — rebasing on origin/main (attempt $i/3)"
+            if git pull --rebase origin main; then
+              continue
+            fi
+            # state/*.jsonl union-merges (see state/.gitattributes), so the only
+            # file that can genuinely conflict is scoreboard.json — and that one
+            # is derived, not authored: summary() rebuilds it from the merged
+            # predictions log. Regenerate rather than merge.
+            conflicts="$(git diff --name-only --diff-filter=U)"
+            if [ "$conflicts" != "state/scoreboard.json" ]; then
+              echo "Unexpected rebase conflict, leaving it alone:"
+              echo "$conflicts"
+              git rebase --abort || true
+              exit 1
+            fi
+            echo "Regenerating state/scoreboard.json from the merged log..."
+            if ! python -c "import scoreboard; scoreboard.summary()"; then
+              echo "Could not regenerate the scoreboard summary."
+              git rebase --abort || true
+              exit 1
+            fi
+            git add state/scoreboard.json
+            if ! GIT_EDITOR=true git rebase --continue; then
+              echo "Rebase could not be completed."
+              git rebase --abort || true
+              exit 1
+            fi
           done
           echo "Could not push state after 3 attempts."
           exit 1
