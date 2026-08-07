@@ -524,6 +524,25 @@ def _dry_script(facts: dict) -> dict:
     }
 
 
+# ── Blog ──────────────────────────────────────────────────────────────────────
+
+def _publish_blog(facts: dict, script: dict, summary: dict, segment,
+                  video_url: str | None, dry_run: bool) -> None:
+    """The same reviewed material, rendered as a written post (see blogpost.py).
+
+    Non-fatal on purpose: the video is the primary product, and a blog write
+    error after a successful upload must not turn a published run into a
+    crashed one.
+    """
+    try:
+        import blogpost
+        blogpost.publish(facts, script, summary, segment, video_url,
+                         dry_run=dry_run)
+    except Exception as e:                                        # noqa: BLE001
+        log.warning(f"  Blog post generation failed (non-fatal): "
+                    f"{type(e).__name__}: {e}")
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def run(args: argparse.Namespace) -> int:
@@ -586,6 +605,7 @@ def run(args: argparse.Namespace) -> int:
         stage = "upload"
         if args.no_upload or args.dry_run:
             reason = "--dry-run" if args.dry_run else "--no-upload"
+            _publish_blog(facts, script, summary, segment, None, args.dry_run)
             record_run("rendered", stage, f"Weekly built, not uploaded ({reason}).",
                        {"video": str(video), "duration_s": round(duration or 0, 1)},
                        kind="weekly")
@@ -608,11 +628,15 @@ def run(args: argparse.Namespace) -> int:
                                   description=desc, tags=script["tags"])
         except PipelineAbort as e:
             log.error(f"Weekly upload failed: {e}")
+            # The facts are graded and reviewed regardless of the upload — the
+            # written post still publishes, just without a video link.
+            _publish_blog(facts, script, summary, segment, None, False)
             record_run("rendered", "upload", str(e), {"video": str(video)},
                        kind="weekly")
             notify.rendered_only({}, script, str(video), str(e))
             return 0
 
+        _publish_blog(facts, script, summary, segment, url, False)
         record_run("published", "upload", script["title"],
                    {"url": url, "visibility": config()["upload"]["visibility"],
                     "duration_s": round(duration or 0, 1)}, kind="weekly")
