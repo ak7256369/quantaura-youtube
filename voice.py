@@ -11,6 +11,7 @@ guess.
 """
 from __future__ import annotations
 
+import re
 import wave
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,16 @@ import numpy as np
 from common import BUILD_DIR, MODELS_DIR, PipelineAbort, config, http_session, log
 
 SAMPLE_RATE_FALLBACK = 24000
+
+# Kokoro's internal long-text handling splits on sentence punctuation, and a
+# decimal point qualifies: "14.4" synthesises as "fourteen", a clause pause,
+# then "four". Writing the point out as a word keeps the number one utterance.
+# Applied to the synthesiser's input only — captions keep the original "14.4".
+_DECIMAL_POINT = re.compile(r"(?<=\d)\.(?=\d)")
+
+
+def speakable(text: str) -> str:
+    return _DECIMAL_POINT.sub(" point ", text)
 
 
 @dataclass
@@ -156,7 +167,7 @@ def synthesize(sentences: list[tuple[str, str]], *, out_name: str = "narration.w
 
     for section, text in sentences:
         try:
-            samples, rate = kokoro.create(text, voice=cfg["voice_id"],
+            samples, rate = kokoro.create(speakable(text), voice=cfg["voice_id"],
                                           speed=float(cfg["speed"]), lang=cfg["lang"])
         except Exception as e:                                   # noqa: BLE001
             raise PipelineAbort(f"Kokoro failed on \"{text[:60]}...\": {e}")
