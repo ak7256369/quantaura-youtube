@@ -73,11 +73,33 @@ def build_description(script: dict, snapshot: dict, score: dict) -> str:
     else:
         parts += ["", "PUBLIC RECORD", "This is the first entry. The record starts now."]
 
+    parts += ["", "THE REST OF THE MODEL"] + _link_lines(cfg)
+
     parts += ["", "This video was generated automatically. The narration voice is "
                   "synthetic and the script was written by an AI model from the "
                   "ensemble's real output.",
               cfg["disclaimer"]["description"].strip()]
     return "\n".join(parts)[:4900]
+
+
+def _link_lines(cfg: dict) -> list[str]:
+    """The same call goes out on four surfaces; every one links to the others.
+
+    Kept as plain labelled URLs rather than a bare list: YouTube linkifies them
+    automatically, and a viewer scanning the description should be able to tell
+    what each destination actually is before clicking.
+    """
+    links = cfg.get("links") or {}
+    rows = [
+        ("Full output — confidence and the 4 models' votes", links.get("site")),
+        ("The public record, wins and losses", links.get("record")),
+        ("$10k paper portfolio", links.get("portfolio")),
+        ("Weekly research write-up", links.get("blog")),
+        ("Daily call on X", links.get("x")),
+        ("Free Telegram channel", links.get("telegram_channel")),
+        ("Premium alerts bot", links.get("telegram_bot")),
+    ]
+    return [f"{label}: {url}" for label, url in rows if url]
 
 
 def publish(video: Path, thumb: Path | None, *, title: str, description: str,

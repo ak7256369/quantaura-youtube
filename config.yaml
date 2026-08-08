@@ -7,6 +7,25 @@ channel:
   asset_label: "Bitcoin"
   timezone_note: "All times UTC"
 
+# The ecosystem's other public surfaces. Every output links to every other one,
+# so the same list is duplicated in the three sibling repos (they are separate
+# deployments and cannot share a module):
+#   web/quantaura/src/lib/social.ts · quantaura-telegram-bot/bot/config.js
+#   quantaura-x/config.yaml
+# Public handles, not secrets — a missing env var must never silently drop the
+# links out of a published video description.
+links:
+  site: "https://quantaura.tech"
+  # The handle the X pipeline authenticates as (see quantaura-x --check), not a
+  # brand name. Renaming it on X keeps followers and history; if that happens,
+  # update all four repos.
+  x: "https://x.com/abdulla05775100"
+  telegram_channel: "https://t.me/quantaura_signals"
+  telegram_bot: "https://t.me/QuantAuraBot"
+  blog: "https://quantaura.tech/blog"
+  portfolio: "https://quantaura.tech/portfolio"
+  record: "https://quantaura.tech/predictions"
+
 api:
   # The public QuantAura API. /api/signals/stats needs no auth; /api/signals
   # redacts confidence + per-model detail unless the caller is premium, which is

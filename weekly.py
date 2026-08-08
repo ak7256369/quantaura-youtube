@@ -620,6 +620,8 @@ def run(args: argparse.Namespace) -> int:
                             for d in facts["days"])
                 + f"\n\nAll-time: {facts['alltime_hits']} of "
                   f"{facts['alltime_resolved']} graded calls correct."
+                + "\n\nTHE REST OF THE MODEL\n"
+                + "\n".join(U._link_lines(config()))
                 + "\n\nThis video was generated automatically. The narration "
                   "voice is synthetic.\n"
                 + config()["disclaimer"]["description"].strip())
