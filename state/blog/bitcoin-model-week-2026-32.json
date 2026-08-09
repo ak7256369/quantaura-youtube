@@ -1,0 +1,104 @@
+{
+  "slug": "bitcoin-model-week-2026-32",
+  "iso_year": 2026,
+  "iso_week": 32,
+  "title": "Bitcoin AI Model Review — Week 32: 1 of 4 Calls Correct",
+  "meta_description": "Week 32 graded: 1 of 4 Bitcoin calls correct (25%). All-time: 25.0% over 4 public calls. Paper portfolio +0.6% vs holding. Logged before outcomes were knowable.",
+  "published_at": "2026-08-09T15:43:42+00:00",
+  "updated_at": "2026-08-09T15:43:42+00:00",
+  "date_range": "2026-08-05 to 2026-08-08",
+  "week": {
+    "resolved": 4,
+    "hits": 1,
+    "misses": 3,
+    "accuracy_pct": 25.0,
+    "days": [
+      {
+        "weekday": "Wednesday",
+        "date": "2026-08-05",
+        "signal": "BUY",
+        "confidence_pct": 85.1,
+        "gated": false,
+        "change_pct": -0.43,
+        "correct": false
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-08-06",
+        "signal": "HOLD",
+        "confidence_pct": 51.8,
+        "gated": false,
+        "change_pct": 0.16,
+        "correct": true
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-08-07",
+        "signal": "HOLD",
+        "confidence_pct": 49.1,
+        "gated": false,
+        "change_pct": 1.27,
+        "correct": false
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-08-08",
+        "signal": "BUY",
+        "confidence_pct": 61.3,
+        "gated": false,
+        "change_pct": 0.32,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 4,
+    "hits": 1,
+    "misses": 3,
+    "accuracy_pct": 25.0
+  },
+  "portfolio": {
+    "value_usd": 10061.58,
+    "return_pct": 0.62,
+    "hold_return_pct": 0.77,
+    "vs_hold_pct": -0.15,
+    "fees_paid_usd": 15.0,
+    "trades": 1,
+    "position": "BTC"
+  },
+  "narrative": {
+    "intro": [
+      "This is the week 32 recap for the date range 2026-08-05 to 2026-08-08.",
+      "Out of 4 week resolved calls, the model logged 1 week hit, giving a week accuracy of 25.0 percent.",
+      "A failed high confidence buy call on Wednesday marked the worst stumble of the period."
+    ],
+    "days": [
+      "On Wednesday the model issued an incorrect buy signal with 85.1 percent confidence while price changed negative 0.43 percent.",
+      "Thursday provided the single correct call, a hold signal at 51.8 percent confidence with a price change of 0.16 percent.",
+      "Friday followed with a hold signal at 49.1 percent confidence that failed as price shifted 1.27 percent.",
+      "On Saturday a buy signal at 61.3 percent confidence was incorrect after a 0.32 percent change."
+    ],
+    "trend": [
+      "For alltime performance, the model stands at 1 hit out of 4 alltime resolved calls.",
+      "That puts the alltime accuracy at 25.0 percent, matching this week's result.",
+      "There is no change in the long term trajectory yet."
+    ]
+  },
+  "research": {
+    "title": "Why the model sometimes refuses to call a direction",
+    "bullets": [
+      "Confidence gate",
+      "Low conviction becomes HOLD",
+      "Silence over guessing"
+    ],
+    "paragraphs": [
+      "When the ensemble's confidence falls below its threshold, a gate downgrades the call to hold.",
+      "A forced guess would look decisive and grade like a coin flip. The gate would rather say nothing."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=_kOCs-PBEDI"
+}

@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-08-09T15:43:42+00:00",
+  "posts": [
+    {
+      "slug": "bitcoin-model-week-2026-32",
+      "title": "Bitcoin AI Model Review — Week 32: 1 of 4 Calls Correct",
+      "meta_description": "Week 32 graded: 1 of 4 Bitcoin calls correct (25%). All-time: 25.0% over 4 public calls. Paper portfolio +0.6% vs holding. Logged before outcomes were knowable.",
+      "published_at": "2026-08-09T15:43:42+00:00",
+      "updated_at": "2026-08-09T15:43:42+00:00",
+      "iso_year": 2026,
+      "iso_week": 32,
+      "week_resolved": 4,
+      "week_hits": 1,
+      "week_accuracy_pct": 25.0
+    }
+  ]
+}
