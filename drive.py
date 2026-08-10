@@ -148,6 +148,54 @@ def ensure_folder(service) -> str:
     return folder["id"]
 
 
+def check() -> bool:
+    """Verify the Drive credentials and destination folder, writing nothing.
+
+    The failure this exists to catch is a CI environment whose
+    GDRIVE_REFRESH_TOKEN and YT_CLIENT_ID/SECRET disagree — the token is minted
+    locally but spent in Actions, so nothing proves the two match until a real
+    run tries it. On a scheduled run that surfaces as a warning *after* the
+    video has rendered, hours after the mistake was made; here it surfaces in
+    about a minute, on demand.
+
+    Read-only on purpose: auth plus folder resolution is enough to prove the
+    pairing, and a check that creates files leaves litter to clean up.
+    """
+    try:
+        service = _service()
+        who = service.about().get(fields="user(emailAddress),storageQuota(usage,limit)"
+                                  ).execute()
+        email = who.get("user", {}).get("emailAddress", "?")
+        quota = who.get("storageQuota") or {}
+        log.info(f"  Authenticated as {email}")
+        if quota.get("limit"):
+            used = int(quota.get("usage", 0)) / (1 << 30)
+            cap = int(quota["limit"]) / (1 << 30)
+            log.info(f"  Drive storage: {used:.1f} / {cap:.0f} GB used")
+
+        folder_id = ensure_folder(service)
+        files = service.files().list(
+            q=f"'{folder_id}' in parents and trashed=false",
+            spaces="drive", orderBy="createdTime desc", pageSize=5,
+            fields="files(name,size,createdTime)").execute().get("files", [])
+
+        log.info(f"  Folder: https://drive.google.com/drive/folders/{folder_id}")
+        if files:
+            log.info(f"  {len(files)} recent file(s):")
+            for f in files:
+                mb = int(f.get("size") or 0) / (1 << 20)
+                log.info(f"    {f['name']}  ({mb:.1f} MB)  {f.get('createdTime', '')[:10]}")
+        else:
+            log.info("  Folder is empty — nothing has been mirrored yet.")
+
+        log.info("Drive check passed — nothing was written.")
+        return True
+
+    except Exception as e:                                       # noqa: BLE001
+        log.error(f"Drive check FAILED: {type(e).__name__}: {e}")
+        return False
+
+
 def _upload(service, path: Path, folder_id: str, *, name: str, mime: str,
             description: str = "") -> dict:
     from googleapiclient.http import MediaFileUpload

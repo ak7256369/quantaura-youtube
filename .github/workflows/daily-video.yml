@@ -28,6 +28,10 @@ on:
         description: 'Skip the Google Drive mirror'
         type: boolean
         default: false
+      check_drive:
+        description: 'Verify Drive credentials only — renders nothing, publishes nothing'
+        type: boolean
+        default: false
       dry_run:
         description: 'Synthetic data, no API calls, no upload'
         type: boolean
@@ -57,9 +61,12 @@ jobs:
           cache-dependency-path: requirements.txt
 
       - name: Install ffmpeg
+        # Nothing is rendered on a credential check, so skip the apt round-trip.
+        if: inputs.check_drive != true
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
       - name: Cache Kokoro voice model
+        if: inputs.check_drive != true
         uses: actions/cache@v4
         with:
           # ~350MB of ONNX weights. Downloading these daily would be the
@@ -98,6 +105,7 @@ jobs:
           [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"
           [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
           [ "${{ inputs.no_drive }}"  = "true" ] && ARGS="$ARGS --no-drive"
+          [ "${{ inputs.check_drive }}" = "true" ] && ARGS="$ARGS --check-drive"
           python pipeline.py $ARGS
 
       - name: Commit scoreboard

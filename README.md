@@ -68,6 +68,7 @@ python pipeline.py --no-upload
 | `--no-voice` | Silent placeholder audio — fast iteration on the visual template |
 | `--no-upload` | Build everything from live data, publish nothing |
 | `--no-drive` | Skip the Google Drive mirror; still uploads to YouTube |
+| `--check-drive` | Verify Drive credentials and folder, then exit. Renders nothing, writes nothing. Also a `workflow_dispatch` input, which is the point: the token is minted locally but spent in Actions, and this is what proves the two agree. |
 
 ## Secrets
 

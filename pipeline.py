@@ -4,6 +4,7 @@
     python pipeline.py --no-upload     # build everything, publish nothing
     python pipeline.py --no-voice      # silent placeholder audio, fast render
     python pipeline.py --no-drive      # skip the Drive mirror, still upload
+    python pipeline.py --check-drive   # verify Drive auth only, then exit
     python pipeline.py --dry-run       # no LLM, no upload: plumbing check
 
 The governing rule is in the failure path, not the happy path: any stage that
@@ -246,6 +247,8 @@ def main() -> int:
                    help="use silent placeholder audio (fast render iteration)")
     p.add_argument("--no-drive", action="store_true",
                    help="skip the Google Drive mirror (still uploads to YouTube)")
+    p.add_argument("--check-drive", action="store_true",
+                   help="verify the Drive credentials and folder, then exit")
     p.add_argument("--dry-run", action="store_true",
                    help="synthetic data, no API calls, no upload")
     p.add_argument("--force", action="store_true",
@@ -255,6 +258,14 @@ def main() -> int:
     log.info("=" * 60)
     log.info(f"QuantAura channel pipeline · {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC}")
     log.info("=" * 60)
+
+    if args.check_drive:
+        # Short-circuits ahead of run(): the check needs no data, no script and
+        # no render, and a credential probe that first spends five minutes
+        # building a video is not a probe anyone will run.
+        import drive as drive_mod
+        return 0 if drive_mod.check() else 1
+
     return run(args)
 
 
