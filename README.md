@@ -150,6 +150,12 @@ Each run leaves two files in the folder:
 Uploads replace by name, so re-running a mirror for the same day or week
 updates the file in place instead of leaving a second copy behind.
 
+`weekly.py` takes `--no-drive` and `--drive-only` too, both also exposed as
+`workflow_dispatch` inputs. The weekly `--drive-only` skips three things rather
+than the daily's two: the YouTube upload, the scoreboard grading, **and the blog
+post** — the recap's written post went out with the scheduled run, and
+republishing it to produce a video clip would duplicate a live page.
+
 The caption also arrives on Telegram in a copy-button block alongside the Drive
 link, which is the intended workflow: tap, download, copy, post. A Drive failure
 never fails the day — the video still goes to YouTube and the mp4 is still in

@@ -19,6 +19,10 @@ on:
         description: 'Skip the Google Drive mirror'
         type: boolean
         default: false
+      drive_only:
+        description: 'X clip only — mirror to Drive, no YouTube upload, no blog post'
+        type: boolean
+        default: false
       dry_run:
         description: 'Synthetic week, no API calls, no upload'
         type: boolean
@@ -37,6 +41,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: read          # drive_only pulls the published recap's mp4 artifact
 
 jobs:
   publish:
@@ -67,6 +72,53 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Restore the published recap
+        # Same as the daily's restore step, but keyed on the most recent
+        # published weekly rather than today's — a recap publishes on Sunday and
+        # a --drive-only rerun will usually be some other day.
+        if: inputs.drive_only == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build
+          RUN_ID=$(python - <<'PY'
+          import json, pathlib
+          out = ""
+          p = pathlib.Path("state/runs.jsonl")
+          if p.exists():
+              for ln in p.read_text(encoding="utf-8", errors="replace").splitlines():
+                  try:
+                      r = json.loads(ln)
+                  except Exception:
+                      continue
+                  if (r.get("kind") == "weekly" and r.get("status") == "published"
+                          and r.get("run_id")):
+                      out = str(r["run_id"])
+          print(out)
+          PY
+          )
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(gh run list --workflow=weekly-video.yml --event=schedule \
+                       --status=success --limit 5 --json databaseId \
+                       -q '.[0].databaseId // empty')
+            echo "No run_id in the log — falling back to the last scheduled recap: ${RUN_ID:-none}"
+          fi
+          if [ -z "$RUN_ID" ]; then
+            echo "No published recap found — the pipeline will render fresh."
+            exit 0
+          fi
+          gh run download "$RUN_ID" --dir _restore --pattern 'weekly-*' 2>/dev/null || {
+            echo "Artifact for run $RUN_ID unavailable (expired?) — rendering fresh."
+            exit 0; }
+          SRC=$(find _restore -name weekly.mp4 -print -quit)
+          D=$(dirname "${SRC:-_restore/none}")
+          if [ -n "$SRC" ] && [ -f "$D/weekly_facts.json" ] && [ -f "$D/weekly_script.json" ]; then
+            cp "$D/weekly.mp4" "$D/weekly_facts.json" "$D/weekly_script.json" build/
+            echo "Restored the published recap from run $RUN_ID"
+          else
+            echo "Run $RUN_ID has no complete recap — the pipeline will render fresh."
+          fi
+
       - name: Run weekly recap
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -86,6 +138,7 @@ jobs:
           [ "${{ inputs.no_upload }}" = "true" ] && ARGS="$ARGS --no-upload"
           [ "${{ inputs.no_voice }}"  = "true" ] && ARGS="$ARGS --no-voice"
           [ "${{ inputs.no_drive }}"  = "true" ] && ARGS="$ARGS --no-drive"
+          [ "${{ inputs.drive_only }}" = "true" ] && ARGS="$ARGS --drive-only"
           [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"
           [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
           python weekly.py $ARGS

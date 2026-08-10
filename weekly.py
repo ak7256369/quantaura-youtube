@@ -88,8 +88,6 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "hours into an upward, downward, or flat regime.",
       "Exact price targets are noise at this horizon. Regimes are the part of "
       "the problem a model can actually learn.",
-      "That difference decides how every call on this channel should be read. It "
-      "is a statement about direction, never about how far the price travels.",
       "Ask a model for a number it cannot know and it will hand you one anyway. "
       "We would rather ask it a question it can answer."]),
     ("High accuracy still is not a trading edge",
@@ -99,8 +97,6 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "can score well on classification metrics and still not be profitable to "
       "trade after fees.",
       "That finding is the reason this scoreboard exists in public.",
-      "The gap hides in the size of the moves. Being right about a long run of "
-      "very small moves pays for nothing once every round trip costs you.",
       "So the paper portfolio sits next to the accuracy in these recaps, and the "
       "two numbers are allowed to disagree in front of you."]),
     ("Why the model sometimes refuses to call a direction",
@@ -112,9 +108,7 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "would rather say nothing.",
       "That makes hold the most common call here, and it is meant to be. A model "
       "with a strong opinion every single day is telling you about itself rather "
-      "than about the market.",
-      "A gated day is still graded like any other. Declining to guess buys no "
-      "mercy from the scoreboard."]),
+      "than about the market."]),
     ("Four architectures, one vote",
      ["Different model families", "Different failure modes", "Blended with learned weights"],
      ["A quick look inside the research this week.",
@@ -122,9 +116,6 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "differently, so they fail differently.",
       "When their votes are blended, one model's blind spot is another model's "
       "signal. Disagreement between them is information, not a bug.",
-      "The L S T M and the transformer read the sequence itself. The gradient "
-      "boosted model reads engineered features, and the K A N fits the smooth "
-      "functions the others only approximate.",
       "None of the four is the best model. Picking a favourite would mean betting "
       "everything on one way of being wrong."]),
     ("How the models keep learning without forgetting",
@@ -136,9 +127,7 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "Any update that scores worse than the current model is rejected outright.",
       "Catastrophic forgetting is the failure that guards against. A model tuned "
       "only on the last month becomes an expert on the last month and a novice "
-      "everywhere else.",
-      "The rejection gate is the unglamorous half of the idea. Most candidate "
-      "updates never ship at all."]),
+      "everywhere else."]),
     ("Why we grade on plain price moves",
      ["Anyone can verify a move", "No in-house metric", "Same rule every day"],
      ["A quick look inside the research this week.",
@@ -146,9 +135,6 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "band for small moves.",
       "We could have graded on the model's own training label, and scored better. "
       "But you cannot verify our label on your chart. You can verify a price move.",
-      "The flat band does the same job in the other direction. A tiny drift is "
-      "not a trend, and counting it as one would flatter every directional call "
-      "we make.",
       "The harsher rule is the one worth publishing. The kinder one would only "
       "measure how generous we were with ourselves."]),
 ]
@@ -165,16 +151,15 @@ METHOD_STEPS = [
     ("NEVER EDITED", "the rule does not change to suit the result"),
 ]
 
+
+# One sentence per card, in order: the scene deals a card as its sentence is
+# spoken (see `_sentence_cuts`), so these two lists must stay the same length.
 METHOD_SENTENCES = [
     "Here is exactly how a call is graded, so none of this rests on trusting us.",
     "Once a day the ensemble publishes a single call for the next twenty four "
-    "hours. It is written down with the price at that moment, before the outcome "
-    "can be known.",
-    "Twenty four hours later the realised move settles it. A rise of more than "
-    "one percent is up, a fall of more than one percent is down, and everything "
-    "in between counts as flat.",
-    "A buy is right only on a rise, a sell only on a fall, and a hold only when "
-    "the market stayed inside that band.",
+    "hours, written down with the price before the outcome can be known.",
+    "Twenty four hours later the realised move settles it. A rise or fall of more "
+    "than one percent is a direction, and anything smaller counts as flat.",
     "The rule never bends to suit the result, and no call is edited once it has "
     "been graded.",
 ]
@@ -304,12 +289,12 @@ def word_budget(required: tuple[str, ...] | list[str]) -> tuple[int, int]:
     The absolute numbers are what set the video's runtime, measured rather than
     guessed: the 2026-08-09 recap read 267 words in 110.0s, so Kokoro at
     speed 1.02 delivers ~152 words per minute including sentence gaps. About
-    280 words of fixed prose (method, research, watchlist, outro) are appended
-    in code afterwards, so a mid-range 345 LLM words lands the finished recap
+    215 words of fixed prose (method, research, watchlist, outro) are appended
+    in code afterwards, so a mid-range 390 LLM words lands the finished recap
     at roughly four minutes. Moving this range moves the runtime, and nothing
     else does — see the module docstring.
     """
-    return 50 * len(required), 65 * len(required)
+    return 58 * len(required), 72 * len(required)
 
 
 def validate(raw: dict, required: tuple[str, ...] | list[str] = LLM_SECTIONS) -> dict:
@@ -836,7 +821,31 @@ def fixed_sentences(segment: tuple[str, list[str], list[str]]) -> list[tuple[str
 
 # ── Assembly ──────────────────────────────────────────────────────────────────
 
-def _staged_clip(pngs: list[Path], total: float, out: Path, w: int, h: int) -> Path:
+def _sentence_cuts(narration: V.Narration, section: str, n_stages: int) -> list[float]:
+    """Stage boundaries at sentence starts, measured from the section's start.
+
+    A card that arrives while the sentence introducing it is being spoken reads
+    as illustration. The same card arriving three seconds into a forty-second
+    scene reads as decoration, which is what a fixed front-loaded deal produces
+    once a section runs long.
+
+    Returns fewer boundaries than requested when the section has fewer
+    sentences than stages; `_staged_clip` drops the surplus stages rather than
+    inventing beats for them.
+    """
+    starts = [s.start for s in narration.segments if s.section == section]
+    if len(starts) < 2 or n_stages < 2:
+        return []
+    base, rest = starts[0], starts[1:]
+    if n_stages - 1 > len(rest):
+        return [t - base for t in rest]
+    step = len(rest) / (n_stages - 1)
+    idx = sorted({min(len(rest) - 1, int(round(i * step))) for i in range(n_stages - 1)})
+    return [rest[i] - base for i in idx]
+
+
+def _staged_clip(pngs: list[Path], total: float, out: Path, w: int, h: int,
+                 cuts: list[float] | None = None) -> Path:
     """A scene that builds itself in: each still held briefly, the last one for
     the rest of the section.
 
@@ -849,16 +858,31 @@ def _staged_clip(pngs: list[Path], total: float, out: Path, w: int, h: int) -> P
     so restarting it at every stage would pop the scale on each step; the reveal
     is the motion this scene needs.
     """
+    if cuts:
+        cuts = sorted(t for t in cuts if 0 < t < total)
+        pngs = pngs[:len(cuts) + 1]
     n = len(pngs)
-    # Reveal over at most the first 45% of the section, and never slower than
-    # 0.6s a stage: on a long section the point is to finish dealing early and
-    # leave the completed card up while the narration keeps going.
-    reveal = min(total * 0.45, 0.6 * (n - 1))
-    stage = reveal / (n - 1)
+    if n == 1 or total < 0.3 * n:
+        return R._still_clip(pngs[-1], total, out, drift=False, w=w, h=h)
+    if not cuts:
+        # No narration beats to hang the stages on (the tabular scenes, whose
+        # rows outnumber their sentences): deal evenly across the first 60% and
+        # leave the finished card up for the rest.
+        cuts = [total * 0.6 * (i + 1) / (n - 1) for i in range(n - 1)]
+
+    # Boundaries are clamped forward so they stay ordered and the final stage
+    # always ends exactly at `total`. The sum has to equal the section length
+    # to the frame: _crossfade centres each transition on a running boundary,
+    # and a scene that is even slightly long walks the picture off the voice.
+    bounds = [0.0]
+    for c in cuts:
+        bounds.append(min(max(c, bounds[-1] + 0.25), total - 0.25 * (n - len(bounds))))
+    bounds.append(total)
+
     parts = []
     for i, png in enumerate(pngs):
-        d = stage if i < n - 1 else max(total - reveal, 0.4)
-        parts.append(R._still_clip(png, d, FRAMES_DIR / f"{out.stem}_s{i}.mp4",
+        parts.append(R._still_clip(png, bounds[i + 1] - bounds[i],
+                                   FRAMES_DIR / f"{out.stem}_s{i}.mp4",
                                    drift=False, w=w, h=h))
     return R._concat(parts, out)
 
@@ -881,9 +905,11 @@ def _stage_pngs(facts: dict, segment, wk: int) -> dict[str, list[Path]]:
         "record": [scene_record(facts, FRAMES_DIR / "record.png")],
         "method": [scene_method(wk, FRAMES_DIR / f"method_{i}.png", steps_shown=i + 1)
                    for i in range(len(METHOD_STEPS))],
+        # Starts on the title alone, then one bullet per sentence — the first
+        # research sentence is a lead-in that introduces no bullet of its own.
         "research": [scene_research(segment, wk, FRAMES_DIR / f"research_{i}.png",
-                                    bullets_shown=i + 1)
-                     for i in range(len(segment[1]))],
+                                    bullets_shown=i)
+                     for i in range(len(segment[1]) + 1)],
         "watchlist": [scene_watchlist(wk, FRAMES_DIR / "watchlist.png")],
         "outro": [scene_outro_wide(wk, FRAMES_DIR / "outro.png")],
     }
@@ -904,6 +930,11 @@ def assemble(facts: dict, script: dict, candles: list[list] | None,
     spans = narration.section_spans(sections)
     stages = _stage_pngs(facts, segment, wk)
 
+    # The fixed segments have one still per spoken sentence, so their stages
+    # can land on the narration. The tabular scenes have more rows than
+    # sentences and deal on their own clock instead — see `_staged_clip`.
+    SENTENCE_PACED = ("method", "research")
+
     clips, durations = [], []
     for i, sec in enumerate(sections):
         d = max(spans.get(sec, 0.0), 2.0)
@@ -913,7 +944,9 @@ def assemble(facts: dict, script: dict, candles: list[list] | None,
             clips.append(R._still_clip(pngs[0], d + xf, out,
                                        drift=(sec != "outro"), w=w, h=h))
         else:
-            clips.append(_staged_clip(pngs, d + xf, out, w, h))
+            cuts = (_sentence_cuts(narration, sec, len(pngs))
+                    if sec in SENTENCE_PACED else None)
+            clips.append(_staged_clip(pngs, d + xf, out, w, h, cuts=cuts))
         durations.append(d)
 
     log.info("Assembling weekly body...")
@@ -965,7 +998,8 @@ def _dry_script(facts: dict, required: list[str]) -> dict:
         "intro": ["Five of seven calls landed this week, the model's best run so far.",
                   "The week ran from Monday to Sunday, and the misses both came "
                   "from directional calls rather than holds.",
-                  "Here is every one of them, graded the same way."],
+                  "Here is every one of them, graded the same way, including the "
+                  "two the model got wrong."],
         "days": ["The week opened with two holds, both correct, in a market that "
                  "refused to move more than a fraction of a percent.",
                  "Wednesday was the first directional call of the week, a buy, and "
@@ -980,11 +1014,16 @@ def _dry_script(facts: dict, required: list[str]) -> dict:
                       "The model called a buy with real conviction and the market "
                       "fell almost two percent against it.",
                       "A confident wrong call is worse than an unconfident one, and "
-                      "the scoreboard does not soften either."],
+                      "the scoreboard does not soften either.",
+                      "It stays in the log exactly as it was written, which is the "
+                      "only thing that makes the rest of these numbers worth "
+                      "anything."],
         "trend": ["Across the whole week the price moved in a narrow range with two "
                   "sharp days at either end of it.",
                   "Every call sits on that line at the moment it was made, with a "
-                  "ring showing how it graded."],
+                  "ring showing how it graded.",
+                  "Seen that way the pattern is easy to read. The model handled the "
+                  "quiet middle of the week and lost money at both edges."],
         "portfolio": ["The paper portfolio traded mechanically on those same calls, "
                       "starting from ten thousand dollars.",
                       "It ended the period ahead of where it started, but that is "
@@ -996,7 +1035,9 @@ def _dry_script(facts: dict, required: list[str]) -> dict:
                    "Holds carry most of that number, which is what a confidence "
                    "gate is supposed to produce.",
                    "The sample is still far too small to draw a conclusion from, "
-                   "and saying so is part of the job."],
+                   "and saying so is part of the job.",
+                   "Ask again after a few hundred graded calls. Until then the "
+                   "number on this card is a running total, not a result."],
     }
     return {
         "title": f"BTC Model Week {facts['week_number']}: "
@@ -1030,14 +1071,53 @@ def _publish_blog(facts: dict, script: dict, summary: dict, segment,
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+def _prior_weekly() -> tuple[dict, dict, Path] | None:
+    """Facts, script and mp4 of a recap that already published, if the workflow
+    restored its artifact into build/. See pipeline._prior_build — same idea,
+    and the same reason: mirroring a re-render would put a different video on X
+    from the one on YouTube."""
+    from common import read_json
+    video = BUILD_DIR / "weekly.mp4"
+    facts_p, script_p = (BUILD_DIR / "weekly_facts.json",
+                         BUILD_DIR / "weekly_script.json")
+    if not (video.exists() and facts_p.exists() and script_p.exists()):
+        return None
+    facts, script = read_json(facts_p), read_json(script_p)
+    if not (facts and script and facts.get("week_number")):
+        return None
+    return facts, script, video
+
+
 def run(args: argparse.Namespace) -> int:
     stage = "startup"
     now = datetime.now(timezone.utc)
     try:
-        publishing = not (args.dry_run or args.no_upload)
+        publishing = not (args.dry_run or args.no_upload or args.drive_only)
         if publishing and not args.force and published_today("weekly"):
             log.info("A weekly recap was already published today — nothing to do.")
             return 0
+
+        # ── reuse the published recap, when the workflow restored one ──
+        # A recap takes minutes to render and its blog post is already live, so
+        # re-deriving it to produce an X clip would be both slow and wrong.
+        if args.drive_only:
+            prior = _prior_weekly()
+            if prior:
+                stage = "drive"
+                facts, script, video = prior
+                log.info(f"Reusing the published recap for week "
+                         f"{facts.get('week_number')} — same file as the video.")
+                drive_info = drive_mod.mirror_weekly(video, facts)
+                ok = bool(drive_info and drive_info.get("ok"))
+                record_run("mirrored" if ok else "rendered", "drive",
+                           "Mirrored the published recap — no re-render, no upload.",
+                           {"video": str(video), "reused": True,
+                            **drive_mod.run_log_extra(drive_info)}, kind="weekly")
+                notify.rendered_only({}, script, str(video),
+                                     "--drive-only (mirrored the published recap)",
+                                     drive_info)
+                return 0 if ok else 1
+            log.info("No published recap restored into build/ — rendering fresh.")
 
         _assert_method_matches_config()
 
@@ -1058,7 +1138,13 @@ def run(args: argparse.Namespace) -> int:
                        "portfolio": scoreboard._portfolio(rows)}
             candles = None
         else:
-            scoreboard.resolve_due()
+            if args.drive_only:
+                # Read, never write. Grading is the scheduled run's job; a
+                # --drive-only pass exists to produce a clip, not to move the
+                # record.
+                log.info("  --drive-only: reading the scoreboard, not grading")
+            else:
+                scoreboard.resolve_due()
             summary = scoreboard.summary()
             rows = week_rows(now)
             # 8 days, not 7: the week's oldest call (last Sunday 13:00) sits
@@ -1131,6 +1217,22 @@ def run(args: argparse.Namespace) -> int:
             drive_info = drive_mod.mirror_weekly(video, facts)
 
         stage = "upload"
+        if args.drive_only:
+            # No blog: the recap's written post went out with the scheduled run
+            # and republishing it would duplicate a live page for the sake of a
+            # video clip.
+            ok = bool(drive_info and drive_info.get("ok"))
+            log.info("--drive-only: skipping YouTube and the blog post." if ok
+                     else "--drive-only: Drive mirror failed, nothing to show for it.")
+            record_run("mirrored" if ok else "rendered", "drive",
+                       "Rendered and mirrored — no upload, no blog post.",
+                       {"video": str(video), "duration_s": round(duration or 0, 1),
+                        **drive_mod.run_log_extra(drive_info)}, kind="weekly")
+            notify.rendered_only({}, script, str(video),
+                                 "--drive-only (X clip requested on demand)",
+                                 drive_info)
+            return 0 if ok else 1
+
         if args.no_upload or args.dry_run:
             reason = "--dry-run" if args.dry_run else "--no-upload"
             _publish_blog(facts, script, summary, segment, None, args.dry_run)
@@ -1199,6 +1301,9 @@ def main() -> int:
     p.add_argument("--no-voice", action="store_true")
     p.add_argument("--no-drive", action="store_true",
                    help="skip the Google Drive mirror (still uploads to YouTube)")
+    p.add_argument("--drive-only", action="store_true",
+                   help="mirror to Drive for an X clip, without uploading to "
+                        "YouTube, publishing the blog post, or grading")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--force", action="store_true",
                    help="publish even if a recap already went out today")
