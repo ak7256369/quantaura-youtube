@@ -18,6 +18,7 @@ YouTube.
 from __future__ import annotations
 
 import re
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from common import BUILD_DIR, PipelineAbort, config, env, log
@@ -292,15 +293,33 @@ def mirror(video: Path, snapshot: dict, score: dict) -> dict:
         return _failed(e, caption)
 
 
+def week_stem(facts: dict) -> str:
+    """`quantaura-week-<ISO year>-W<nn>`.
+
+    The year is not simply facts["iso_year"]: a recap published before that
+    field existed still has to be mirrorable, and --drive-only restores exactly
+    those older artifacts. An empty default produced `quantaura-week--W32`, so
+    the year is recovered from the week's own date range and only then falls
+    back to now — never to blank.
+    """
+    year = facts.get("iso_year")
+    if not year:
+        tail = (facts.get("date_range") or "").split()
+        try:
+            year = date.fromisoformat(tail[-1]).isocalendar().year
+        except (ValueError, IndexError):
+            year = datetime.now(timezone.utc).isocalendar().year
+        log.info(f"  facts carry no iso_year — using {year} for the filename")
+    return f"quantaura-week-{year}-W{int(facts['week_number']):02d}"
+
+
 def mirror_weekly(video: Path, facts: dict) -> dict:
     """Same for the Sunday recap. Named by ISO week, not by date, so it sorts
     beside the dailies without pretending to be one."""
     caption = ""
     try:
         caption = build_weekly_caption(facts)
-        stem = (f"quantaura-week-{facts.get('iso_year', '')}"
-                f"-W{int(facts['week_number']):02d}")
-        return _push(video, stem, caption)
+        return _push(video, week_stem(facts), caption)
     except Exception as e:                                       # noqa: BLE001
         return _failed(e, caption)
 
