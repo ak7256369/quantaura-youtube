@@ -33,8 +33,31 @@ def _esc(v) -> str:
     return html.escape(str(v))
 
 
+def _x_block(drive: dict | None) -> list[str]:
+    """The manual-X-post section.
+
+    X's API is pay-per-use since 2026-02-06 and the automated poster is off, so
+    this notification *is* the workflow: tap the link, download, copy the
+    caption, post. The caption goes in a <pre> block because Telegram renders
+    those with a copy button — a caption you have to select by hand on a phone
+    would not survive contact with a daily routine.
+    """
+    if drive is None:                    # never attempted — say nothing at all
+        return []
+    if not drive.get("ok"):
+        return ["", "📥 <b>X post</b>: Drive mirror failed — grab the mp4 from "
+                    "the workflow artifact if you want to post it.",
+                f"<code>{_esc(drive.get('error', ''))[:200]}</code>"]
+    lines = ["", "📥 <b>Ready to post on X</b>"]
+    if drive.get("video_url"):
+        lines.append(f"{drive['video_url']}  ({_esc(drive.get('size_mb'))} MB)")
+    if drive.get("caption"):
+        lines += ["", f"<pre>{_esc(drive['caption'])}</pre>"]
+    return lines
+
+
 def success(snapshot: dict, score: dict, script: dict, video_url: str | None,
-            visibility: str) -> None:
+            visibility: str, drive: dict | None = None) -> None:
     acc = score.get("accuracy_pct")
     lines = [
         "<b>✅ Video published</b>",
@@ -53,6 +76,7 @@ def success(snapshot: dict, score: dict, script: dict, video_url: str | None,
         lines.append(f"🔗 {video_url}")
     lines.append(f"Visibility: <b>{_esc(visibility)}</b>"
                  + (" — review and set public" if visibility == "private" else ""))
+    lines += _x_block(drive)
     _send("\n".join(lines))
 
 
@@ -71,16 +95,20 @@ def weekly_published(title: str, url: str, facts: dict, visibility: str) -> None
     ]))
 
 
-def rendered_only(snapshot: dict, script: dict, path: str, reason: str) -> None:
+def rendered_only(snapshot: dict, script: dict, path: str, reason: str,
+                  drive: dict | None = None) -> None:
+    # "Not uploaded" means not on YouTube. The Drive mirror runs first and is
+    # reported separately, so a failed YouTube upload can still leave a
+    # perfectly good X post waiting.
     _send("\n".join([
-        "<b>⚠️ Video rendered but not uploaded</b>",
+        "<b>⚠️ Video rendered but not uploaded to YouTube</b>",
         f"<b>{_esc(script['title'])}</b>",
         "",
         f"Reason: {_esc(reason)}",
         f"File: <code>{_esc(path)}</code>",
         "",
         "The mp4 is attached to the workflow run as an artifact (7 days).",
-    ]))
+    ] + _x_block(drive)))
 
 
 def skipped(reason: str, stage: str = "") -> None:

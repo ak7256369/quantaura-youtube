@@ -231,3 +231,20 @@ upload:
     - "crypto"
     - "algorithmic trading"
     - "data science"
+
+drive:
+  # Every daily video is mirrored to Google Drive so it can be posted to X by
+  # hand. X's API has been pay-per-use since 2026-02-06 — no free write tier,
+  # and $0.200 for any post containing a link — so the automated X poster in the
+  # quantaura-x repo is disabled and this is how the call reaches X.
+  #
+  # The folder is created by the pipeline itself under the drive.file scope,
+  # which can only ever see files this app made. Renaming it in the Drive UI is
+  # fine as long as GDRIVE_FOLDER_ID is pinned; rename it without pinning and
+  # the next run quietly makes a new one under the old name.
+  folder_name: "QuantAura daily videos"
+  # folder_id: ""            # optional; overridden by the GDRIVE_FOLDER_ID secret
+  # Its own short disclaimer rather than disclaimer.description, which is a
+  # multi-paragraph YouTube block that opens with a "---" rule. Same wording the
+  # retired X pipeline used, so the account's voice does not change mid-stream.
+  caption_disclaimer: "Automated research — not financial advice."

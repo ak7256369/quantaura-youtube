@@ -24,6 +24,10 @@ on:
         description: 'Silent placeholder audio (fast render check)'
         type: boolean
         default: false
+      no_drive:
+        description: 'Skip the Google Drive mirror'
+        type: boolean
+        default: false
       dry_run:
         description: 'Synthetic data, no API calls, no upload'
         type: boolean
@@ -79,6 +83,11 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          # Google Drive mirror — where the mp4 lands for the manual X post.
+          # Its own refresh token on the drive.file scope; the client id/secret
+          # fall back to the YouTube pair because it is the same OAuth client.
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
           # Operator notifications
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -88,6 +97,7 @@ jobs:
           [ "${{ inputs.no_voice }}"  = "true" ] && ARGS="$ARGS --no-voice"
           [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"
           [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
+          [ "${{ inputs.no_drive }}"  = "true" ] && ARGS="$ARGS --no-drive"
           python pipeline.py $ARGS
 
       - name: Commit scoreboard
@@ -156,5 +166,6 @@ jobs:
             build/*.jpg
             build/*.json
             build/*.ass
+            build/*.txt
           retention-days: 7
           if-no-files-found: ignore

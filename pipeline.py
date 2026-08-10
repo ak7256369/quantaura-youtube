@@ -3,6 +3,7 @@
     python pipeline.py                 # full run, uploads per config.yaml
     python pipeline.py --no-upload     # build everything, publish nothing
     python pipeline.py --no-voice      # silent placeholder audio, fast render
+    python pipeline.py --no-drive      # skip the Drive mirror, still upload
     python pipeline.py --dry-run       # no LLM, no upload: plumbing check
 
 The governing rule is in the failure path, not the happy path: any stage that
@@ -115,6 +116,14 @@ def build_script(snapshot: dict, score: dict) -> dict:
     raise PipelineAbort("Unreachable: script loop exited without a result")
 
 
+def _drive_extra(info: dict | None) -> dict:
+    """Drive columns for the run log — present only when the mirror worked, so
+    a missing `drive_url` in the log means the X copy needs doing by hand."""
+    if not (info and info.get("ok")):
+        return {}
+    return {"drive_url": info.get("video_url"), "drive_mb": info.get("size_mb")}
+
+
 def run(args: argparse.Namespace) -> int:
     stage = "startup"
     try:
@@ -169,6 +178,18 @@ def run(args: argparse.Namespace) -> int:
         stage = "thumbnail"
         thumb = thumb_mod.build(snapshot, score)
 
+        # ── mirror to Drive for the manual X post ──
+        # Ahead of the YouTube upload on purpose. X is now a hand-delivered
+        # surface (the API went pay-per-use — see drive.py), so this copy has no
+        # retry path of its own and should not be contingent on YouTube working.
+        stage = "drive"
+        drive_info = None
+        if args.no_drive or args.no_upload or args.dry_run:
+            log.info("Skipping the Drive mirror.")
+        else:
+            import drive as drive_mod
+            drive_info = drive_mod.mirror(video, snapshot, score)
+
         # ── publish ──
         stage = "upload"
         if args.no_upload or args.dry_run:
@@ -187,16 +208,18 @@ def run(args: argparse.Namespace) -> int:
             # The video is good; only delivery failed. Keep it as an artifact
             # so the day can still be published by hand.
             log.error(f"Upload failed: {e}")
-            _record_run("rendered", "upload", str(e), {"video": str(video)})
-            notify.rendered_only(snapshot, script, str(video), str(e))
+            _record_run("rendered", "upload", str(e),
+                        {"video": str(video), **_drive_extra(drive_info)})
+            notify.rendered_only(snapshot, script, str(video), str(e), drive_info)
             return 0
 
         visibility = config()["upload"]["visibility"]
         _record_run("published", "upload", script["title"],
                     {"url": url, "visibility": visibility,
                      "signal": snapshot["signal"],
-                     "duration_s": round(duration or 0, 1)})
-        notify.success(snapshot, score, script, url, visibility)
+                     "duration_s": round(duration or 0, 1),
+                     **_drive_extra(drive_info)})
+        notify.success(snapshot, score, script, url, visibility, drive_info)
         log.info(f"Done: {url}")
         return 0
 
@@ -221,6 +244,8 @@ def main() -> int:
                    help="build the video but do not publish it")
     p.add_argument("--no-voice", action="store_true",
                    help="use silent placeholder audio (fast render iteration)")
+    p.add_argument("--no-drive", action="store_true",
+                   help="skip the Google Drive mirror (still uploads to YouTube)")
     p.add_argument("--dry-run", action="store_true",
                    help="synthetic data, no API calls, no upload")
     p.add_argument("--force", action="store_true",

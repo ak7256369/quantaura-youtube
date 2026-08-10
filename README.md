@@ -67,6 +67,7 @@ python pipeline.py --no-upload
 | `--dry-run` | Synthetic data, no API calls, no LLM, silent audio, no upload |
 | `--no-voice` | Silent placeholder audio — fast iteration on the visual template |
 | `--no-upload` | Build everything from live data, publish nothing |
+| `--no-drive` | Skip the Google Drive mirror; still uploads to YouTube |
 
 ## Secrets
 
@@ -80,6 +81,8 @@ secrets (Settings → Secrets and variables → Actions).
 | `GEMINI_API_KEY` | Script writing | [aistudio.google.com](https://aistudio.google.com) → Get API key. Free tier. |
 | `GROQ_API_KEY` | Script fallback | [console.groq.com](https://console.groq.com) → API keys. Free tier. |
 | `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` | Upload | See below |
+| `GDRIVE_REFRESH_TOKEN` | Drive mirror for the manual X post | See below |
+| `GDRIVE_FOLDER_ID` | *Optional* — pins the Drive folder | Printed by `get_drive_token.py` |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Notifications | `@BotFather` → `/newbot`; get the chat id from `@userinfobot` |
 
 Only the Gemini key is needed to try the pipeline. Everything else degrades
@@ -107,6 +110,44 @@ a password.
 > supervised rollout and the platform's own restriction line up. Flip it to
 > `public` only after the API audit is approved **and** 14 consecutive clean days.
 
+### Google Drive credentials (one-time)
+
+Every daily video is mirrored to Google Drive so it can be posted to **X by
+hand**. X's API has been pay-per-use since 2026-02-06 — no free write tier, and
+$0.200 for any post containing a link — so the automated poster in the
+`quantaura-x` repo is switched off and this is how the daily call reaches X.
+
+Same Google Cloud project and the same `client_secret.json` as YouTube; a
+separate grant, so a broken Drive consent cannot take the channel upload down
+with it.
+
+1. APIs & Services → Library → enable **Google Drive API**.
+2. Mint the Drive refresh token on your own machine:
+
+```bash
+python get_drive_token.py client_secret.json
+```
+
+It creates the destination folder, prints its id, and prints
+`GDRIVE_REFRESH_TOKEN` to paste into GitHub.
+
+The scope is `drive.file` — the narrowest Drive scope there is. It can only see
+and touch files this app itself created, never the rest of your Drive. Google
+classifies it **non-sensitive**, so it needs no verification review of its own
+and cannot disturb the pending YouTube API audit.
+
+Each run leaves two files in the folder:
+
+| File | Contents |
+|---|---|
+| `quantaura-YYYY-MM-DD.mp4` | The 1080×1920 video, ~40–70s — inside X's 140s cap for non-Premium accounts |
+| `quantaura-YYYY-MM-DD.txt` | The caption, ≤280 weighted chars, ready to paste |
+
+The caption also arrives on Telegram in a copy-button block alongside the Drive
+link, which is the intended workflow: tap, download, copy, post. A Drive failure
+never fails the day — the video still goes to YouTube and the mp4 is still in
+the workflow artifact.
+
 ## YouTube Studio settings (one-time)
 
 - Settings → Channel → Advanced → set the channel default for **altered or
@@ -128,6 +169,7 @@ a password.
 | `render.py` | Scene drawing, captions, ffmpeg assembly |
 | `thumbnail.py` | Pillow text over an optional AI background |
 | `upload.py` | YouTube Data API v3 |
+| `drive.py` | Drive mirror + X caption, for posting to X by hand |
 | `notify.py` | Telegram operator messages |
 | `state/` | The scoreboard. Committed after every run. |
 
