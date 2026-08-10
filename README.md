@@ -142,8 +142,13 @@ Each run leaves two files in the folder:
 
 | File | Contents |
 |---|---|
-| `quantaura-YYYY-MM-DD.mp4` | The 1080×1920 video, ~40–70s — inside X's 140s cap for non-Premium accounts |
+| `quantaura-YYYY-MM-DD.mp4` | The daily 1080×1920 Short, ~40–70s — inside X's 140s cap for non-Premium accounts |
 | `quantaura-YYYY-MM-DD.txt` | The caption, ≤280 weighted chars, ready to paste |
+| `quantaura-week-YYYY-Wnn.mp4` | The Sunday recap, 1920×1080 and minutes long. **Over X's 140s cap** — mirrored for trimming or for posting elsewhere, not to go up whole |
+| `quantaura-week-YYYY-Wnn.txt` | The recap caption — the week's record, no live call |
+
+Uploads replace by name, so re-running a mirror for the same day or week
+updates the file in place instead of leaving a second copy behind.
 
 The caption also arrives on Telegram in a copy-button block alongside the Drive
 link, which is the intended workflow: tap, download, copy, post. A Drive failure

@@ -178,7 +178,10 @@ weekly:
   # Lowered 3 → 2 on 2026-08-07 so the first Sunday recap runs while the
   # scoreboard is still young; raise it back once the log has depth.
   min_resolved_calls: 2
-  max_seconds: 480
+  # Warning threshold only — a long recap still publishes. The actual runtime is
+  # set by weekly.word_budget(), because every scene lasts exactly as long as the
+  # narration spoken over it. 300s ≈ four minutes plus a minute of headroom.
+  max_seconds: 300
   caption_fontsize: 46
   caption_margin_v: 84
   # Research segments rotate by ISO week number — content lives in weekly.py.

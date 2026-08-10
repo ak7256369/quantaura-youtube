@@ -93,9 +93,12 @@ def build_post(facts: dict, script: dict, summary: dict,
             "position": portfolio["position"],
         } if portfolio else None),
 
-        # Narration that already passed the video's fact-check gates.
-        "narrative": {sec: list(script["sections"].get(sec) or [])
-                      for sec in ("intro", "days", "trend")},
+        # Narration that already passed the video's fact-check gates. Keyed off
+        # the script's own sections rather than a hard-coded list, so a section
+        # added to (or dropped from) the recap reaches the post without a second
+        # edit here — weekly.LLM_SECTIONS is the single source of that order.
+        "narrative": {sec: list(sentences)
+                      for sec, sentences in script["sections"].items()},
         "research": {
             "title": res_title,
             "bullets": list(res_bullets),

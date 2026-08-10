@@ -98,13 +98,45 @@ def build_caption(snapshot: dict, score: dict) -> str:
     if site:
         lines += ["", f"Confidence + the 4 models' votes: {site}"]
     lines += ["", disclaimer]
+    return _fit(lines)
 
+
+def build_weekly_caption(facts: dict) -> str:
+    """The weekly recap's caption — the record, never a call.
+
+    The recap is about calls that have already been graded, so unlike the daily
+    caption there is nothing here to withhold: a resolved outcome is public by
+    the time it appears.
+    """
+    cfg = config()
+    links = cfg.get("links") or {}
+    disclaimer = ((cfg.get("drive") or {}).get("caption_disclaimer")
+                  or cfg["disclaimer"]["narration"])
+
+    lines = [f"📊 Bitcoin model — week {facts.get('week_number')} recap", ""]
+    if facts.get("week_resolved"):
+        acc = facts.get("week_accuracy_pct")
+        lines.append(f"This week: {facts.get('week_hits')}/{facts['week_resolved']}"
+                     f" calls correct" + (f" ({acc:.0f}%)" if acc is not None else ""))
+    if facts.get("alltime_resolved"):
+        lines.append(f"All-time: {facts.get('alltime_hits')}/{facts['alltime_resolved']}"
+                     f" — wins and losses, all public")
+    link = links.get("blog") or links.get("record") or links.get("site")
+    if link:
+        lines += ["", f"Every graded call: {link}"]
+    lines += ["", disclaimer]
+    return _fit(lines)
+
+
+def _fit(lines: list[str]) -> str:
+    """Trim to X's 280 weighted characters, dropping whole lines not digits."""
     text = "\n".join(lines)
     n = weighted_len(text)
     if n > 280:
         # Drop the record line rather than truncate a number mid-digit. The call
         # and the price are the post; the record is the nice-to-have.
-        lines = [ln for ln in lines if not ln.startswith("Record:")]
+        lines = [ln for ln in lines
+                 if not ln.startswith(("Record:", "All-time:"))]
         text = "\n".join(lines)
         log.warning(f"  Caption was {n} weighted chars — dropped the record line")
         n = weighted_len(text)
@@ -255,33 +287,60 @@ def mirror(video: Path, snapshot: dict, score: dict) -> dict:
     caption = ""
     try:
         caption = build_caption(snapshot, score)
-        stem = f"quantaura-{snapshot['date']}"
-
-        # Written next to the video whether or not Drive is reachable, so the
-        # workflow artifact carries the caption too.
-        caption_path = BUILD_DIR / f"{stem}.txt"
-        caption_path.write_text(caption + "\n", encoding="utf-8")
-
-        service = _service()
-        folder_id = ensure_folder(service)
-
-        log.info("Mirroring to Google Drive...")
-        meta = _upload(service, video, folder_id, name=f"{stem}.mp4",
-                       mime="video/mp4", description=caption)
-        # The caption also goes up as a sibling .txt: the mp4's description is
-        # buried in Drive's details pane, and a .txt opens in one tap on a phone.
-        _upload(service, caption_path, folder_id, name=f"{stem}.txt",
-                mime="text/plain")
-
-        size_mb = round(int(meta.get("size") or 0) / (1 << 20), 1)
-        url = meta.get("webViewLink") or ""
-        log.info(f"  Drive: {meta.get('name')} ({size_mb} MB) {url}")
-        return {"ok": True, "caption": caption, "video_url": url,
-                "video_name": meta.get("name"), "size_mb": size_mb}
-
+        return _push(video, f"quantaura-{snapshot['date']}", caption)
     except Exception as e:                                       # noqa: BLE001
-        # Deliberately broad: a Drive failure must never cost the day's video.
-        detail = f"{type(e).__name__}: {e}"
-        log.warning(f"  Drive mirror failed ({detail}) — the mp4 is still in "
-                    f"the run artifact")
-        return {"ok": False, "error": detail, "caption": caption}
+        return _failed(e, caption)
+
+
+def mirror_weekly(video: Path, facts: dict) -> dict:
+    """Same for the Sunday recap. Named by ISO week, not by date, so it sorts
+    beside the dailies without pretending to be one."""
+    caption = ""
+    try:
+        caption = build_weekly_caption(facts)
+        stem = (f"quantaura-week-{facts.get('iso_year', '')}"
+                f"-W{int(facts['week_number']):02d}")
+        return _push(video, stem, caption)
+    except Exception as e:                                       # noqa: BLE001
+        return _failed(e, caption)
+
+
+def run_log_extra(info: dict | None) -> dict:
+    """Drive columns for the run log, written only when the mirror worked — so
+    a row without `drive_url` means that video's X post needs doing by hand."""
+    if not (info and info.get("ok")):
+        return {}
+    return {"drive_url": info.get("video_url"), "drive_mb": info.get("size_mb")}
+
+
+def _failed(e: Exception, caption: str) -> dict:
+    # Deliberately broad: a Drive failure must never cost the video.
+    detail = f"{type(e).__name__}: {e}"
+    log.warning(f"  Drive mirror failed ({detail}) — the mp4 is still in "
+                f"the run artifact")
+    return {"ok": False, "error": detail, "caption": caption}
+
+
+def _push(video: Path, stem: str, caption: str) -> dict:
+    """Upload the video and its caption. Raises; the mirror_* wrappers catch."""
+    # Written next to the video whether or not Drive is reachable, so the
+    # workflow artifact carries the caption too.
+    caption_path = BUILD_DIR / f"{stem}.txt"
+    caption_path.write_text(caption + "\n", encoding="utf-8")
+
+    service = _service()
+    folder_id = ensure_folder(service)
+
+    log.info("Mirroring to Google Drive...")
+    meta = _upload(service, video, folder_id, name=f"{stem}.mp4",
+                   mime="video/mp4", description=caption)
+    # The caption also goes up as a sibling .txt: the mp4's description is
+    # buried in Drive's details pane, and a .txt opens in one tap on a phone.
+    _upload(service, caption_path, folder_id, name=f"{stem}.txt",
+            mime="text/plain")
+
+    size_mb = round(int(meta.get("size") or 0) / (1 << 20), 1)
+    url = meta.get("webViewLink") or ""
+    log.info(f"  Drive: {meta.get('name')} ({size_mb} MB) {url}")
+    return {"ok": True, "caption": caption, "video_url": url,
+            "video_name": meta.get("name"), "size_mb": size_mb}

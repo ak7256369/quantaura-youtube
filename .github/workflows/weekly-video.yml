@@ -15,6 +15,10 @@ on:
         description: 'Silent placeholder audio (fast layout check)'
         type: boolean
         default: false
+      no_drive:
+        description: 'Skip the Google Drive mirror'
+        type: boolean
+        default: false
       dry_run:
         description: 'Synthetic week, no API calls, no upload'
         type: boolean
@@ -37,7 +41,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # 60, not the daily's 45: the recap is now ~4 minutes of 1080p rather than
+    # ~2, and the closing mux burns captions over the whole thing at preset
+    # medium. The 2026-08-09 run took 7 minutes end to end; this leaves room.
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -67,12 +74,18 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          # Drive mirror — the recap lands beside the dailies. It is landscape
+          # and minutes long, so it is over X's 140s cap for non-Premium
+          # accounts: mirrored for trimming or for posting elsewhere.
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           ARGS=""
           [ "${{ inputs.no_upload }}" = "true" ] && ARGS="$ARGS --no-upload"
           [ "${{ inputs.no_voice }}"  = "true" ] && ARGS="$ARGS --no-voice"
+          [ "${{ inputs.no_drive }}"  = "true" ] && ARGS="$ARGS --no-drive"
           [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"
           [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
           python weekly.py $ARGS

@@ -80,7 +80,8 @@ def success(snapshot: dict, score: dict, script: dict, video_url: str | None,
     _send("\n".join(lines))
 
 
-def weekly_published(title: str, url: str, facts: dict, visibility: str) -> None:
+def weekly_published(title: str, url: str, facts: dict, visibility: str,
+                     drive: dict | None = None) -> None:
     _send("\n".join([
         "<b>📅 Weekly recap published</b>",
         f"<b>{_esc(title)}</b>",
@@ -92,7 +93,7 @@ def weekly_published(title: str, url: str, facts: dict, visibility: str) -> None
         f"🔗 {url}",
         f"Visibility: <b>{_esc(visibility)}</b>"
         + (" — review and set public" if visibility == "private" else ""),
-    ]))
+    ] + _x_block(drive)))
 
 
 def rendered_only(snapshot: dict, script: dict, path: str, reason: str,

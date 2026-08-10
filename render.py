@@ -95,17 +95,24 @@ def _signal_color(signal: str) -> str:
 
 
 def _fit_text(fig, ax, y: float, s: str, size: int, max_w: float = W - 140,
-              x: float = W / 2, **kw):
+              x: float = W / 2, min_size: int = 30, **kw):
     """Centred text, shrunk until its MEASURED width fits.
 
     Wrapping by character count cannot do this job: DejaVu glyph widths vary
     enough that "Unanimous Buy Signal" passed a 22-char wrap and still clipped
     its first and last letters at 64pt. The canvas draws at 100 dpi, so display
     pixels and canvas coordinates coincide and the extent is directly usable.
+
+    `min_size` is the floor the shrinking stops at — below it text is no longer
+    worth reading and the layout is the thing that needs fixing. It is a
+    parameter rather than the hard-coded 30 it used to be because a caller
+    asking to fit text *at* 27pt was silently getting no fitting at all: the
+    loop's guard was the floor, so any size already under it skipped the
+    measurement entirely and overflowed unchecked.
     """
     txt = _text(ax, x, y, s, size=size, ha="center", **kw)
     renderer = fig.canvas.get_renderer()
-    while size > 30:
+    while size > min_size:
         w = txt.get_window_extent(renderer=renderer).width
         if w <= max_w:
             break

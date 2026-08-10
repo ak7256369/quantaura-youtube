@@ -22,6 +22,7 @@ import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
+import drive as drive_mod
 import fetch
 import factcheck
 import notify
@@ -139,13 +140,6 @@ def _prior_build() -> tuple[dict, dict, Path] | None:
     return snapshot, script, video
 
 
-def _drive_extra(info: dict | None) -> dict:
-    """Drive columns for the run log — present only when the mirror worked, so
-    a missing `drive_url` in the log means the X copy needs doing by hand."""
-    if not (info and info.get("ok")):
-        return {}
-    return {"drive_url": info.get("video_url"), "drive_mb": info.get("size_mb")}
-
 
 def run(args: argparse.Namespace) -> int:
     stage = "startup"
@@ -166,13 +160,12 @@ def run(args: argparse.Namespace) -> int:
                 log.info(f"Reusing the published render for {snapshot['date']} "
                          f"— the X post will be the same file as the video.")
                 score = scoreboard.summary()
-                import drive as drive_mod
                 drive_info = drive_mod.mirror(video, snapshot, score)
                 ok = bool(drive_info and drive_info.get("ok"))
                 _record_run("mirrored" if ok else "rendered", "drive",
                             "Mirrored the published render — no re-render, no upload.",
                             {"video": str(video), "reused": True,
-                             **_drive_extra(drive_info)})
+                             **drive_mod.run_log_extra(drive_info)})
                 notify.rendered_only(snapshot, script, str(video),
                                      "--drive-only (mirrored the published render)",
                                      drive_info)
@@ -238,7 +231,6 @@ def run(args: argparse.Namespace) -> int:
         if args.no_drive or args.no_upload or args.dry_run:
             log.info("Skipping the Drive mirror.")
         else:
-            import drive as drive_mod
             drive_info = drive_mod.mirror(video, snapshot, score)
 
         # ── publish ──
@@ -250,7 +242,7 @@ def run(args: argparse.Namespace) -> int:
             _record_run("mirrored" if ok else "rendered", "drive",
                         "Drive mirror only — not uploaded to YouTube.",
                         {"video": str(video), "duration_s": round(duration or 0, 1),
-                         **_drive_extra(drive_info)})
+                         **drive_mod.run_log_extra(drive_info)})
             # Reuses rendered_only's shape: from the channel's point of view this
             # day genuinely was rendered and not uploaded. The X block carries
             # the part that matters.
@@ -276,7 +268,7 @@ def run(args: argparse.Namespace) -> int:
             # so the day can still be published by hand.
             log.error(f"Upload failed: {e}")
             _record_run("rendered", "upload", str(e),
-                        {"video": str(video), **_drive_extra(drive_info)})
+                        {"video": str(video), **drive_mod.run_log_extra(drive_info)})
             notify.rendered_only(snapshot, script, str(video), str(e), drive_info)
             return 0
 
@@ -289,7 +281,7 @@ def run(args: argparse.Namespace) -> int:
                      # --drive-only pass reads it back to mirror the exact file
                      # that was published, instead of guessing from run order.
                      "run_id": os.environ.get("GITHUB_RUN_ID"),
-                     **_drive_extra(drive_info)})
+                     **drive_mod.run_log_extra(drive_info)})
         notify.success(snapshot, score, script, url, visibility, drive_info)
         log.info(f"Done: {url}")
         return 0
@@ -336,7 +328,6 @@ def main() -> int:
         # Short-circuits ahead of run(): the check needs no data, no script and
         # no render, and a credential probe that first spends five minutes
         # building a video is not a probe anyone will run.
-        import drive as drive_mod
         return 0 if drive_mod.check() else 1
 
     return run(args)
