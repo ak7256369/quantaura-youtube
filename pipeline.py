@@ -5,6 +5,7 @@
     python pipeline.py --no-voice      # silent placeholder audio, fast render
     python pipeline.py --no-drive      # skip the Drive mirror, still upload
     python pipeline.py --check-drive   # verify Drive auth only, then exit
+    python pipeline.py --drive-only    # X post only: render + Drive, no YouTube
     python pipeline.py --dry-run       # no LLM, no upload: plumbing check
 
 The governing rule is in the failure path, not the happy path: any stage that
@@ -130,7 +131,7 @@ def run(args: argparse.Namespace) -> int:
     try:
         # The catch-up schedule exists because GitHub drops cron runs; this is
         # what stops it publishing a second video when the first slot worked.
-        publishing = not (args.dry_run or args.no_upload)
+        publishing = not (args.dry_run or args.no_upload or args.drive_only)
         if publishing and not args.force and published_today("daily"):
             log.info("A daily video was already published today — nothing to do.")
             return 0
@@ -148,7 +149,13 @@ def run(args: argparse.Namespace) -> int:
         # ── scoreboard: grade what is due, then log today ──
         stage = "scoreboard"
         log.info("Updating scoreboard...")
-        if not args.dry_run:
+        if args.drive_only:
+            # Read, never write. A --drive-only run is a second pass over a day
+            # the scheduled run already recorded; re-recording would move
+            # today's call to a later timestamp and price, quietly shifting the
+            # 24h window the published video already committed to.
+            log.info("  --drive-only: reading the scoreboard, not writing to it")
+        elif not args.dry_run:
             scoreboard.resolve_due()
             scoreboard.record(snapshot)
         score = scoreboard.summary()
@@ -193,6 +200,22 @@ def run(args: argparse.Namespace) -> int:
 
         # ── publish ──
         stage = "upload"
+        if args.drive_only:
+            ok = bool(drive_info and drive_info.get("ok"))
+            log.info("--drive-only: skipping YouTube." if ok
+                     else "--drive-only: Drive mirror failed, nothing to show for it.")
+            _record_run("mirrored" if ok else "rendered", "drive",
+                        "Drive mirror only — not uploaded to YouTube.",
+                        {"video": str(video), "duration_s": round(duration or 0, 1),
+                         **_drive_extra(drive_info)})
+            # Reuses rendered_only's shape: from the channel's point of view this
+            # day genuinely was rendered and not uploaded. The X block carries
+            # the part that matters.
+            notify.rendered_only(snapshot, script, str(video),
+                                 "--drive-only (X post requested on demand)",
+                                 drive_info)
+            return 0 if ok else 1
+
         if args.no_upload or args.dry_run:
             reason = "--dry-run" if args.dry_run else "--no-upload"
             log.info(f"Skipping upload ({reason}). Video at {video}")
@@ -249,6 +272,9 @@ def main() -> int:
                    help="skip the Google Drive mirror (still uploads to YouTube)")
     p.add_argument("--check-drive", action="store_true",
                    help="verify the Drive credentials and folder, then exit")
+    p.add_argument("--drive-only", action="store_true",
+                   help="render and mirror to Drive for an X post, without "
+                        "uploading to YouTube or writing to the scoreboard")
     p.add_argument("--dry-run", action="store_true",
                    help="synthetic data, no API calls, no upload")
     p.add_argument("--force", action="store_true",

@@ -32,6 +32,10 @@ on:
         description: 'Verify Drive credentials only — renders nothing, publishes nothing'
         type: boolean
         default: false
+      drive_only:
+        description: 'X post only — render and mirror to Drive, no YouTube upload, scoreboard untouched'
+        type: boolean
+        default: false
       dry_run:
         description: 'Synthetic data, no API calls, no upload'
         type: boolean
@@ -106,6 +110,7 @@ jobs:
           [ "${{ inputs.force }}"     = "true" ] && ARGS="$ARGS --force"
           [ "${{ inputs.no_drive }}"  = "true" ] && ARGS="$ARGS --no-drive"
           [ "${{ inputs.check_drive }}" = "true" ] && ARGS="$ARGS --check-drive"
+          [ "${{ inputs.drive_only }}"  = "true" ] && ARGS="$ARGS --drive-only"
           python pipeline.py $ARGS
 
       - name: Commit scoreboard

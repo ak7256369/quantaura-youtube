@@ -69,6 +69,7 @@ python pipeline.py --no-upload
 | `--no-upload` | Build everything from live data, publish nothing |
 | `--no-drive` | Skip the Google Drive mirror; still uploads to YouTube |
 | `--check-drive` | Verify Drive credentials and folder, then exit. Renders nothing, writes nothing. Also a `workflow_dispatch` input, which is the point: the token is minted locally but spent in Actions, and this is what proves the two agree. |
+| `--drive-only` | Render and mirror to Drive for an X post, without uploading to YouTube. Reads the scoreboard but never writes to it, so it is safe to run on a day the scheduled job already covered — use this rather than `--force`, which would publish a second video and move today's recorded call to a later timestamp. |
 
 ## Secrets
 

@@ -251,7 +251,7 @@ def record_run(status: str, stage: str, detail: str, extra: dict | None = None,
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         icon = {"published": "✅", "rendered": "⚠️", "skipped": "🚫",
-                "crashed": "💥"}.get(status, "•")
+                "crashed": "💥", "mirrored": "📥"}.get(status, "•")
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write(f"### {icon} {status.title()} ({kind}) — {row['date']}\n\n"
                      f"**Stage:** {stage}\n\n{detail[:600]}\n\n")
