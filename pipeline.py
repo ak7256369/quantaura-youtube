@@ -16,6 +16,7 @@ a wrong number in it is permanent.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import traceback
 from datetime import datetime, timezone
@@ -30,7 +31,7 @@ import scriptwriter
 import thumbnail as thumb_mod
 import voice as voice_mod
 from common import (BUILD_DIR, PipelineAbort, config, log, published_today,
-                    record_run as _record_run, write_json)
+                    read_json, record_run as _record_run, write_json)
 
 
 def _dry_snapshot() -> dict:
@@ -118,6 +119,26 @@ def build_script(snapshot: dict, score: dict) -> dict:
     raise PipelineAbort("Unreachable: script loop exited without a result")
 
 
+def _prior_build() -> tuple[dict, dict, Path] | None:
+    """The snapshot, script and mp4 of a run that already happened, if the
+    workflow restored its artifact into build/.
+
+    --drive-only exists to produce the X post for a day the scheduled run
+    already covered. Rendering afresh would mirror a *different* video from the
+    one on YouTube — same call, but a later price and timestamp — so when the
+    published run's artifact is available we mirror that exact file instead.
+    Returns None if anything is missing, and the caller renders normally.
+    """
+    video, snap, scr = (BUILD_DIR / "video.mp4", BUILD_DIR / "snapshot.json",
+                        BUILD_DIR / "script.json")
+    if not (video.exists() and snap.exists() and scr.exists()):
+        return None
+    snapshot, script = read_json(snap), read_json(scr)
+    if not (snapshot and script and snapshot.get("date")):
+        return None
+    return snapshot, script, video
+
+
 def _drive_extra(info: dict | None) -> dict:
     """Drive columns for the run log — present only when the mirror worked, so
     a missing `drive_url` in the log means the X copy needs doing by hand."""
@@ -135,6 +156,28 @@ def run(args: argparse.Namespace) -> int:
         if publishing and not args.force and published_today("daily"):
             log.info("A daily video was already published today — nothing to do.")
             return 0
+
+        # ── reuse the published render, when there is one ──
+        if args.drive_only:
+            prior = _prior_build()
+            if prior:
+                stage = "drive"
+                snapshot, script, video = prior
+                log.info(f"Reusing the published render for {snapshot['date']} "
+                         f"— the X post will be the same file as the video.")
+                score = scoreboard.summary()
+                import drive as drive_mod
+                drive_info = drive_mod.mirror(video, snapshot, score)
+                ok = bool(drive_info and drive_info.get("ok"))
+                _record_run("mirrored" if ok else "rendered", "drive",
+                            "Mirrored the published render — no re-render, no upload.",
+                            {"video": str(video), "reused": True,
+                             **_drive_extra(drive_info)})
+                notify.rendered_only(snapshot, script, str(video),
+                                     "--drive-only (mirrored the published render)",
+                                     drive_info)
+                return 0 if ok else 1
+            log.info("No published render restored into build/ — rendering fresh.")
 
         # ── data ──
         stage = "fetch"
@@ -242,6 +285,10 @@ def run(args: argparse.Namespace) -> int:
                     {"url": url, "visibility": visibility,
                      "signal": snapshot["signal"],
                      "duration_s": round(duration or 0, 1),
+                     # Which Actions run holds this video's artifact. A later
+                     # --drive-only pass reads it back to mirror the exact file
+                     # that was published, instead of guessing from run order.
+                     "run_id": os.environ.get("GITHUB_RUN_ID"),
                      **_drive_extra(drive_info)})
         notify.success(snapshot, score, script, url, visibility, drive_info)
         log.info(f"Done: {url}")

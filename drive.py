@@ -196,18 +196,46 @@ def check() -> bool:
         return False
 
 
+def _existing(service, folder_id: str, name: str) -> str | None:
+    safe = name.replace("\\", "\\\\").replace("'", "\\'")
+    found = service.files().list(
+        q=f"name='{safe}' and '{folder_id}' in parents and trashed=false",
+        spaces="drive", fields="files(id)", pageSize=1,
+    ).execute().get("files", [])
+    return found[0]["id"] if found else None
+
+
 def _upload(service, path: Path, folder_id: str, *, name: str, mime: str,
             description: str = "") -> dict:
-    from googleapiclient.http import MediaFileUpload
+    """Create the file, or replace its content if today's is already there.
 
-    body: dict = {"name": name, "parents": [folder_id]}
-    if description:
-        body["description"] = description[:4000]
+    Re-running the mirror for a date is a supported recovery path, so plain
+    create() would leave two files with the same name in the folder — Drive
+    permits that, and the operator would have no way to tell which one is
+    current. Replacing in place keeps one file per day and preserves its id and
+    link.
+    """
+    from googleapiclient.http import MediaFileUpload
 
     media = MediaFileUpload(str(path), chunksize=4 << 20, resumable=True,
                             mimetype=mime)
-    request = service.files().create(body=body, media_body=media,
-                                     fields="id,name,size,webViewLink")
+    fields = "id,name,size,webViewLink"
+    body: dict = {}
+    if description:
+        body["description"] = description[:4000]
+
+    file_id = _existing(service, folder_id, name)
+    if file_id:
+        # No "parents" on update — Drive rejects it there; the file is already
+        # in the folder.
+        log.info(f"    replacing existing {name}")
+        request = service.files().update(fileId=file_id, body=body,
+                                         media_body=media, fields=fields)
+    else:
+        request = service.files().create(body={**body, "name": name,
+                                               "parents": [folder_id]},
+                                         media_body=media, fields=fields)
+
     response = None
     while response is None:
         status, response = request.next_chunk()

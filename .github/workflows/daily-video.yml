@@ -49,6 +49,7 @@ concurrency:
 
 permissions:
   contents: write        # commit the updated scoreboard back to main
+  actions: read          # drive_only pulls the published run's mp4 artifact
 
 jobs:
   publish:
@@ -80,6 +81,67 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Restore the published render
+        # --drive-only must mirror the exact file that went to YouTube, not a
+        # fresh render of the same day — same call, but minutes later and a few
+        # dollars off, which would leave the X post disagreeing with the video.
+        # The published mp4 lives in that run's artifact (7-day retention).
+        # Best-effort: if nothing is found the pipeline just renders.
+        if: inputs.drive_only == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TODAY=$(date -u +%F)
+          mkdir -p build
+
+          # The publishing run records its own id in the log. Prefer that: a
+          # --drive-only run also leaves a video-* artifact, so "the newest run
+          # with an mp4" would happily pick up an earlier re-render instead of
+          # the file that actually went to YouTube.
+          RUN_ID=$(TODAY="$TODAY" python - <<'PY'
+          import json, os, pathlib
+          today, out = os.environ["TODAY"], ""
+          p = pathlib.Path("state/runs.jsonl")
+          if p.exists():
+              for ln in p.read_text(encoding="utf-8", errors="replace").splitlines():
+                  try:
+                      r = json.loads(ln)
+                  except Exception:
+                      continue
+                  if (r.get("date") == today and r.get("kind", "daily") == "daily"
+                          and r.get("status") == "published" and r.get("run_id")):
+                      out = str(r["run_id"])
+          print(out)
+          PY
+          )
+
+          # Rows written before run_id was logged have none; the day's scheduled
+          # run is the right guess for those.
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(gh run list --workflow=daily-video.yml --event=schedule \
+                       --status=success --limit 10 --json databaseId,createdAt \
+                       -q "[.[] | select(.createdAt | startswith(\"$TODAY\"))] | .[0].databaseId // empty")
+            echo "No run_id in the log — falling back to today's scheduled run: ${RUN_ID:-none}"
+          fi
+
+          if [ -z "$RUN_ID" ]; then
+            echo "Nothing published for $TODAY — the pipeline will render fresh."
+            exit 0
+          fi
+
+          gh run download "$RUN_ID" --dir _restore --pattern 'video-*' 2>/dev/null || {
+            echo "Artifact for run $RUN_ID unavailable (expired?) — rendering fresh."
+            exit 0; }
+          SRC=$(find _restore -name video.mp4 -print -quit)
+          D=$(dirname "${SRC:-_restore/none}")
+          # All three or none: a video without its snapshot cannot be captioned.
+          if [ -n "$SRC" ] && [ -f "$D/snapshot.json" ] && [ -f "$D/script.json" ]; then
+            cp "$D/video.mp4" "$D/snapshot.json" "$D/script.json" build/
+            echo "Restored the published render from run $RUN_ID"
+          else
+            echo "Run $RUN_ID has no complete render — the pipeline will render fresh."
+          fi
 
       - name: Run pipeline
         env:
