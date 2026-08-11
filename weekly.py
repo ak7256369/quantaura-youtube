@@ -60,15 +60,18 @@ from common import (BUILD_DIR, PipelineAbort, config, log,          # noqa: E402
 from llm import complete_json                                      # noqa: E402
 from common import prompt as load_prompt                           # noqa: E402
 
-SECTIONS = ["intro", "days", "spotlight", "trend", "portfolio", "record",
-            "method", "research", "watchlist", "outro"]
 LLM_SECTIONS = ("intro", "days", "spotlight", "trend", "portfolio", "record")
+FIXED_SECTIONS = ("method", "research", "watchlist", "outro")
 # Dropped from both the script and the scene list when the facts cannot support
 # them. The paper portfolio needs priced rows; a week that somehow has none
 # should lose the segment, not stall the recap on a section the model cannot
 # write honestly.
 OPTIONAL_LLM_SECTIONS = ("portfolio",)
-FIXED_SECTIONS = ("method", "research", "watchlist", "outro")
+
+# Scene order, derived rather than written out a third time. The narration, the
+# scene builders and section_spans all read this list, so a hand-kept copy is
+# just a fourth chance for them to disagree about what the video contains.
+SECTIONS = list(LLM_SECTIONS) + list(FIXED_SECTIONS)
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday", "Sunday"]
@@ -377,6 +380,21 @@ def _wh() -> tuple[int, int]:
     return int(w["width"]), int(w["height"])
 
 
+def _safe_bottom(h: int) -> float:
+    """Lowest y a scene may draw at. Below this belongs to the captions.
+
+    Burned-in captions are not an overlay these cards can share: at
+    caption_fontsize 46 with margin_v 84, a three-line caption reaches ~270px
+    up from the bottom edge, opaque box and all. Anything a scene puts there is
+    simply not in the video, which is how the recap shipped a "24H MOVE" tile
+    with its own number hidden behind the narration of that number.
+
+    Landscape only. The daily Short has the opposite problem — a tall frame
+    with room to spare — and keeps its own geometry in render.py.
+    """
+    return h - 270
+
+
 def _lheader(ax, w: int, label: str, week_no: int):
     t = R._theme()
     R._text(ax, 72, 84, "QUANTAURA", size=36, weight="bold", color=t["accent"])
@@ -408,16 +426,16 @@ def scene_title(facts: dict, path: Path) -> Path:
     strip = len(days) * dot + (len(days) - 1) * gap
     x = (w - strip) / 2
     for d in days:
-        ax.add_patch(R.plt.Circle((x + dot / 2, 760), dot / 2,
+        ax.add_patch(R.plt.Circle((x + dot / 2, 720), dot / 2,
                                   color=t["up"] if d["correct"] else t["down"], zorder=3))
-        R._text(ax, x + dot / 2, 760, "✓" if d["correct"] else "✗",
+        R._text(ax, x + dot / 2, 720, "✓" if d["correct"] else "✗",
                 size=30, weight="bold", color=t["bg"], ha="center")
-        R._text(ax, x + dot / 2, 840, d["weekday"][:3].upper(), size=24,
+        R._text(ax, x + dot / 2, 796, d["weekday"][:3].upper(), size=24,
                 color=t["muted"], ha="center")
         x += dot + gap
 
-    R._text(ax, w / 2, h - 90, "graded on the realised 24-hour move · flat band ±"
-            f"{facts.get('flat_band_pct', 1)}%", size=28, color=t["muted"], ha="center")
+    # The grading rule used to be footnoted here, below the caption line where
+    # nobody could read it. The `method` scene now states it properly.
     return R._save(fig, path)
 
 
@@ -431,16 +449,19 @@ def scene_days(facts: dict, path: Path, rows_shown: int | None = None) -> Path:
 
     days = facts["days"]
     # Header row sits below the scene label, not on top of it; rows then fill
-    # the remaining height.
-    top = 300
-    row_h = min(106, (h - top - 50) // max(len(days), 1))
+    # the remaining height. That height stops at the caption safe area, not at
+    # the frame edge — a full seven-day week used to run its last two rows
+    # underneath the burned-in narration.
+    top = 282
+    row_h = min(106, int(_safe_bottom(h) - top) // max(len(days), 1))
     cols = {"day": 110, "call": 470, "conf": 800, "move": 1150, "verdict": w - 180}
 
-    R._text(ax, cols["day"], top - 46, "DAY", size=26, color=t["muted"])
-    R._text(ax, cols["call"], top - 46, "CALL", size=26, color=t["muted"])
-    R._text(ax, cols["conf"], top - 46, "CONFIDENCE", size=26, color=t["muted"])
-    R._text(ax, cols["move"], top - 46, "24H MOVE", size=26, color=t["muted"])
-    R._text(ax, cols["verdict"], top - 46, "RESULT", size=26, color=t["muted"], ha="right")
+    hy = top - 44          # clear of the scene label at y=178
+    R._text(ax, cols["day"], hy, "DAY", size=26, color=t["muted"])
+    R._text(ax, cols["call"], hy, "CALL", size=26, color=t["muted"])
+    R._text(ax, cols["conf"], hy, "CONFIDENCE", size=26, color=t["muted"])
+    R._text(ax, cols["move"], hy, "24H MOVE", size=26, color=t["muted"])
+    R._text(ax, cols["verdict"], hy, "RESULT", size=26, color=t["muted"], ha="right")
 
     y = top
     # Row geometry is computed from the full week above, so a partially dealt
@@ -486,10 +507,10 @@ def scene_spotlight(facts: dict, path: Path) -> Path:
             size=36, color=t["muted"], ha="center")
 
     sig = n.get("signal", "—")
-    R._text(ax, w / 2, 520, sig, size=180, weight="bold",
+    R._text(ax, w / 2, 490, sig, size=180, weight="bold",
             color=R._signal_color(sig), ha="center")
     if n.get("gated"):
-        R._text(ax, w / 2, 630, "downgraded by the confidence gate", size=32,
+        R._text(ax, w / 2, 600, "downgraded by the confidence gate", size=32,
                 color=t["flat"], ha="center")
 
     # Three tiles: what the model said, what the market did, how it graded.
@@ -499,16 +520,14 @@ def scene_spotlight(facts: dict, path: Path) -> Path:
               t["up"] if (chg or 0) >= 0 else t["down"]),
              ("RESULT", "MISS" if miss else "HIT", t["down"] if miss else t["up"])]
     bw, gap = 460, 40
+    ty = _safe_bottom(h) - 180
     x = (w - (len(tiles) * bw + (len(tiles) - 1) * gap)) / 2
     for label, value, colour in tiles:
-        R._panel(ax, x, 720, bw, 190, color=t["panel"])
-        R._text(ax, x + bw / 2, 780, label, size=28, color=t["muted"], ha="center")
-        R._text(ax, x + bw / 2, 860, value, size=68, weight="bold", color=colour,
+        R._panel(ax, x, ty, bw, 180, color=t["panel"])
+        R._text(ax, x + bw / 2, ty + 56, label, size=28, color=t["muted"], ha="center")
+        R._text(ax, x + bw / 2, ty + 132, value, size=68, weight="bold", color=colour,
                 ha="center")
         x += bw + gap
-
-    R._text(ax, w / 2, h - 80, "logged before the outcome was knowable",
-            size=28, color=t["muted"], ha="center")
     return R._save(fig, path)
 
 
@@ -518,7 +537,9 @@ def scene_trend(facts: dict, candles: list[list] | None, path: Path) -> Path:
     fig, ax = R._canvas(w, h)
     _lheader(ax, w, "the week on the chart", facts["week_number"])
 
-    x0, x1, y0, y1 = 120, w - 120, 280, h - 260
+    # The axis label below the chart has to clear the captions too, so the plot
+    # bottom sits a label's height above the safe area rather than at h-260.
+    x0, x1, y0, y1 = 120, w - 120, 280, _safe_bottom(h) - 50
     if candles and len(candles) >= 8:
         closes = [c[4] for c in candles]
         times = [c[0] for c in candles]
@@ -577,9 +598,10 @@ def scene_portfolio(facts: dict, curve: list[dict], path: Path,
     p = facts.get("portfolio") or {}
     _lheader(ax, w, "the paper portfolio", facts["week_number"])
 
-    # Bottom stops at h-260, not h-200: the two caption lines and the verdict
-    # below the chart need the room.
-    x0, x1, y0, y1 = 120, w - 640, 300, h - 260
+    # The chart gives up its bottom to two caption lines and the verdict, which
+    # in turn have to finish above the burned-in narration.
+    safe = _safe_bottom(h)
+    x0, x1, y0, y1 = 120, w - 640, 300, safe - 130
     pts = curve[:max(2, int(len(curve) * reveal))] if len(curve) >= 2 else []
     if pts:
         vals = [c["value"] for c in curve] + [c["hold"] for c in curve]
@@ -607,8 +629,10 @@ def scene_portfolio(facts: dict, curve: list[dict], path: Path,
         R._text(ax, x0, y0 - 40, "FOLLOWING THE CALLS", size=26,
                 weight="bold", color=t["accent"])
         R._text(ax, x0 + 620, y0 - 40, "JUST HOLDING", size=26, color=t["muted"])
-        R._text(ax, x1, y0 - 40, f"${hi:,.0f}", size=24, color=t["muted"], ha="right")
-        R._text(ax, x1, y1 + 36, f"${lo:,.0f}", size=24, color=t["muted"], ha="right")
+        # Both axis labels live inside the plot box. Below it is where the
+        # caption lines go, and a right-aligned "$9,985" landed on top of them.
+        R._text(ax, x1, y0 + 26, f"${hi:,.0f}", size=24, color=t["muted"], ha="right")
+        R._text(ax, x1, y1 - 26, f"${lo:,.0f}", size=24, color=t["muted"], ha="right")
     else:
         R._text(ax, (x0 + x1) / 2, (y0 + y1) / 2, "curve unavailable",
                 size=34, color=t["muted"], ha="center")
@@ -621,12 +645,15 @@ def scene_portfolio(facts: dict, curve: list[dict], path: Path,
              ("JUST HOLDING", f"{hold:+.2f}%" if hold is not None else "—",
               t["up"] if (hold or 0) >= 0 else t["down"]),
              ("FEES PAID", f"${p.get('fees_paid_usd', 0):,.2f}", t["muted"])]
-    tx, ty, tw = w - 580, 300, 460
-    for label, value, colour in tiles:
-        R._panel(ax, tx, ty, tw, 150, color=t["panel"])
-        R._text(ax, tx + 34, ty + 48, label, size=25, color=t["muted"])
-        R._text(ax, tx + 34, ty + 108, value, size=54, weight="bold", color=colour)
-        ty += 170
+    # The tile column is on the right, but a caption line is centred and wide
+    # enough to reach under it, so these stop at the safe area as well.
+    tx, tw, ttop = w - 580, 460, 260
+    pitch = (safe - ttop) / len(tiles)
+    for i, (label, value, colour) in enumerate(tiles):
+        ty = ttop + i * pitch
+        R._panel(ax, tx, ty, tw, pitch - 22, color=t["panel"])
+        R._text(ax, tx + 34, ty + 40, label, size=25, color=t["muted"])
+        R._text(ax, tx + 34, ty + 88, value, size=52, weight="bold", color=colour)
 
     # Stated plainly whichever way it went. The tradeability research says this
     # line probably reads "behind" more often than not, and printing it anyway
@@ -639,9 +666,9 @@ def scene_portfolio(facts: dict, curve: list[dict], path: Path,
                f"committed calls · {trades} trade{'' if trades == 1 else 's'} · "
                f"fees included")
     for i, line in enumerate(R._wrap(caption, 46)[:2]):
-        R._fit_text(fig, ax, h - 165 + i * 40, line, 26, max_w=x1 - x0,
+        R._fit_text(fig, ax, safe - 92 + i * 36, line, 26, max_w=x1 - x0,
                     x=(x0 + x1) / 2, min_size=18, color=t["muted"])
-    R._text(ax, (x0 + x1) / 2, h - 60,
+    R._text(ax, (x0 + x1) / 2, safe - 12,
             "behind buy-and-hold" if behind else "ahead of buy-and-hold",
             size=30, weight="bold", color=t["down"] if behind else t["up"], ha="center")
     return R._save(fig, path)
@@ -654,26 +681,27 @@ def scene_record(facts: dict, path: Path) -> Path:
     fig, ax = R._canvas(w, h)
     _lheader(ax, w, "the record so far", facts["week_number"])
 
+    safe = _safe_bottom(h)
     acc = facts.get("alltime_accuracy_pct")
-    R._text(ax, 360, 420, f"{acc:.0f}%" if acc is not None else "—", size=190,
+    R._text(ax, 360, 400, f"{acc:.0f}%" if acc is not None else "—", size=190,
             weight="bold", ha="center",
             color=t["up"] if acc is not None and acc >= 50 else t["down"])
-    R._text(ax, 360, 560, f"{facts.get('alltime_hits', 0)} hits · "
+    R._text(ax, 360, 535, f"{facts.get('alltime_hits', 0)} hits · "
                           f"{facts.get('alltime_misses', 0)} misses", size=34,
             color=t["muted"], ha="center")
-    R._text(ax, 360, 620, f"over {facts.get('alltime_resolved', 0)} graded calls",
+    R._text(ax, 360, 592, f"over {facts.get('alltime_resolved', 0)} graded calls",
             size=34, color=t["muted"], ha="center")
 
     # Every graded outcome as a dot strip — the honest shape of the record,
     # which an aggregate percentage always flatters or hides.
     recent = facts.get("_recent") or []
     if recent:
-        R._text(ax, 120, 760, f"LAST {len(recent)} CALLS", size=28, weight="bold",
-                color=t["muted"])
+        R._text(ax, 120, safe - 130, f"LAST {len(recent)} CALLS", size=28,
+                weight="bold", color=t["muted"])
         dot, dgap = 34, 12
         x = 120
         for r in recent:
-            ax.add_patch(R.plt.Circle((x + dot / 2, 850), dot / 2,
+            ax.add_patch(R.plt.Circle((x + dot / 2, safe - 50), dot / 2,
                                       color=t["up"] if r["correct"] else t["down"],
                                       zorder=3))
             x += dot + dgap
@@ -691,15 +719,15 @@ def scene_record(facts: dict, path: Path) -> Path:
                          f"{a:.0f}% of {s.get('n', 0)}" if a is not None
                          else f"— of {s.get('n', 0)}"))
 
-    y = 300
-    for label, value in rows_txt:
-        R._panel(ax, w - 780, y, 660, 118, color=t["panel"])
-        R._text(ax, w - 740, y + 59, label, size=34, color=t["muted"])
-        R._text(ax, w - 160, y + 59, value, size=40, weight="bold", ha="right")
-        y += 136
-
-    R._text(ax, w / 2, h - 70, "the full log is public at quantaura.tech",
-            size=28, color=t["muted"], ha="center")
+    # Pitched to fill exactly the space above the captions, however many rows
+    # there are — five today, more if a signal class is ever added.
+    pitch = (safe - 300) / len(rows_txt)
+    for i, (label, value) in enumerate(rows_txt):
+        y = 300 + i * pitch
+        R._panel(ax, w - 780, y, 660, pitch - 18, color=t["panel"])
+        cy = y + (pitch - 18) / 2
+        R._text(ax, w - 740, cy, label, size=34, color=t["muted"])
+        R._text(ax, w - 160, cy, value, size=40, weight="bold", ha="right")
     return R._save(fig, path)
 
 
@@ -732,10 +760,10 @@ def scene_method(week_no: int, path: Path, steps_shown: int | None = None) -> Pa
                         x=x + bw / 2, min_size=18, color=t["muted"])
         x += bw + gap
 
-    R._text(ax, w / 2, h - 150, "The same rule every day, applied to a call that was "
-            "already written down.", size=34, ha="center")
-    R._text(ax, w / 2, h - 80, "You can check any of it on your own chart.",
-            size=30, color=t["muted"], ha="center")
+    # One closing line, not two: the second sat squarely under the captions.
+    R._text(ax, w / 2, _safe_bottom(h) - 30,
+            "The same rule every day — and you can check any of it on your own chart.",
+            size=32, ha="center")
     return R._save(fig, path)
 
 
@@ -747,16 +775,18 @@ def scene_research(segment: tuple[str, list[str], list[str]], week_no: int,
     _lheader(ax, w, "inside the research", week_no)
 
     title, bullets, _ = segment
-    R._fit_text(fig, ax, 360, title, 72, max_w=w - 240, x=w / 2, weight="bold")
-    y = 520
-    for b in bullets[:bullets_shown if bullets_shown is not None else len(bullets)]:
-        R._panel(ax, w / 2 - 560, y, 1120, 118, color=t["panel"])
-        ax.plot([w / 2 - 520, w / 2 - 520], [y + 32, y + 86], color=t["accent"],
+    R._fit_text(fig, ax, 340, title, 72, max_w=w - 240, x=w / 2, weight="bold")
+    # Bullet block pitched to end at the safe area. The quantaura.tech footer
+    # that used to close this card is gone — it sat under the captions, and the
+    # watchlist and outro scenes both carry the same call to action anyway.
+    top, pitch = 460, 116
+    shown = bullets_shown if bullets_shown is not None else len(bullets)
+    for i, b in enumerate(bullets[:shown]):
+        y = top + i * pitch
+        R._panel(ax, w / 2 - 560, y, 1120, pitch - 18, color=t["panel"])
+        ax.plot([w / 2 - 520, w / 2 - 520], [y + 26, y + 72], color=t["accent"],
                 lw=8, solid_capstyle="round", zorder=3)
-        R._text(ax, w / 2 - 480, y + 59, b, size=38)
-        y += 146
-    R._text(ax, w / 2, h - 110, "full methodology at quantaura.tech",
-            size=30, color=t["muted"], ha="center")
+        R._text(ax, w / 2 - 480, y + (pitch - 18) / 2, b, size=38)
     return R._save(fig, path)
 
 
@@ -766,7 +796,8 @@ def scene_watchlist(week_no: int, path: Path) -> Path:
     fig, ax = R._canvas(w, h)
     _lheader(ax, w, "beyond bitcoin", week_no)
 
-    R._text(ax, w / 2, 320, "The ensemble also covers", size=44, ha="center",
+    safe = _safe_bottom(h)
+    R._text(ax, w / 2, 280, "The ensemble also covers", size=44, ha="center",
             color=t["muted"])
     symbols = ["ETH", "BNB", "SOL", "XRP", "ADA", "DOGE", "AVAX"]
     bw, gap = 220, 24
@@ -776,13 +807,13 @@ def scene_watchlist(week_no: int, path: Path) -> Path:
         count = min(per_row, len(symbols) - row * per_row)
         row_w = count * bw + (count - 1) * gap
         x = (w - row_w) / 2 + col_i * (bw + gap)
-        y = 420 + row * 180
-        R._panel(ax, x, y, bw, 140, color=t["panel"])
-        R._text(ax, x + bw / 2, y + 70, s, size=48, weight="bold", ha="center")
+        y = 350 + row * 165
+        R._panel(ax, x, y, bw, 130, color=t["panel"])
+        R._text(ax, x + bw / 2, y + 65, s, size=48, weight="bold", ha="center")
 
-    R._text(ax, w / 2, 850, "Daily calls for every symbol live at",
+    R._text(ax, w / 2, safe - 105, "Daily calls for every symbol live at",
             size=38, ha="center")
-    R._text(ax, w / 2, 930, "quantaura.tech", size=64, weight="bold",
+    R._text(ax, w / 2, safe - 30, "quantaura.tech", size=64, weight="bold",
             color=t["accent"], ha="center")
     return R._save(fig, path)
 
@@ -796,9 +827,9 @@ def scene_outro_wide(week_no: int, path: Path) -> Path:
     for i, line in enumerate(R._wrap(
             "An automated research project. The model is often wrong — "
             "that is why the scoreboard is public.", 52)[:3]):
-        R._text(ax, w / 2, 540 + i * 60, line, size=38, color=t["muted"], ha="center")
-    R._text(ax, w / 2, 800, "A new call, every day, in Shorts", size=44,
-            weight="bold", color=t["accent"], ha="center")
+        R._text(ax, w / 2, 520 + i * 60, line, size=38, color=t["muted"], ha="center")
+    R._text(ax, w / 2, _safe_bottom(h) - 30, "A new call, every day, in Shorts",
+            size=44, weight="bold", color=t["accent"], ha="center")
     return R._save(fig, path)
 
 
@@ -953,9 +984,13 @@ def assemble(facts: dict, script: dict, candles: list[list] | None,
     body = R._crossfade(clips, durations, BUILD_DIR / "wk_body_silent.mp4")
 
     wcfg = config()["weekly"]
+    # 76 chars, not 60: at 1920 wide a 60-char wrap pushed most sentences onto
+    # three lines, and three lines is what forced every scene's footer up into
+    # _safe_bottom. 76 keeps the common sentence at two and still leaves the
+    # side margins intact.
     ass = R.build_captions(narration, BUILD_DIR / "wk_captions.ass", w=w, h=h,
                            fontsize=int(wcfg["caption_fontsize"]),
-                           margin_v=int(wcfg["caption_margin_v"]), wrap_chars=60)
+                           margin_v=int(wcfg["caption_margin_v"]), wrap_chars=76)
     final = BUILD_DIR / "weekly.mp4"
     escaped = ass.as_posix().replace(":", r"\:")
     R._run(["-i", str(body), "-i", str(narration.wav_path),
