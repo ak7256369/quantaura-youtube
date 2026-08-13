@@ -31,6 +31,7 @@ import scoreboard
 import scriptwriter
 import thumbnail as thumb_mod
 import voice as voice_mod
+import daily_blogpost
 from common import (BUILD_DIR, PipelineAbort, config, log, published_today,
                     read_json, record_run as _record_run, write_json)
 
@@ -258,6 +259,11 @@ def run(args: argparse.Namespace) -> int:
                         {"video": str(video), "duration_s": round(duration or 0, 1)})
             if not args.dry_run:
                 notify.rendered_only(snapshot, script, str(video), reason)
+                # Write the daily blog post even when not uploading — the call
+                # is committed and the post can go live regardless of upload
+                # status. Dry runs write to build/ so state/ stays clean.
+                daily_blogpost.publish(snapshot, script, score, None,
+                                       dry_run=args.dry_run)
             return 0
 
         try:
@@ -283,6 +289,9 @@ def run(args: argparse.Namespace) -> int:
                      "run_id": os.environ.get("GITHUB_RUN_ID"),
                      **drive_mod.run_log_extra(drive_info)})
         notify.success(snapshot, score, script, url, visibility, drive_info)
+        # Write the daily blog post from the verified script + snapshot.
+        # video_url is the YouTube URL so readers can watch the same call.
+        daily_blogpost.publish(snapshot, script, score, url)
         log.info(f"Done: {url}")
         return 0
 
