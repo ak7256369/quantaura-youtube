@@ -1,6 +1,19 @@
 {
-  "updated_at": "2026-08-14T14:26:46+00:00",
+  "updated_at": "2026-08-15T13:32:46+00:00",
   "posts": [
+    {
+      "slug": "bitcoin-daily-2026-08-15",
+      "post_type": "daily",
+      "title": "Bitcoin AI Call — 2026-08-15: SELL at 58% Confidence",
+      "meta_description": "Bitcoin AI model call for 2026-08-15: SELL at 58% confidence. BTC trading at $63,043. All-time record: 56% over 9 public calls.",
+      "published_at": "2026-08-15T13:32:46+00:00",
+      "updated_at": "2026-08-15T13:32:46+00:00",
+      "iso_year": 2026,
+      "iso_week": 33,
+      "week_resolved": 1,
+      "week_hits": 0,
+      "week_accuracy_pct": null
+    },
     {
       "slug": "bitcoin-daily-2026-08-14",
       "post_type": "daily",
