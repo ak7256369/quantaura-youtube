@@ -1,0 +1,72 @@
+{
+  "slug": "bitcoin-daily-2026-08-16",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 33,
+  "title": "Bitcoin AI Call — 2026-08-16: HOLD at 50% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-08-16: HOLD at 50% confidence. BTC trading at $63,061. All-time record: 46% over 11 public calls.",
+  "published_at": "2026-08-16T13:32:23+00:00",
+  "updated_at": "2026-08-16T13:32:23+00:00",
+  "date_range": "2026-08-16",
+  "signal": "HOLD",
+  "signal_raw": "HOLD",
+  "confidence_pct": 49.5,
+  "gated": false,
+  "change_pct": 0.0,
+  "per_model": {
+    "lstm": "HOLD",
+    "xgboost": "SELL",
+    "transformer": "HOLD",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.3121,
+    "lstm": 0.1537,
+    "transformer": 0.2672,
+    "xgboost": 0.267
+  },
+  "fear_greed": {
+    "value": 34,
+    "classification": "Fear"
+  },
+  "narrative": {
+    "intro": [
+      "The system is currently on a three call miss streak as its inner models split evenly on direction.",
+      "Today the overall ensemble output is a hold signal with a confidence of 49.5 percent.",
+      "Bitcoin is priced at 63,061 dollars with a 24-hour change of 0.0 percent."
+    ],
+    "days": [
+      "The gradient boosted model and the K A N voted to sell, whereas the L S T M and the transformer voted to hold.",
+      "The full probability split reaches 49.5 percent sell, 46.5 percent hold, and 4 percent buy.",
+      "The model evaluated these alongside a 7-day change of -3.37 percent and a fear score of 34."
+    ],
+    "trend": [
+      "On August 15th, the model issued a sell signal that turned out incorrect after a price change of 0.03 percent.",
+      "That brings the system to an accuracy rate of 45.5 percent over 11 resolved calls."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 11,
+    "hits": 5,
+    "misses": 6,
+    "accuracy_pct": 45.5
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=LnJdTADj5WA"
+}
