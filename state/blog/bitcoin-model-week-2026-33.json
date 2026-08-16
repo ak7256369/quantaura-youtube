@@ -1,0 +1,139 @@
+{
+  "slug": "bitcoin-model-week-2026-33",
+  "iso_year": 2026,
+  "iso_week": 33,
+  "title": "Bitcoin AI Model Review — Week 33: 3 of 6 Calls Correct",
+  "meta_description": "Week 33 graded: 3 of 6 Bitcoin calls correct (50%). All-time: 45.5% over 11 public calls. Paper portfolio -3.5% vs holding.",
+  "published_at": "2026-08-16T15:40:12+00:00",
+  "updated_at": "2026-08-16T15:40:12+00:00",
+  "date_range": "2026-08-10 to 2026-08-15",
+  "week": {
+    "resolved": 6,
+    "hits": 3,
+    "misses": 3,
+    "accuracy_pct": 50.0,
+    "days": [
+      {
+        "weekday": "Monday",
+        "date": "2026-08-10",
+        "signal": "HOLD",
+        "confidence_pct": 57.8,
+        "gated": false,
+        "change_pct": -0.97,
+        "correct": true
+      },
+      {
+        "weekday": "Tuesday",
+        "date": "2026-08-11",
+        "signal": "HOLD",
+        "confidence_pct": 68,
+        "gated": false,
+        "change_pct": -0.6,
+        "correct": true
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-08-12",
+        "signal": "HOLD",
+        "confidence_pct": 63.3,
+        "gated": false,
+        "change_pct": 0.15,
+        "correct": true
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-08-13",
+        "signal": "HOLD",
+        "confidence_pct": 59.4,
+        "gated": false,
+        "change_pct": -1.88,
+        "correct": false
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-08-14",
+        "signal": "SELL",
+        "confidence_pct": 75.8,
+        "gated": false,
+        "change_pct": 0.69,
+        "correct": false
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-08-15",
+        "signal": "SELL",
+        "confidence_pct": 57.6,
+        "gated": false,
+        "change_pct": 0.03,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 11,
+    "hits": 5,
+    "misses": 6,
+    "accuracy_pct": 45.5
+  },
+  "portfolio": {
+    "value_usd": 9646.61,
+    "return_pct": -3.53,
+    "hold_return_pct": -2.57,
+    "vs_hold_pct": -0.97,
+    "fees_paid_usd": 29.49,
+    "trades": 2,
+    "position": "cash"
+  },
+  "narrative": {
+    "intro": [
+      "Welcome to the weekly recap for week 33, covering the date range 2026-08-10 to 2026-08-15.",
+      "The model resolved 6 calls this week, landing 3 hits and 3 misses for an even 50.0 percent accuracy.",
+      "The week split into two halves, opening with clean calls before sliding into an active streak of 3 misses."
+    ],
+    "days": [
+      "The week began on Monday with a hold signal at 57.8 percent confidence, which proved correct as price moved negative 0.97 percent.",
+      "On Tuesday the model issued another hold at 68 percent confidence, logging a hit against a negative 0.6 percent move.",
+      "Wednesday continued the winning run with a hold at 63.3 percent confidence over a 0.15 percent change.",
+      "Late in the week the model flipped its posture to sell signals that missed entirely.",
+      "Friday produced a sell call at 75.8 percent confidence against a 0.69 percent gain, and Saturday ended with a sell at 57.6 percent confidence during a 0.03 percent move."
+    ],
+    "spotlight": [
+      "The notable miss of the week occurred on Thursday, 2026-08-13.",
+      "The model issued a hold call with 59.4 percent confidence.",
+      "Bitcoin dropped negative 1.88 percent over the 24 hour horizon, breaking past the 1.0 percent flat band.",
+      "That graded as an outright miss and broke the model's opening run."
+    ],
+    "trend": [
+      "Price action stayed relatively quiet during the early session before taking a sharper dip on Thursday.",
+      "The subsequent rebound on Friday and flat Saturday trading caught the model leaning short, turning both late sell calls into failed predictions."
+    ],
+    "portfolio": [
+      "The paper portfolio started with 10000.0 dollars and is now valued at 9646.61 dollars after 12 days, sitting in cash.",
+      "That represents a return of negative 3.53 percent across 2 trades with 29.49 dollars paid in fees.",
+      "A simple buy and hold strategy sits at 9743.19 dollars or negative 2.57 percent, meaning following the model trailed holding by negative 0.97 percent."
+    ],
+    "record": [
+      "Across the entire history, the all time record stands at 5 hits and 6 misses over 11 resolved calls, giving an accuracy of 45.5 percent.",
+      "Hold calls have carried the system with 71.4 percent accuracy across 7 signals, while buy and sell signals each remain at 0.0 percent accuracy over 2 calls each.",
+      "With only 11 resolved calls on record, this remains a very small sample size that is performing below a coin flip."
+    ]
+  },
+  "research": {
+    "title": "Four architectures, one vote",
+    "bullets": [
+      "Different model families",
+      "Different failure modes",
+      "Blended with learned weights"
+    ],
+    "paragraphs": [
+      "The ensemble mixes four model families on purpose. They read the market differently, so they fail differently.",
+      "When their votes are blended, one model's blind spot is another model's signal. Disagreement between them is information, not a bug.",
+      "None of the four is the best model. Picking a favourite would mean betting everything on one way of being wrong."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=sm2mAs4USoQ"
+}
