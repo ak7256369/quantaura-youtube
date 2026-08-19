@@ -1,0 +1,73 @@
+{
+  "slug": "bitcoin-daily-2026-08-19",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 34,
+  "title": "Bitcoin AI Call — 2026-08-19: BUY at 88% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-08-19: BUY at 88% confidence. BTC trading at $65,114. All-time record: 54% over 13 public calls.",
+  "published_at": "2026-08-19T13:55:54+00:00",
+  "updated_at": "2026-08-19T13:55:54+00:00",
+  "date_range": "2026-08-19",
+  "signal": "BUY",
+  "signal_raw": "BUY",
+  "confidence_pct": 87.8,
+  "gated": false,
+  "change_pct": 1.39,
+  "per_model": {
+    "lstm": "BUY",
+    "xgboost": "BUY",
+    "transformer": "BUY",
+    "kan": "BUY"
+  },
+  "weights": {
+    "kan": 0.3055,
+    "lstm": 0.1393,
+    "transformer": 0.3131,
+    "xgboost": 0.2421
+  },
+  "fear_greed": {
+    "value": 46,
+    "classification": "Fear"
+  },
+  "narrative": {
+    "intro": [
+      "Every single sub-model voted buy this morning, driving confidence to 87.8 percent.",
+      "The combined ensemble outputs a buy call for Bitcoin over the next 24 hours.",
+      "Bitcoin trades at 65,114 dollars after rising 1.39 percent in the last day."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, the transformer, and the K A N all aligned on the same directional bias.",
+      "The overall probability split allocated 10.9 percent to hold and 1.3 percent to sell.",
+      "This call comes as seven-day momentum sits at 2.76 percent while the market displays a fear reading of 46."
+    ],
+    "trend": [
+      "On August 17th, the model correctly called a hold during a 0.6 percent price movement.",
+      "That result extends the model's winning streak to two consecutive hits.",
+      "Overall, the system sits at 53.8 percent accuracy across 13 resolved calls."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 13,
+    "hits": 7,
+    "misses": 6,
+    "accuracy_pct": 53.8
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=gn-db775M0Y"
+}
