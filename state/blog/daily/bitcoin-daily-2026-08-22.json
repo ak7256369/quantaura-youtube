@@ -1,0 +1,71 @@
+{
+  "slug": "bitcoin-daily-2026-08-22",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 34,
+  "title": "Bitcoin AI Call — 2026-08-22: BUY at 98% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-08-22: BUY at 98% confidence. BTC trading at $77,189. All-time record: 62% over 16 public calls.",
+  "published_at": "2026-08-22T13:33:11+00:00",
+  "updated_at": "2026-08-22T13:33:11+00:00",
+  "date_range": "2026-08-22",
+  "signal": "BUY",
+  "signal_raw": "BUY",
+  "confidence_pct": 98.4,
+  "gated": false,
+  "change_pct": -0.1,
+  "per_model": {
+    "lstm": "BUY",
+    "xgboost": "BUY",
+    "transformer": "BUY",
+    "kan": "BUY"
+  },
+  "weights": {
+    "kan": 0.3203,
+    "lstm": 0.133,
+    "transformer": 0.3157,
+    "xgboost": 0.231
+  },
+  "fear_greed": {
+    "value": 71,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "All four underlying models agreed on a single direction this morning with a 98.4 percent confidence reading.",
+      "The system is issuing an ungated BUY signal for Bitcoin at a price of 77,189 dollars.",
+      "That comes after a 24-hour dip of 0.1 percent."
+    ],
+    "days": [
+      "The L S T M, the transformer, the gradient boosted model, and the K A N all voted BUY, leaving the probability split at 98.4 percent for a buy, 0.6 percent for a hold, and 1 percent for a sell.",
+      "The broader backdrop shows a 7-day gain of 22.44 percent and a Fear and Greed Index reading of 71, marked as Greed."
+    ],
+    "trend": [
+      "The last resolved call from August 20th was a correct BUY as price rose 8.02 percent.",
+      "That extends the winning streak to 5 calls, bringing the public record to 10 hits out of 16 resolved calls, or 62.5 percent accuracy."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 16,
+    "hits": 10,
+    "misses": 6,
+    "accuracy_pct": 62.5
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=_wVydMY0LpU"
+}
