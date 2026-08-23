@@ -1,0 +1,137 @@
+{
+  "slug": "bitcoin-model-week-2026-34",
+  "iso_year": 2026,
+  "iso_week": 34,
+  "title": "Bitcoin AI Model Review — Week 34: 4 of 6 Calls Correct",
+  "meta_description": "Week 34 graded: 4 of 6 Bitcoin calls correct (67%). All-time: 55.6% over 18 public calls. Paper portfolio +15.3% vs holding.",
+  "published_at": "2026-08-23T15:43:13+00:00",
+  "updated_at": "2026-08-23T15:43:13+00:00",
+  "date_range": "2026-08-17 to 2026-08-22",
+  "week": {
+    "resolved": 6,
+    "hits": 4,
+    "misses": 2,
+    "accuracy_pct": 66.7,
+    "days": [
+      {
+        "weekday": "Monday",
+        "date": "2026-08-17",
+        "signal": "HOLD",
+        "confidence_pct": 59,
+        "gated": false,
+        "change_pct": 0.6,
+        "correct": true
+      },
+      {
+        "weekday": "Tuesday",
+        "date": "2026-08-18",
+        "signal": "BUY",
+        "confidence_pct": 95.9,
+        "gated": false,
+        "change_pct": 5.46,
+        "correct": true
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-08-19",
+        "signal": "BUY",
+        "confidence_pct": 87.8,
+        "gated": false,
+        "change_pct": 10.23,
+        "correct": true
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-08-20",
+        "signal": "BUY",
+        "confidence_pct": 98.5,
+        "gated": false,
+        "change_pct": 8.02,
+        "correct": true
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-08-21",
+        "signal": "BUY",
+        "confidence_pct": 98.8,
+        "gated": false,
+        "change_pct": 0.16,
+        "correct": false
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-08-22",
+        "signal": "BUY",
+        "confidence_pct": 98.4,
+        "gated": false,
+        "change_pct": 0.36,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 18,
+    "hits": 10,
+    "misses": 8,
+    "accuracy_pct": 55.6
+  },
+  "portfolio": {
+    "value_usd": 11533.08,
+    "return_pct": 15.33,
+    "hold_return_pct": 19.68,
+    "vs_hold_pct": -4.35,
+    "fees_paid_usd": 43.96,
+    "trades": 3,
+    "position": "BTC"
+  },
+  "narrative": {
+    "intro": [
+      "For week 34 of 2026, covering 2026-08-17 to 2026-08-22, the model delivered 4 hits out of 6 resolved calls, achieving a 66.7 percent weekly accuracy rate.",
+      "The week started strong with a four call winning streak before concluding on a 2 call miss streak."
+    ],
+    "days": [
+      "On Monday the model called a hold with 59 percent confidence, which was correct as price moved 0.6 percent.",
+      "Tuesday brought a correct buy signal at 95.9 percent confidence with a 5.46 percent gain.",
+      "Wednesday and Thursday added two more winning buy calls at 87.8 percent and 98.5 percent confidence as Bitcoin surged 10.23 percent and 8.02 percent.",
+      "Friday broke the winning run with an incorrect buy call at 98.8 percent confidence when price rose just 0.16 percent."
+    ],
+    "spotlight": [
+      "The worst call of the week arrived on Saturday 2026-08-22 when the model issued a buy signal at 98.4 percent confidence.",
+      "Bitcoin moved up by just 0.36 percent over the 24 hour horizon, failing to cross the 1.0 percent flat band threshold.",
+      "Because the movement remained inside the flat band, this high confidence call was graded as a miss.",
+      "It was a clear failure where extreme model certainty was met with stagnant market action."
+    ],
+    "trend": [
+      "Bitcoin experienced a sharp mid week rally followed by severe compression going into the weekend.",
+      "The signals aligned well with the explosive upward move but failed when volatility vanished into sideways trading."
+    ],
+    "portfolio": [
+      "Starting with 10000.0 dollars, the paper portfolio ended at 11533.08 dollars after 19 days and 3 trades, yielding a return of 15.33 percent after paying 43.96 dollars in fees at 0.15 percent per side.",
+      "Meanwhile, simple buy and hold produced a return of 19.68 percent to reach 11968.46 dollars.",
+      "Following the model signals resulted in a negative 4.35 percent underperformance compared to holding Bitcoin."
+    ],
+    "record": [
+      "Across 18 all time resolved calls, the overall model record stands at 10 hits and 8 misses for an accuracy of 55.6 percent.",
+      "By signal type, hold calls show 77.8 percent accuracy over 9 calls, buy calls show 42.9 percent over 7 calls, and sell calls show 0.0 percent over 2 calls.",
+      "An 18 call sample size is far too small to establish long term certainty, so performance will continue to evolve."
+    ]
+  },
+  "research": {
+    "title": "How the models keep learning without forgetting",
+    "bullets": [
+      "Continuous fine-tuning",
+      "Replay buffers anchor history",
+      "A gate blocks regressions"
+    ],
+    "paragraphs": [
+      "The models fine tune on fresh market data around the clock. A replay buffer keeps old training data in the mix, so adapting to this month cannot erase what two years of history taught them.",
+      "Any update that scores worse than the current model is rejected outright.",
+      "Catastrophic forgetting is the failure that guards against. A model tuned only on the last month becomes an expert on the last month and a novice everywhere else."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=PeYzenMSMsU"
+}
