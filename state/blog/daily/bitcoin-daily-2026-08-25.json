@@ -1,0 +1,74 @@
+{
+  "slug": "bitcoin-daily-2026-08-25",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 35,
+  "title": "Bitcoin AI Call — 2026-08-25: BUY at 96% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-08-25: BUY at 96% confidence. BTC trading at $78,539. All-time record: 55% over 20 public calls.",
+  "published_at": "2026-08-25T13:56:05+00:00",
+  "updated_at": "2026-08-25T13:56:05+00:00",
+  "date_range": "2026-08-25",
+  "signal": "BUY",
+  "signal_raw": "BUY",
+  "confidence_pct": 96.4,
+  "gated": false,
+  "change_pct": -0.08,
+  "per_model": {
+    "lstm": "BUY",
+    "xgboost": "BUY",
+    "transformer": "BUY",
+    "kan": "BUY"
+  },
+  "weights": {
+    "kan": 0.3262,
+    "lstm": 0.1279,
+    "transformer": 0.3238,
+    "xgboost": 0.2221
+  },
+  "fear_greed": {
+    "value": 74,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "All four sub-models reached a unanimous consensus this morning to issue a buy call.",
+      "The system generated a buy signal with 96.4 percent confidence for the next 24 hours.",
+      "Bitcoin trades at 78,539 dollars, after a move of minus 0.08 percent over the past day.",
+      "Because confidence cleared the 55.0 percent threshold, the call was not gated."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, the transformer, and the K A N all voted buy.",
+      "Beyond the main vote, the probability split assigned 2.6 percent to hold and 1 percent to sell.",
+      "The model processed these inputs alongside a 7 day move of 21.36 percent and a fear and greed index of 74."
+    ],
+    "trend": [
+      "Yesterday's buy signal recorded a miss as a 0.39 percent price move remained inside the 1.0 percent flat band.",
+      "The model scoreboard stands at 11 hits and 9 misses over 20 resolved calls.",
+      "That leaves the overall model accuracy at 55.0 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 20,
+    "hits": 11,
+    "misses": 9,
+    "accuracy_pct": 55.0
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=u547CU-RIz0"
+}
