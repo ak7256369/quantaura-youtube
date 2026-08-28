@@ -1,0 +1,73 @@
+{
+  "slug": "bitcoin-daily-2026-08-28",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 35,
+  "title": "Bitcoin AI Call — 2026-08-28: BUY at 66% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-08-28: BUY at 66% confidence. BTC trading at $80,363. All-time record: 54% over 22 public calls.",
+  "published_at": "2026-08-28T00:53:12+00:00",
+  "updated_at": "2026-08-28T00:53:12+00:00",
+  "date_range": "2026-08-28",
+  "signal": "BUY",
+  "signal_raw": "BUY",
+  "confidence_pct": 66.2,
+  "gated": false,
+  "change_pct": 2.13,
+  "per_model": {
+    "lstm": "BUY",
+    "xgboost": "BUY",
+    "transformer": "HOLD",
+    "kan": "BUY"
+  },
+  "weights": {
+    "kan": 0.3413,
+    "lstm": 0.1192,
+    "transformer": 0.3324,
+    "xgboost": 0.2071
+  },
+  "fear_greed": {
+    "value": 73,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "Three of the four underlying architectures voted for a buy signal this morning, leaving only the transformer in a hold position.",
+      "The ensemble model generated a buy signal with 66.2 percent confidence over a 24-hour horizon.",
+      "Bitcoin is currently trading at 80,363 dollars, following a 2.13 percent price gain over the past day."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, and the K A N all voted buy, while hold probability registered at 26.4 percent.",
+      "The underlying model evaluated market conditions featuring a 7-day price increase of 6.97 percent.",
+      "The sentiment metric stands at 73, which indicates greed."
+    ],
+    "trend": [
+      "The last graded signal from August 26th was correct, logging a 1.38 percent upward move on a buy call.",
+      "That result puts the model at 12 hits and 10 misses overall.",
+      "The lifetime record currently stands at 54.5 percent accuracy."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 22,
+    "hits": 12,
+    "misses": 10,
+    "accuracy_pct": 54.5
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=XB1EW3cgPfk"
+}
