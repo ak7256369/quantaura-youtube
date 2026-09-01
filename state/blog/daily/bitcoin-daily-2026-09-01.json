@@ -1,0 +1,73 @@
+{
+  "slug": "bitcoin-daily-2026-09-01",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 36,
+  "title": "Bitcoin AI Call — 2026-09-01: HOLD at 47% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-09-01: HOLD at 47% confidence. BTC trading at $77,563. All-time record: 54% over 26 public calls.",
+  "published_at": "2026-09-01T17:12:56+00:00",
+  "updated_at": "2026-09-01T17:12:56+00:00",
+  "date_range": "2026-09-01",
+  "signal": "HOLD",
+  "signal_raw": "HOLD",
+  "confidence_pct": 47.2,
+  "gated": false,
+  "change_pct": -1.69,
+  "per_model": {
+    "lstm": "HOLD",
+    "xgboost": "HOLD",
+    "transformer": "SELL",
+    "kan": "HOLD"
+  },
+  "weights": {
+    "kan": 0.306,
+    "lstm": 0.1069,
+    "transformer": 0.4015,
+    "xgboost": 0.1857
+  },
+  "fear_greed": {
+    "value": 69,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "The transformer model voted to sell this morning, but three other architectures overruled it to force a hold.",
+      "The primary model outputted a hold signal today with a confidence rating of 47.2 percent.",
+      "Bitcoin trades at 77,563 dollars, reflecting a 24-hour price move of minus 1.69 percent."
+    ],
+    "days": [
+      "The L S T M, the K A N, and the gradient boosted model all backed hold.",
+      "This leaves the probability split distributed at 43.5 percent for hold and 9.3 percent for buy.",
+      "The model evaluated these inputs alongside a seven day move of minus 1.98 percent and a fear and greed score of 69 in greed territory."
+    ],
+    "trend": [
+      "The last evaluated call from August 30th was a hold signal that marked a hit after price moved minus 0.63 percent.",
+      "That outcome extends the current streak to 2 consecutive hits.",
+      "The overall model scoreboard stands at 53.8 percent accuracy across 26 resolved calls."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 26,
+    "hits": 14,
+    "misses": 12,
+    "accuracy_pct": 53.8
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=HiBe3OsNde8"
+}
