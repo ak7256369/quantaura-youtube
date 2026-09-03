@@ -227,11 +227,11 @@ theme:
   accent: "#5B8DEF"
 
 upload:
-  # Uploads start private on purpose: an unaudited YouTube API project has its
-  # uploads locked to private anyway, and the review tap doubles as the
-  # supervised rollout. Flip to "public" only after the audit is approved AND
-  # 14 consecutive clean days.
-  visibility: "private"
+  # Public since 2026-09-03: YouTube API audit approved 2026-08-07, followed by
+  # a clean private-upload run (Aug 5–Sep 2, no failures) as the supervised
+  # rollout. Set back to "private" if you ever need an operator-review tap again
+  # (uploads then need a manual visibility change in Studio before they're seen).
+  visibility: "public"
   category_id: "25"          # News & Politics — the closest fit YouTube offers
   made_for_kids: false
   # Sent as status.containsSyntheticMedia on every upload, so the "AI use"

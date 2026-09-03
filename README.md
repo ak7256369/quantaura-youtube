@@ -2,9 +2,10 @@
 
 Generates and publishes the channel's content automatically:
 
-- **Daily Short** (13:00 UTC, `daily-video.yml`) — the ensemble's live Bitcoin
-  call plus the public accuracy record.
-- **Weekly recap** (Sunday 15:00 UTC, `weekly-video.yml`) — every graded call of
+- **Daily Short** (18:00 UTC, `daily-video.yml`) — the ensemble's live Bitcoin
+  call plus the public accuracy record. Timed for the US afternoon/evening watch
+  window; a 21:00 UTC catch-up covers a dropped GitHub cron slot.
+- **Weekly recap** (Sunday 20:00 UTC, `weekly-video.yml`) — every graded call of
   the week reviewed in a 1080p long-form video: the call table, the week on the
   chart, a rotating research segment, and the watchlist teaser. Skips the week
   if fewer than `weekly.min_resolved_calls` calls were graded — a recap of one
@@ -106,11 +107,11 @@ python get_youtube_token.py client_secret.json
 It prints the three secrets to paste into GitHub. Treat the refresh token like
 a password.
 
-> **Uploads start private.** An unaudited YouTube API project has its uploads
-> locked to private by Google regardless of what the pipeline requests. That is
-> deliberate here too — `config.yaml` sets `upload.visibility: private` so the
-> supervised rollout and the platform's own restriction line up. Flip it to
-> `public` only after the API audit is approved **and** 14 consecutive clean days.
+> **Uploads are public** (`config.yaml` → `upload.visibility: public`), live
+> since 2026-09-03 after the YouTube API audit was approved (2026-08-07) and a
+> clean private-upload rollout. Before the audit, Google locked an unaudited
+> project's uploads to private regardless of what the pipeline requested; set the
+> value back to `private` if you ever need an operator-review tap again.
 
 ### Google Drive credentials (one-time)
 

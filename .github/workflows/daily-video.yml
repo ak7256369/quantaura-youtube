@@ -2,14 +2,16 @@ name: Daily channel video
 
 on:
   schedule:
-    # 13:00 UTC — US breakfast, UK afternoon, 6pm in Pakistan.
-    - cron: '0 13 * * *'
-    # 16:00 UTC catch-up. GitHub's cron is best-effort: runs are delayed under
-    # load and dropped outright when the queue is congested, and on 2026-08-06
-    # the 13:00 slot never fired at all. The pipeline refuses to publish twice
-    # in a UTC day (see common.published_today), so on a normal day this second
-    # run exits in seconds having done nothing.
-    - cron: '0 16 * * *'
+    # 18:00 UTC — 2pm US Eastern / 11am Pacific. Publishes a few hours ahead of
+    # the US evening watch window so the Short builds early velocity going into
+    # peak, rather than at US breakfast. (Sep 2026: US Eastern is EDT, UTC-4.)
+    - cron: '0 18 * * *'
+    # 21:00 UTC catch-up (5pm Eastern). GitHub's cron is best-effort: runs are
+    # delayed under load and dropped outright when the queue is congested, and
+    # on 2026-08-06 the primary slot never fired at all. The pipeline refuses to
+    # publish twice in a UTC day (see common.published_today), so on a normal
+    # day this second run exits in seconds having done nothing.
+    - cron: '0 21 * * *'
   workflow_dispatch:
     inputs:
       no_upload:

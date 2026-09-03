@@ -2,9 +2,11 @@ name: Weekly recap video
 
 on:
   schedule:
-    # Sunday 15:00 UTC — two hours after the daily run, so the week's last
-    # graded outcome is already committed when the recap reads the scoreboard.
-    - cron: '0 15 * * 0'
+    # Sunday 20:00 UTC (4pm US Eastern) — two hours after the daily run's new
+    # 18:00 slot, so the week's last graded outcome is already committed when the
+    # recap reads the scoreboard. Lands in the US Sunday-afternoon watch window.
+    # Keep this exactly two hours behind the daily cron if that ever moves again.
+    - cron: '0 20 * * 0'
   workflow_dispatch:
     inputs:
       no_upload:
