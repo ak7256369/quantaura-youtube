@@ -1,0 +1,137 @@
+{
+  "slug": "bitcoin-model-week-2026-36",
+  "iso_year": 2026,
+  "iso_week": 36,
+  "title": "Bitcoin AI Model Review — Week 36: 3 of 6 Calls Correct",
+  "meta_description": "Week 36 graded: 3 of 6 Bitcoin calls correct (50%). All-time: 53.1% over 32 public calls. Paper portfolio +11.9% vs holding.",
+  "published_at": "2026-09-06T22:08:33+00:00",
+  "updated_at": "2026-09-06T22:08:33+00:00",
+  "date_range": "2026-08-31 to 2026-09-05",
+  "week": {
+    "resolved": 6,
+    "hits": 3,
+    "misses": 3,
+    "accuracy_pct": 50.0,
+    "days": [
+      {
+        "weekday": "Monday",
+        "date": "2026-08-31",
+        "signal": "HOLD",
+        "confidence_pct": 50.6,
+        "gated": false,
+        "change_pct": -2.16,
+        "correct": false
+      },
+      {
+        "weekday": "Tuesday",
+        "date": "2026-09-01",
+        "signal": "HOLD",
+        "confidence_pct": 47.2,
+        "gated": false,
+        "change_pct": -0.53,
+        "correct": true
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-09-02",
+        "signal": "SELL",
+        "confidence_pct": 81.5,
+        "gated": false,
+        "change_pct": 4.87,
+        "correct": false
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-09-03",
+        "signal": "BUY",
+        "confidence_pct": 74,
+        "gated": false,
+        "change_pct": -2.26,
+        "correct": false
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-09-04",
+        "signal": "HOLD",
+        "confidence_pct": 41.1,
+        "gated": false,
+        "change_pct": 0.09,
+        "correct": true
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-09-05",
+        "signal": "HOLD",
+        "confidence_pct": 41.8,
+        "gated": false,
+        "change_pct": 0.09,
+        "correct": true
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 32,
+    "hits": 17,
+    "misses": 15,
+    "accuracy_pct": 53.1
+  },
+  "portfolio": {
+    "value_usd": 11193.74,
+    "return_pct": 11.94,
+    "hold_return_pct": 23.29,
+    "vs_hold_pct": -11.35,
+    "fees_paid_usd": 95.24,
+    "trades": 6,
+    "position": "cash"
+  },
+  "narrative": {
+    "intro": [
+      "For the week spanning 2026-08-31 to 2026-09-05, the model finished with 3 correct calls out of 6 resolved signals, yielding an accuracy rate of 50.0 percent.",
+      "Performance was split down the middle, ending on a 2 hit streak on Friday and Saturday after major high-confidence missteps mid-week.",
+      "We publish every result plainly because holding our predictive system accountable requires total transparency."
+    ],
+    "days": [
+      "The model opened Monday with a HOLD call at 50.6 percent confidence, which graded as incorrect when price dropped 2.16 percent.",
+      "It rebounded on Tuesday with another HOLD signal at 47.2 percent confidence, correctly catching a minor decline of 0.53 percent.",
+      "Following a severe misstep on Wednesday that we will break down in our spotlight, Thursday brought a BUY signal at 74 percent confidence that failed when price fell 2.26 percent.",
+      "The week closed on Friday and Saturday with consecutive HOLD signals at 41.1 percent and 41.8 percent confidence, both grading as hits with identical flat price moves of 0.09 percent."
+    ],
+    "spotlight": [
+      "The worst call of the week occurred on Wednesday, 2026-09-02, when the model issued a SELL signal with high confidence of 81.5 percent.",
+      "Instead of dropping, the market rallied aggressively, posting a sharp price gain of 4.87 percent.",
+      "This call was flatly wrong, grading as a clear miss for our highest confidence signal of the period."
+    ],
+    "trend": [
+      "Price action across the six days was volatile, featuring steep drops early and mid-week alongside a strong mid-week surge.",
+      "The model struggled to track directional momentum, missing both major directional swings while picking up hits only during quiet sideways action."
+    ],
+    "portfolio": [
+      "Starting with 10000.0 dollars over 33 days, the model portfolio ended at 11193.74 dollars, representing a return of 11.94 percent after accounting for 6 trades and 95.24 dollars in paid fees.",
+      "Over that same timeframe, a simple buy and hold benchmark reached 12329.01 dollars for a return of 23.29 percent.",
+      "That leaves the active strategy at negative 11.35 percent relative to hold, confirming that following the calls performed worse than simply holding."
+    ],
+    "record": [
+      "All time, the model stands at 17 hits and 15 misses across 32 resolved calls, which translates to an overall accuracy rate of 53.1 percent.",
+      "This week's 50.0 percent accuracy sat slightly below that baseline, while the 29 resolved calls in the recent evaluation window reflect a 55.2 percent accuracy rate.",
+      "With only 32 total resolved calls logged so far, this sample size remains far too small to establish definitive conclusions."
+    ]
+  },
+  "research": {
+    "title": "Why the model predicts regimes, not prices",
+    "bullets": [
+      "Target: 24h trend regime",
+      "Not a price target",
+      "Direction, not magnitude"
+    ],
+    "paragraphs": [
+      "The model does not predict prices. It classifies the next twenty four hours into an upward, downward, or flat regime.",
+      "Exact price targets are noise at this horizon. Regimes are the part of the problem a model can actually learn.",
+      "Ask a model for a number it cannot know and it will hand you one anyway. We would rather ask it a question it can answer."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=YKVsXtJKElo"
+}
