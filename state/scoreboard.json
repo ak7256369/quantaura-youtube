@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-09-05T20:02:59+00:00",
-  "total_calls": 32,
-  "resolved_calls": 30,
-  "pending_calls": 2,
-  "hits": 15,
+  "updated_at": "2026-09-06T20:06:47+00:00",
+  "total_calls": 33,
+  "resolved_calls": 32,
+  "pending_calls": 1,
+  "hits": 17,
   "misses": 15,
-  "accuracy_pct": 50.0,
-  "accuracy_30d_pct": 50.0,
-  "resolved_30d": 28,
+  "accuracy_pct": 53.1,
+  "accuracy_30d_pct": 55.2,
+  "resolved_30d": 29,
   "streak": {
-    "kind": "miss",
+    "kind": "hit",
     "length": 2
   },
   "by_signal": {
@@ -18,8 +18,8 @@
       "accuracy_pct": 35.7
     },
     "HOLD": {
-      "n": 13,
-      "accuracy_pct": 76.9
+      "n": 15,
+      "accuracy_pct": 80.0
     },
     "SELL": {
       "n": 3,
@@ -27,22 +27,22 @@
     }
   },
   "last_resolved": {
-    "date": "2026-09-03",
-    "made_at": "2026-09-03T20:38:47+00:00",
-    "made_at_ms": 1788467927000,
+    "date": "2026-09-05",
+    "made_at": "2026-09-05T20:02:59+00:00",
+    "made_at_ms": 1788638579000,
     "symbol": "BTCUSDT",
-    "signal": "BUY",
-    "signal_raw": "BUY",
+    "signal": "HOLD",
+    "signal_raw": "HOLD",
     "gated": false,
-    "confidence": 74,
-    "price": 81577.99,
+    "confidence": 41.8,
+    "price": 79750.0,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-09-04T20:40:18+00:00",
-    "price_then": 79735.94,
-    "change_pct": -2.26,
-    "correct": false
+    "resolved_at": "2026-09-06T20:06:47+00:00",
+    "price_then": 79821.8,
+    "change_pct": 0.09,
+    "correct": true
   },
   "flat_band_pct": 1.0,
   "horizon_hours": 24,
@@ -51,15 +51,15 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 32,
-    "value_usd": 11203.87,
-    "return_pct": 12.04,
-    "hold_value_usd": 12321.66,
-    "hold_return_pct": 23.22,
-    "vs_hold_pct": -11.18,
-    "fees_paid_usd": 78.42,
-    "trades": 5,
-    "position": "BTC",
+    "days": 33,
+    "value_usd": 11193.74,
+    "return_pct": 11.94,
+    "hold_value_usd": 12329.01,
+    "hold_return_pct": 23.29,
+    "vs_hold_pct": -11.35,
+    "fees_paid_usd": 95.24,
+    "trades": 6,
+    "position": "cash",
     "curve": [
       {
         "date": "2026-08-05",
@@ -284,6 +284,13 @@
         "hold": 12321.66,
         "price": 79750.0,
         "signal": "HOLD"
+      },
+      {
+        "date": "2026-09-06",
+        "value": 11193.74,
+        "hold": 12329.01,
+        "price": 79797.61,
+        "signal": "SELL"
       }
     ]
   }
