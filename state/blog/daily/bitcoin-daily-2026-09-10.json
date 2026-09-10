@@ -1,0 +1,73 @@
+{
+  "slug": "bitcoin-daily-2026-09-10",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 37,
+  "title": "Bitcoin AI Call — 2026-09-10: SELL at 88% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-09-10: SELL at 88% confidence. BTC trading at $77,244. All-time record: 50% over 36 public calls.",
+  "published_at": "2026-09-10T20:41:04+00:00",
+  "updated_at": "2026-09-10T20:41:04+00:00",
+  "date_range": "2026-09-10",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 88.4,
+  "gated": false,
+  "change_pct": -1.38,
+  "per_model": {
+    "lstm": "SELL",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.2926,
+    "lstm": 0.1022,
+    "transformer": 0.4276,
+    "xgboost": 0.1776
+  },
+  "fear_greed": {
+    "value": 69,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "The L S T M, the gradient boosted model, the transformer, and the K A N were completely unanimous in voting to sell today.",
+      "The system issued a sell call for Bitcoin at a price of 77,244 dollars.",
+      "This follows a 24-hour drop of 1.38 percent.",
+      "The model's confidence exceeded the 55.0 percent gating threshold, keeping the call active."
+    ],
+    "days": [
+      "The probability distribution favored sell at 88.4 percent, alongside 8.5 percent hold and 3.2 percent buy.",
+      "These inputs coincided with a 5.33 percent price drop over seven days and a fear and greed reading of 69."
+    ],
+    "trend": [
+      "The last resolved call from yesterday was a sell signal that proved correct after a 1.33 percent drop.",
+      "That outcome built a hit streak of 1 call.",
+      "Across 36 resolved calls, overall accuracy stands at 50.0 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 36,
+    "hits": 18,
+    "misses": 18,
+    "accuracy_pct": 50.0
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=WdMIaivd5Wg"
+}
