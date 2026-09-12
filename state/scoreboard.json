@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-09-11T20:37:45+00:00",
-  "total_calls": 38,
-  "resolved_calls": 37,
+  "updated_at": "2026-09-12T20:39:15+00:00",
+  "total_calls": 39,
+  "resolved_calls": 38,
   "pending_calls": 1,
   "hits": 18,
-  "misses": 19,
-  "accuracy_pct": 48.6,
+  "misses": 20,
+  "accuracy_pct": 47.4,
   "accuracy_30d_pct": 44.8,
   "resolved_30d": 29,
   "streak": {
     "kind": "miss",
-    "length": 1
+    "length": 2
   },
   "by_signal": {
     "BUY": {
@@ -22,26 +22,26 @@
       "accuracy_pct": 80.0
     },
     "SELL": {
-      "n": 8,
-      "accuracy_pct": 12.5
+      "n": 9,
+      "accuracy_pct": 11.1
     }
   },
   "last_resolved": {
-    "date": "2026-09-10",
-    "made_at": "2026-09-10T20:32:05+00:00",
-    "made_at_ms": 1789072325000,
+    "date": "2026-09-11",
+    "made_at": "2026-09-11T20:37:44+00:00",
+    "made_at_ms": 1789159064000,
     "symbol": "BTCUSDT",
     "signal": "SELL",
     "signal_raw": "SELL",
     "gated": false,
-    "confidence": 88.4,
-    "price": 77244.0,
+    "confidence": 86.3,
+    "price": 77411.38,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-09-11T20:37:45+00:00",
-    "price_then": 77358.01,
-    "change_pct": 0.15,
+    "resolved_at": "2026-09-12T20:39:15+00:00",
+    "price_then": 77165.37,
+    "change_pct": -0.32,
     "correct": false
   },
   "flat_band_pct": 1.0,
@@ -51,12 +51,12 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 38,
+    "days": 39,
     "value_usd": 11193.74,
     "return_pct": 11.94,
-    "hold_value_usd": 11960.33,
-    "hold_return_pct": 19.6,
-    "vs_hold_pct": -7.67,
+    "hold_value_usd": 11923.77,
+    "hold_return_pct": 19.24,
+    "vs_hold_pct": -7.3,
     "fees_paid_usd": 95.24,
     "trades": 6,
     "position": "cash",
@@ -325,6 +325,13 @@
         "value": 11193.74,
         "hold": 11960.33,
         "price": 77411.38,
+        "signal": "SELL"
+      },
+      {
+        "date": "2026-09-12",
+        "value": 11193.74,
+        "hold": 11923.77,
+        "price": 77174.72,
         "signal": "SELL"
       }
     ]
