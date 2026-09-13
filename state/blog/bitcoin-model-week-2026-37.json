@@ -1,0 +1,140 @@
+{
+  "slug": "bitcoin-model-week-2026-37",
+  "iso_year": 2026,
+  "iso_week": 37,
+  "title": "Bitcoin AI Model Review — Week 37: 1 of 6 Calls Correct",
+  "meta_description": "Week 37 graded: 1 of 6 Bitcoin calls correct (17%). All-time: 46.2% over 39 public calls. Paper portfolio +11.9% vs holding.",
+  "published_at": "2026-09-13T22:20:44+00:00",
+  "updated_at": "2026-09-13T22:20:44+00:00",
+  "date_range": "2026-09-07 to 2026-09-12",
+  "week": {
+    "resolved": 6,
+    "hits": 1,
+    "misses": 5,
+    "accuracy_pct": 16.7,
+    "days": [
+      {
+        "weekday": "Monday",
+        "date": "2026-09-07",
+        "signal": "SELL",
+        "confidence_pct": 68,
+        "gated": false,
+        "change_pct": -0.84,
+        "correct": false
+      },
+      {
+        "weekday": "Tuesday",
+        "date": "2026-09-08",
+        "signal": "SELL",
+        "confidence_pct": 83,
+        "gated": false,
+        "change_pct": -0.43,
+        "correct": false
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-09-09",
+        "signal": "SELL",
+        "confidence_pct": 83.3,
+        "gated": false,
+        "change_pct": -1.33,
+        "correct": true
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-09-10",
+        "signal": "SELL",
+        "confidence_pct": 88.4,
+        "gated": false,
+        "change_pct": 0.15,
+        "correct": false
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-09-11",
+        "signal": "SELL",
+        "confidence_pct": 86.3,
+        "gated": false,
+        "change_pct": -0.32,
+        "correct": false
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-09-12",
+        "signal": "SELL",
+        "confidence_pct": 82.2,
+        "gated": false,
+        "change_pct": 0.16,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 39,
+    "hits": 18,
+    "misses": 21,
+    "accuracy_pct": 46.2
+  },
+  "portfolio": {
+    "value_usd": 11193.74,
+    "return_pct": 11.94,
+    "hold_return_pct": 19.47,
+    "vs_hold_pct": -7.54,
+    "fees_paid_usd": 95.24,
+    "trades": 6,
+    "position": "cash"
+  },
+  "narrative": {
+    "intro": [
+      "For the week covering 2026-09-07 to 2026-09-12, the model resolved 1 of 6 calls correctly, resulting in an accuracy of 16.7 percent.",
+      "It was a brutal stretch dominated by 5 misses as the system issued sell recommendations every single day.",
+      "This poor performance brought the current streak to 3 consecutive missed calls."
+    ],
+    "days": [
+      "On Tuesday, the model issued a sell signal at 83 percent confidence while Bitcoin dropped minus 0.43 percent, grading as incorrect.",
+      "Wednesday delivered the only hit of the week when a sell signal at 83.3 percent confidence matched a drop of minus 1.33 percent.",
+      "Thursday and Saturday both generated wrong sell calls at 88.4 percent and 82.2 percent confidence as prices rose 0.15 percent and 0.16 percent.",
+      "On Friday, another sell call at 86.3 percent confidence failed to deliver when price fell minus 0.32 percent."
+    ],
+    "spotlight": [
+      "The spotlight call occurred on Monday, 2026-09-07, when the model posted a sell signal with 68 percent confidence.",
+      "Bitcoin recorded a market change of minus 0.84 percent over the 24 hour horizon.",
+      "Because the movement remained within the 1.0 percent flat band, the call was graded as incorrect.",
+      "This call was plainly wrong, showing how narrow price movements result in a failed signal."
+    ],
+    "trend": [
+      "The model maintained an ungated sell posture across all active trading days this week.",
+      "Market price action fluctuated between small gains and minor losses, repeatedly conflicting with the persistent sell outlook.",
+      "This unrelenting bearish bias during sideways movement accounted for the week's poor performance."
+    ],
+    "portfolio": [
+      "Starting with 10000.0 dollars over 40 days, the paper portfolio reached 11193.74 dollars, a return of 11.94 percent.",
+      "Holding Bitcoin achieved 11947.45 dollars or a 19.47 percent return, meaning following the calls underperformed holding by minus 7.54 percent.",
+      "The strategy logged 6 trades with a fee of 0.15 percent per side, paying 95.24 dollars in fees and currently holding cash."
+    ],
+    "record": [
+      "All time performance stands at 46.2 percent accuracy across 39 resolved calls, comprising 18 hits and 21 misses.",
+      "Historical breakdown shows hold signals lead at 80.0 percent accuracy over 15 calls, while buy signals sit at 35.7 percent across 14 calls and sell signals at 10.0 percent over 10 calls.",
+      "Across 29 resolved calls in the recent evaluation window, accuracy sits at 44.8 percent.",
+      "A total sample size of 39 resolved calls remains small, so short term streaks heavily influence the cumulative record."
+    ]
+  },
+  "research": {
+    "title": "High accuracy still is not a trading edge",
+    "bullets": [
+      "Classification ≠ profit",
+      "Fees and slippage bite",
+      "That is why we publish"
+    ],
+    "paragraphs": [
+      "Our own published measurements show something most channels hide. A model can score well on classification metrics and still not be profitable to trade after fees.",
+      "That finding is the reason this scoreboard exists in public.",
+      "So the paper portfolio sits next to the accuracy in these recaps, and the two numbers are allowed to disagree in front of you."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=nUXtoQepsdg"
+}
