@@ -1,0 +1,73 @@
+{
+  "slug": "bitcoin-daily-2026-09-15",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 38,
+  "title": "Bitcoin AI Call — 2026-09-15: SELL at 66% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-09-15: SELL at 66% confidence. BTC trading at $75,954. All-time record: 45% over 40 public calls.",
+  "published_at": "2026-09-15T21:00:55+00:00",
+  "updated_at": "2026-09-15T21:00:55+00:00",
+  "date_range": "2026-09-15",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 66.1,
+  "gated": false,
+  "change_pct": -3.98,
+  "per_model": {
+    "lstm": "SELL",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "HOLD"
+  },
+  "weights": {
+    "kan": 0.273,
+    "lstm": 0.0953,
+    "transformer": 0.466,
+    "xgboost": 0.1657
+  },
+  "fear_greed": {
+    "value": 69,
+    "classification": "Greed"
+  },
+  "narrative": {
+    "intro": [
+      "The model enters today's forecast on a 4 call losing streak.",
+      "For the 24 hour forecast horizon, the machine learning system output a sell signal with 66.1 percent confidence.",
+      "This call arrives with Bitcoin priced at 75,954 dollars, following a 24-hour move of minus 3.98 percent."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, and the transformer all voted to sell, while only the K A N voted to hold.",
+      "The remaining probability split assigned 30.5 percent to hold and 3.4 percent to buy.",
+      "The model evaluated these factors alongside a 7-day change of minus 3.23 percent and a Fear and Greed value of 69."
+    ],
+    "trend": [
+      "The last resolved call was an incorrect sell signal after Bitcoin logged a 2.72 percent move.",
+      "Across 40 resolved calls, the model has recorded an overall accuracy of 45.0 percent.",
+      "Its 30-day accuracy currently stands at 42.9 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 40,
+    "hits": 18,
+    "misses": 22,
+    "accuracy_pct": 45.0
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=n5igKLVXFEA"
+}
