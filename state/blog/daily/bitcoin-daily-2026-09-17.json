@@ -1,0 +1,72 @@
+{
+  "slug": "bitcoin-daily-2026-09-17",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 38,
+  "title": "Bitcoin AI Call — 2026-09-17: HOLD at 49% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-09-17: HOLD at 49% confidence. BTC trading at $76,492. All-time record: 42% over 43 public calls.",
+  "published_at": "2026-09-17T23:28:15+00:00",
+  "updated_at": "2026-09-17T23:28:15+00:00",
+  "date_range": "2026-09-17",
+  "signal": "HOLD",
+  "signal_raw": "HOLD",
+  "confidence_pct": 48.8,
+  "gated": false,
+  "change_pct": 0.38,
+  "per_model": {
+    "lstm": "HOLD",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "HOLD"
+  },
+  "weights": {
+    "kan": 0.2541,
+    "lstm": 0.158,
+    "transformer": 0.4338,
+    "xgboost": 0.1542
+  },
+  "fear_greed": {
+    "value": 50,
+    "classification": "Neutral"
+  },
+  "narrative": {
+    "intro": [
+      "The model enters today on a streak of 7 consecutive misses.",
+      "For today, the system issued a hold call for Bitcoin with 48.8 percent confidence over a 24 hour horizon.",
+      "Bitcoin trades at 76,492 dollars, reflecting a 24 hour change of 0.38 percent."
+    ],
+    "days": [
+      "Inside the voting ensemble, the gradient boosted model and the transformer selected sell, whereas the L S T M and the K A N chose hold.",
+      "The internal probability split assigned 46.1 percent to hold and 5.1 percent to buy.",
+      "The broader market context includes a 7 day change of minus 0.54 percent and a Neutral Fear and Greed reading of 50."
+    ],
+    "trend": [
+      "The previous result from 2026-09-16 was an incorrect sell call following a 0.51 percent price move.",
+      "Across 43 resolved calls, the record stands at 18 hits and 25 misses with an accuracy of 41.9 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 43,
+    "hits": 18,
+    "misses": 25,
+    "accuracy_pct": 41.9
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=HzltRoiU4Rc"
+}
