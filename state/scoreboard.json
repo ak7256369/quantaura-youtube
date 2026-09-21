@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-09-20T23:02:06+00:00",
-  "total_calls": 47,
+  "updated_at": "2026-09-21T21:47:25+00:00",
+  "total_calls": 48,
   "resolved_calls": 46,
-  "pending_calls": 1,
+  "pending_calls": 2,
   "hits": 18,
   "misses": 28,
   "accuracy_pct": 39.1,
-  "accuracy_30d_pct": 27.6,
-  "resolved_30d": 29,
+  "accuracy_30d_pct": 28.6,
+  "resolved_30d": 28,
   "streak": {
     "kind": "miss",
     "length": 10
@@ -51,12 +51,12 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 47,
-    "value_usd": 11198.74,
-    "return_pct": 11.99,
-    "hold_value_usd": 12543.22,
-    "hold_return_pct": 25.43,
-    "vs_hold_pct": -13.44,
+    "days": 48,
+    "value_usd": 11962.09,
+    "return_pct": 19.62,
+    "hold_value_usd": 13398.21,
+    "hold_return_pct": 33.98,
+    "vs_hold_pct": -14.36,
     "fees_paid_usd": 112.03,
     "trades": 7,
     "position": "BTC",
@@ -388,6 +388,13 @@
         "value": 11198.74,
         "hold": 12543.22,
         "price": 81184.0,
+        "signal": "BUY"
+      },
+      {
+        "date": "2026-09-21",
+        "value": 11962.09,
+        "hold": 13398.21,
+        "price": 86717.82,
         "signal": "BUY"
       }
     ]
