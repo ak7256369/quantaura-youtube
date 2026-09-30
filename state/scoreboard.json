@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-09-30T00:05:33+00:00",
+  "updated_at": "2026-09-30T22:01:16+00:00",
   "total_calls": 57,
-  "resolved_calls": 55,
-  "pending_calls": 2,
+  "resolved_calls": 56,
+  "pending_calls": 1,
   "hits": 22,
-  "misses": 33,
-  "accuracy_pct": 40.0,
+  "misses": 34,
+  "accuracy_pct": 39.3,
   "accuracy_30d_pct": 27.6,
   "resolved_30d": 29,
   "streak": {
     "kind": "miss",
-    "length": 1
+    "length": 2
   },
   "by_signal": {
     "BUY": {
@@ -22,26 +22,26 @@
       "accuracy_pct": 73.7
     },
     "SELL": {
-      "n": 17,
-      "accuracy_pct": 11.8
+      "n": 18,
+      "accuracy_pct": 11.1
     }
   },
   "last_resolved": {
-    "date": "2026-09-28",
-    "made_at": "2026-09-28T23:01:18+00:00",
-    "made_at_ms": 1790636478000,
+    "date": "2026-09-29",
+    "made_at": "2026-09-29T21:59:45+00:00",
+    "made_at_ms": 1790719185000,
     "symbol": "BTCUSDT",
     "signal": "SELL",
     "signal_raw": "SELL",
     "gated": false,
-    "confidence": 66.4,
-    "price": 83556.01,
+    "confidence": 74.4,
+    "price": 83503.99,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-09-30T00:05:33+00:00",
-    "price_then": 83667.03,
-    "change_pct": 0.13,
+    "resolved_at": "2026-09-30T22:01:16+00:00",
+    "price_then": 83772.0,
+    "change_pct": 0.32,
     "correct": false
   },
   "flat_band_pct": 1.0,
@@ -54,9 +54,9 @@
     "days": 57,
     "value_usd": 11534.34,
     "return_pct": 15.34,
-    "hold_value_usd": 12932.57,
-    "hold_return_pct": 29.33,
-    "vs_hold_pct": -13.98,
+    "hold_value_usd": 12940.87,
+    "hold_return_pct": 29.41,
+    "vs_hold_pct": -14.07,
     "fees_paid_usd": 129.36,
     "trades": 8,
     "position": "cash",
@@ -456,8 +456,8 @@
       {
         "date": "2026-09-30",
         "value": 11534.34,
-        "hold": 12932.57,
-        "price": 83704.0,
+        "hold": 12940.87,
+        "price": 83757.72,
         "signal": "SELL"
       }
     ]
