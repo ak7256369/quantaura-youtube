@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-02T21:55:36+00:00",
-  "total_calls": 59,
-  "resolved_calls": 57,
+  "updated_at": "2026-10-03T00:11:00+00:00",
+  "total_calls": 60,
+  "resolved_calls": 58,
   "pending_calls": 2,
-  "hits": 22,
+  "hits": 23,
   "misses": 35,
-  "accuracy_pct": 38.6,
-  "accuracy_30d_pct": 25.0,
-  "resolved_30d": 28,
+  "accuracy_pct": 39.7,
+  "accuracy_30d_pct": 27.6,
+  "resolved_30d": 29,
   "streak": {
-    "kind": "miss",
-    "length": 3
+    "kind": "hit",
+    "length": 1
   },
   "by_signal": {
     "BUY": {
@@ -18,8 +18,8 @@
       "accuracy_pct": 31.6
     },
     "HOLD": {
-      "n": 19,
-      "accuracy_pct": 73.7
+      "n": 20,
+      "accuracy_pct": 75.0
     },
     "SELL": {
       "n": 19,
@@ -27,22 +27,22 @@
     }
   },
   "last_resolved": {
-    "date": "2026-09-30",
-    "made_at": "2026-09-30T21:58:48+00:00",
-    "made_at_ms": 1790805528000,
+    "date": "2026-10-01",
+    "made_at": "2026-10-01T22:26:20+00:00",
+    "made_at_ms": 1790893580000,
     "symbol": "BTCUSDT",
-    "signal": "SELL",
-    "signal_raw": "SELL",
+    "signal": "HOLD",
+    "signal_raw": "HOLD",
     "gated": false,
-    "confidence": 74.2,
-    "price": 83757.72,
+    "confidence": 41.4,
+    "price": 84737.56,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-10-01T22:26:20+00:00",
-    "price_then": 84544.99,
-    "change_pct": 0.94,
-    "correct": false
+    "resolved_at": "2026-10-03T00:11:00+00:00",
+    "price_then": 84492.01,
+    "change_pct": -0.29,
+    "correct": true
   },
   "flat_band_pct": 1.0,
   "horizon_hours": 24,
@@ -51,12 +51,12 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 59,
+    "days": 60,
     "value_usd": 11534.34,
     "return_pct": 15.34,
-    "hold_value_usd": 13058.56,
-    "hold_return_pct": 30.59,
-    "vs_hold_pct": -15.24,
+    "hold_value_usd": 13056.67,
+    "hold_return_pct": 30.57,
+    "vs_hold_pct": -15.22,
     "fees_paid_usd": 129.36,
     "trades": 8,
     "position": "cash",
@@ -472,6 +472,13 @@
         "value": 11534.34,
         "hold": 13058.56,
         "price": 84519.5,
+        "signal": "HOLD"
+      },
+      {
+        "date": "2026-10-03",
+        "value": 11534.34,
+        "hold": 13056.67,
+        "price": 84507.22,
         "signal": "HOLD"
       }
     ]
