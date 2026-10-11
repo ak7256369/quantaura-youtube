@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-11T00:06:36+00:00",
+  "updated_at": "2026-10-11T21:37:13+00:00",
   "total_calls": 68,
-  "resolved_calls": 66,
-  "pending_calls": 2,
-  "hits": 27,
+  "resolved_calls": 67,
+  "pending_calls": 1,
+  "hits": 28,
   "misses": 39,
-  "accuracy_pct": 40.9,
-  "accuracy_30d_pct": 31.0,
+  "accuracy_pct": 41.8,
+  "accuracy_30d_pct": 34.5,
   "resolved_30d": 29,
   "streak": {
-    "kind": "miss",
-    "length": 2
+    "kind": "hit",
+    "length": 1
   },
   "by_signal": {
     "BUY": {
@@ -18,8 +18,8 @@
       "accuracy_pct": 31.6
     },
     "HOLD": {
-      "n": 24,
-      "accuracy_pct": 75.0
+      "n": 25,
+      "accuracy_pct": 76.0
     },
     "SELL": {
       "n": 23,
@@ -27,22 +27,22 @@
     }
   },
   "last_resolved": {
-    "date": "2026-10-09",
-    "made_at": "2026-10-09T22:23:24+00:00",
-    "made_at_ms": 1791584604000,
+    "date": "2026-10-10",
+    "made_at": "2026-10-10T21:17:26+00:00",
+    "made_at_ms": 1791667046000,
     "symbol": "BTCUSDT",
-    "signal": "SELL",
-    "signal_raw": "SELL",
+    "signal": "HOLD",
+    "signal_raw": "HOLD",
     "gated": false,
-    "confidence": 86.5,
-    "price": 82535.03,
+    "confidence": 49.1,
+    "price": 83046.01,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-10-11T00:06:36+00:00",
-    "price_then": 82999.06,
-    "change_pct": 0.56,
-    "correct": false
+    "resolved_at": "2026-10-11T21:37:13+00:00",
+    "price_then": 83342.73,
+    "change_pct": 0.36,
+    "correct": true
   },
   "flat_band_pct": 1.0,
   "horizon_hours": 24,
@@ -54,9 +54,9 @@
     "days": 68,
     "value_usd": 11534.34,
     "return_pct": 15.34,
-    "hold_value_usd": 12823.8,
-    "hold_return_pct": 28.24,
-    "vs_hold_pct": -12.89,
+    "hold_value_usd": 12899.81,
+    "hold_return_pct": 29.0,
+    "vs_hold_pct": -13.65,
     "fees_paid_usd": 129.36,
     "trades": 8,
     "position": "cash",
@@ -533,9 +533,9 @@
       {
         "date": "2026-10-11",
         "value": 11534.34,
-        "hold": 12823.8,
-        "price": 83000.02,
-        "signal": "SELL"
+        "hold": 12899.81,
+        "price": 83492.01,
+        "signal": "HOLD"
       }
     ]
   }
