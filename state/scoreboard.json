@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-13T00:16:28+00:00",
+  "updated_at": "2026-10-13T02:26:27+00:00",
   "total_calls": 70,
   "resolved_calls": 69,
   "pending_calls": 1,
@@ -54,9 +54,9 @@
     "days": 70,
     "value_usd": 11534.34,
     "return_pct": 15.34,
-    "hold_value_usd": 12598.52,
-    "hold_return_pct": 25.99,
-    "vs_hold_pct": -10.64,
+    "hold_value_usd": 12792.59,
+    "hold_return_pct": 27.93,
+    "vs_hold_pct": -12.58,
     "fees_paid_usd": 129.36,
     "trades": 8,
     "position": "cash",
@@ -547,8 +547,8 @@
       {
         "date": "2026-10-13",
         "value": 11534.34,
-        "hold": 12598.52,
-        "price": 81541.95,
+        "hold": 12792.59,
+        "price": 82798.0,
         "signal": "SELL"
       }
     ]
