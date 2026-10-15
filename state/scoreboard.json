@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-10-14T23:43:46+00:00",
-  "total_calls": 71,
+  "updated_at": "2026-10-15T21:02:17+00:00",
+  "total_calls": 72,
   "resolved_calls": 70,
-  "pending_calls": 1,
+  "pending_calls": 2,
   "hits": 29,
   "misses": 41,
   "accuracy_pct": 41.4,
-  "accuracy_30d_pct": 37.9,
-  "resolved_30d": 29,
+  "accuracy_30d_pct": 39.3,
+  "resolved_30d": 28,
   "streak": {
     "kind": "miss",
     "length": 2
@@ -51,12 +51,12 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 71,
+    "days": 72,
     "value_usd": 11534.34,
     "return_pct": 15.34,
-    "hold_value_usd": 12600.41,
-    "hold_return_pct": 26.0,
-    "vs_hold_pct": -10.66,
+    "hold_value_usd": 12674.43,
+    "hold_return_pct": 26.74,
+    "vs_hold_pct": -11.4,
     "fees_paid_usd": 129.36,
     "trades": 8,
     "position": "cash",
@@ -556,6 +556,13 @@
         "value": 11534.34,
         "hold": 12600.41,
         "price": 81554.16,
+        "signal": "SELL"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 11534.34,
+        "hold": 12674.43,
+        "price": 82033.27,
         "signal": "SELL"
       }
     ]
