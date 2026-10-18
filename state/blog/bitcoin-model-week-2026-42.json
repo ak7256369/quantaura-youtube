@@ -1,0 +1,131 @@
+{
+  "slug": "bitcoin-model-week-2026-42",
+  "iso_year": 2026,
+  "iso_week": 42,
+  "title": "Bitcoin AI Model Review — Week 42: 0 of 5 Calls Correct",
+  "meta_description": "Week 42 graded: 0 of 5 Bitcoin calls correct (0%). All-time: 39.7% over 73 public calls. Paper portfolio +15.3% vs holding.",
+  "published_at": "2026-10-18T22:25:23+00:00",
+  "updated_at": "2026-10-18T22:25:23+00:00",
+  "date_range": "2026-10-12 to 2026-10-16",
+  "week": {
+    "resolved": 5,
+    "hits": 0,
+    "misses": 5,
+    "accuracy_pct": 0.0,
+    "days": [
+      {
+        "weekday": "Monday",
+        "date": "2026-10-12",
+        "signal": "HOLD",
+        "confidence_pct": 60.5,
+        "gated": false,
+        "change_pct": -2.63,
+        "correct": false
+      },
+      {
+        "weekday": "Tuesday",
+        "date": "2026-10-13",
+        "signal": "HOLD",
+        "confidence_pct": 54.3,
+        "gated": false,
+        "change_pct": -2.2,
+        "correct": false
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-10-14",
+        "signal": "SELL",
+        "confidence_pct": 80.7,
+        "gated": false,
+        "change_pct": 0.76,
+        "correct": false
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-10-15",
+        "signal": "SELL",
+        "confidence_pct": 69.3,
+        "gated": false,
+        "change_pct": -0.73,
+        "correct": false
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-10-16",
+        "signal": "SELL",
+        "confidence_pct": 63,
+        "gated": false,
+        "change_pct": -0.53,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 73,
+    "hits": 29,
+    "misses": 44,
+    "accuracy_pct": 39.7
+  },
+  "portfolio": {
+    "value_usd": 11534.34,
+    "return_pct": 15.34,
+    "hold_return_pct": 24.96,
+    "vs_hold_pct": -9.62,
+    "fees_paid_usd": 129.36,
+    "trades": 8,
+    "position": "cash"
+  },
+  "narrative": {
+    "intro": [
+      "Welcome to the QuantAura Signals weekly recap for the period of 2026-10-12 to 2026-10-16.",
+      "This week the model posted a clean sweep of losses, finishing with 0 hits out of 5 resolved calls for an accuracy rate of 0.0 percent.",
+      "That active 5 call miss streak marks a severe slump on our ledger, leaving no room for spin."
+    ],
+    "days": [
+      "Looking past Monday, Tuesday brought another hold signal at 54.3 percent confidence while the market dropped 2.2 percent.",
+      "On Wednesday the system pivoted aggressively, issuing a sell call with 80.7 percent confidence, but Bitcoin ticked upward by 0.76 percent to break the signal.",
+      "Thursday and Friday both saw consecutive sell recommendations at 69.3 percent and 63 percent confidence.",
+      "Because the market moved down only 0.73 percent on Thursday and 0.53 percent on Friday, both moves stayed within the 1.0 percent flat band and registered as misses."
+    ],
+    "spotlight": [
+      "The most notable failure of the week arrived on Monday, where the model started the run with a hold call.",
+      "Confidence sat at 60.5 percent heading into the 24 hour evaluation horizon.",
+      "Instead of holding steady within the threshold, Bitcoin dropped 2.63 percent, resulting in a plain and decisive miss.",
+      "The model misread both the direction and the volatility right from the opening bell."
+    ],
+    "trend": [
+      "Across the entire week, Bitcoin experienced steady downward pressure punctuated by a brief mid-week bounce.",
+      "The model reacted to this environment by issuing holds during the steeper drops and switching to sell signals right as price movement compressed.",
+      "Every single call sat on the wrong side of the daily price shifts."
+    ],
+    "portfolio": [
+      "Our paper portfolio tracks an initial balance of 10000.0 dollars over 75 days of active tracking.",
+      "The strategy currently sits entirely in cash at 11534.34 dollars, representing a gain of 15.34 percent after deducting 129.36 dollars in trading fees from 8 trades.",
+      "A simple buy and hold approach over the same duration reached 12495.85 dollars, delivering a return of 24.96 percent.",
+      "That leaves the signal strategy trailing buy and hold by negative 9.62 percent, demonstrating that following these calls underperformed passive ownership."
+    ],
+    "record": [
+      "Over our entire published history, the model holds 29 hits and 44 misses across 73 resolved calls, establishing an all-time accuracy of 39.7 percent.",
+      "The sell signal remains particularly defective, achieving an accuracy of just 11.5 percent over 26 instances.",
+      "That record keeps the system well below a coin flip, though the overall sample remains an early baseline."
+    ]
+  },
+  "research": {
+    "title": "Why the model predicts regimes, not prices",
+    "bullets": [
+      "Target: 24h trend regime",
+      "Not a price target",
+      "Direction, not magnitude"
+    ],
+    "paragraphs": [
+      "The model does not predict prices. It classifies the next twenty four hours into an upward, downward, or flat regime.",
+      "Exact price targets are noise at this horizon. Regimes are the part of the problem a model can actually learn.",
+      "Ask a model for a number it cannot know and it will hand you one anyway. We would rather ask it a question it can answer."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null
+}
