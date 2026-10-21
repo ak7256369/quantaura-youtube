@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-10-20T23:38:50+00:00",
-  "total_calls": 77,
+  "updated_at": "2026-10-21T21:22:08+00:00",
+  "total_calls": 78,
   "resolved_calls": 76,
-  "pending_calls": 1,
+  "pending_calls": 2,
   "hits": 30,
   "misses": 46,
   "accuracy_pct": 39.5,
@@ -51,15 +51,15 @@
     "fee_pct_per_side": 0.15,
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
-    "days": 77,
-    "value_usd": 11534.34,
-    "return_pct": 15.34,
-    "hold_value_usd": 12807.26,
-    "hold_return_pct": 28.07,
-    "vs_hold_pct": -12.73,
-    "fees_paid_usd": 129.36,
-    "trades": 8,
-    "position": "cash",
+    "days": 78,
+    "value_usd": 11517.04,
+    "return_pct": 15.17,
+    "hold_value_usd": 13091.87,
+    "hold_return_pct": 30.92,
+    "vs_hold_pct": -15.75,
+    "fees_paid_usd": 146.66,
+    "trades": 9,
+    "position": "BTC",
     "curve": [
       {
         "date": "2026-08-05",
@@ -599,6 +599,13 @@
         "hold": 12807.26,
         "price": 82892.97,
         "signal": "HOLD"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 11517.04,
+        "hold": 13091.87,
+        "price": 84735.09,
+        "signal": "BUY"
       }
     ]
   }
