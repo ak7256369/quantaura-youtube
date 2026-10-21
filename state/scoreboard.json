@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-21T21:22:08+00:00",
+  "updated_at": "2026-10-21T23:55:14+00:00",
   "total_calls": 78,
-  "resolved_calls": 76,
-  "pending_calls": 2,
+  "resolved_calls": 77,
+  "pending_calls": 1,
   "hits": 30,
-  "misses": 46,
-  "accuracy_pct": 39.5,
+  "misses": 47,
+  "accuracy_pct": 39.0,
   "accuracy_30d_pct": 37.9,
   "resolved_30d": 29,
   "streak": {
     "kind": "miss",
-    "length": 2
+    "length": 3
   },
   "by_signal": {
     "BUY": {
@@ -18,8 +18,8 @@
       "accuracy_pct": 31.6
     },
     "HOLD": {
-      "n": 30,
-      "accuracy_pct": 70.0
+      "n": 31,
+      "accuracy_pct": 67.7
     },
     "SELL": {
       "n": 27,
@@ -27,21 +27,21 @@
     }
   },
   "last_resolved": {
-    "date": "2026-10-19",
-    "made_at": "2026-10-19T22:05:31+00:00",
-    "made_at_ms": 1792447531000,
+    "date": "2026-10-20",
+    "made_at": "2026-10-20T23:38:49+00:00",
+    "made_at_ms": 1792539529000,
     "symbol": "BTCUSDT",
     "signal": "HOLD",
     "signal_raw": "HOLD",
     "gated": false,
-    "confidence": 81.8,
-    "price": 82090.17,
+    "confidence": 61.3,
+    "price": 82892.97,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-10-20T23:38:50+00:00",
-    "price_then": 83037.83,
-    "change_pct": 1.15,
+    "resolved_at": "2026-10-21T23:55:13+00:00",
+    "price_then": 84307.45,
+    "change_pct": 1.71,
     "correct": false
   },
   "flat_band_pct": 1.0,
@@ -54,9 +54,9 @@
     "days": 78,
     "value_usd": 11517.04,
     "return_pct": 15.17,
-    "hold_value_usd": 13091.87,
-    "hold_return_pct": 30.92,
-    "vs_hold_pct": -15.75,
+    "hold_value_usd": 12999.77,
+    "hold_return_pct": 30.0,
+    "vs_hold_pct": -14.83,
     "fees_paid_usd": 146.66,
     "trades": 9,
     "position": "BTC",
@@ -603,8 +603,8 @@
       {
         "date": "2026-10-21",
         "value": 11517.04,
-        "hold": 13091.87,
-        "price": 84735.09,
+        "hold": 12999.77,
+        "price": 84138.94,
         "signal": "BUY"
       }
     ]
