@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-23T21:06:56+00:00",
+  "updated_at": "2026-10-23T23:55:17+00:00",
   "total_calls": 80,
-  "resolved_calls": 78,
-  "pending_calls": 2,
-  "hits": 30,
+  "resolved_calls": 79,
+  "pending_calls": 1,
+  "hits": 31,
   "misses": 48,
-  "accuracy_pct": 38.5,
+  "accuracy_pct": 39.2,
   "accuracy_30d_pct": 37.9,
   "resolved_30d": 29,
   "streak": {
-    "kind": "miss",
-    "length": 4
+    "kind": "hit",
+    "length": 1
   },
   "by_signal": {
     "BUY": {
@@ -18,8 +18,8 @@
       "accuracy_pct": 30.0
     },
     "HOLD": {
-      "n": 31,
-      "accuracy_pct": 67.7
+      "n": 32,
+      "accuracy_pct": 68.8
     },
     "SELL": {
       "n": 27,
@@ -27,22 +27,22 @@
     }
   },
   "last_resolved": {
-    "date": "2026-10-21",
-    "made_at": "2026-10-21T23:55:13+00:00",
-    "made_at_ms": 1792626913000,
+    "date": "2026-10-22",
+    "made_at": "2026-10-22T23:53:46+00:00",
+    "made_at_ms": 1792713226000,
     "symbol": "BTCUSDT",
-    "signal": "BUY",
-    "signal_raw": "BUY",
+    "signal": "HOLD",
+    "signal_raw": "HOLD",
     "gated": false,
-    "confidence": 84.1,
-    "price": 84138.94,
+    "confidence": 51.6,
+    "price": 81421.02,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-10-22T23:56:44+00:00",
-    "price_then": 81421.02,
-    "change_pct": -3.23,
-    "correct": false
+    "resolved_at": "2026-10-23T23:55:17+00:00",
+    "price_then": 81189.44,
+    "change_pct": -0.28,
+    "correct": true
   },
   "flat_band_pct": 1.0,
   "horizon_hours": 24,
@@ -52,11 +52,11 @@
     "policy": "BUY = fully long, SELL = fully in cash, HOLD = unchanged",
     "since": "2026-08-05",
     "days": 80,
-    "value_usd": 11147.61,
-    "return_pct": 11.48,
-    "hold_value_usd": 12582.77,
-    "hold_return_pct": 25.83,
-    "vs_hold_pct": -14.35,
+    "value_usd": 11095.73,
+    "return_pct": 10.96,
+    "hold_value_usd": 12524.21,
+    "hold_return_pct": 25.24,
+    "vs_hold_pct": -14.28,
     "fees_paid_usd": 146.66,
     "trades": 9,
     "position": "BTC",
@@ -616,9 +616,9 @@
       },
       {
         "date": "2026-10-23",
-        "value": 11147.61,
-        "hold": 12582.77,
-        "price": 81440.0,
+        "value": 11095.73,
+        "hold": 12524.21,
+        "price": 81061.01,
         "signal": "HOLD"
       }
     ]
