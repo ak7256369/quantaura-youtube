@@ -1,0 +1,60 @@
+{
+  "slug": "bitcoin-daily-2026-11-12",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 46,
+  "title": "Bitcoin AI Call — 2026-11-12: SELL at 93% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-12: SELL at 93% confidence. BTC at $71,428. Record: 37% over 94 public calls.",
+  "published_at": "2026-11-12T23:17:51+00:00",
+  "updated_at": "2026-11-14T08:41:42+00:00",
+  "date_range": "2026-11-12",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 93.2,
+  "gated": false,
+  "change_pct": -4.91,
+  "correct": true,
+  "per_model": null,
+  "weights": null,
+  "fear_greed": null,
+  "narrative": {
+    "intro": [
+      "On November 12, 2026 the QuantAura four-model ensemble published a SELL call on Bitcoin at 93.2 percent confidence.",
+      "Bitcoin was trading at $71,428 when the call was made."
+    ],
+    "days": [
+      "Twenty-four hours later the price had moved -4.91 percent, so the call was graded correct.",
+      "A SELL call needs price to move more than 1 percent in its direction within 24 hours to be graded correct."
+    ],
+    "trend": [
+      "Going into the day, the public record stood at 35 hits and 59 misses over 94 graded calls, an accuracy of 37.2 percent.",
+      "Over the preceding thirty days accuracy was 25.0 percent.",
+      "This post was rebuilt from the committed prediction log while the daily video pipeline was offline, so there is no video for this day."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 94,
+    "hits": 35,
+    "misses": 59,
+    "accuracy_pct": 37.2
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null,
+  "backfilled": true
+}

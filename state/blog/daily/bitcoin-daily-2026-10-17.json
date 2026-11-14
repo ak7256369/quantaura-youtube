@@ -1,0 +1,60 @@
+{
+  "slug": "bitcoin-daily-2026-10-17",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 42,
+  "title": "Bitcoin AI Call — 2026-10-17: HOLD at 52% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-10-17: HOLD at 52% confidence. BTC at $81,407. Record: 40% over 73 public calls.",
+  "published_at": "2026-10-17T22:55:24+00:00",
+  "updated_at": "2026-11-14T08:41:42+00:00",
+  "date_range": "2026-10-17",
+  "signal": "HOLD",
+  "signal_raw": "HOLD",
+  "confidence_pct": 51.8,
+  "gated": false,
+  "change_pct": 0.49,
+  "correct": true,
+  "per_model": null,
+  "weights": null,
+  "fear_greed": null,
+  "narrative": {
+    "intro": [
+      "On October 17, 2026 the QuantAura four-model ensemble published a HOLD call on Bitcoin at 51.8 percent confidence.",
+      "Bitcoin was trading at $81,407 when the call was made."
+    ],
+    "days": [
+      "Twenty-four hours later the price had moved +0.49 percent, so the call was graded correct.",
+      "A HOLD call counts as correct only when price stays within ±1 percent over the 24-hour horizon."
+    ],
+    "trend": [
+      "Going into the day, the public record stood at 29 hits and 44 misses over 73 graded calls, an accuracy of 39.7 percent.",
+      "Over the preceding thirty days accuracy was 36.7 percent.",
+      "This post was rebuilt from the committed prediction log while the daily video pipeline was offline, so there is no video for this day."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 73,
+    "hits": 29,
+    "misses": 44,
+    "accuracy_pct": 39.7
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null,
+  "backfilled": true
+}

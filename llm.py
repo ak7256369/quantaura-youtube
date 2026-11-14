@@ -53,23 +53,42 @@ def _call_groq(spec: dict, prompt: str, temperature: float) -> str:
     key = env(spec["api_key_env"])
     if not key:
         raise LLMUnavailable(f"{spec['api_key_env']} not set")
-    res = post_json(
-        spec["endpoint"],
-        {
+
+    def _post(json_mode: bool):
+        payload = {
             "model": spec["model"],
             "messages": [{"role": "user", "content": prompt}],
             "temperature": temperature,
-            "response_format": {"type": "json_object"},
-        },
-        headers={"Authorization": f"Bearer {key}"},
-        label="groq",
-    )
+            # gpt-oss is a reasoning model: with the default budget its hidden
+            # reasoning can consume every token, leaving an empty answer that
+            # json_object mode then rejects ("json_validate_failed",
+            # failed_generation ""). That took out the Groq fallback on every
+            # Gemini 503 from Sep 29 onward. Low effort + a generous cap leaves
+            # room for the script itself.
+            "reasoning_effort": "low",
+            "max_completion_tokens": 8192,
+        }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
+        return post_json(spec["endpoint"], payload,
+                         headers={"Authorization": f"Bearer {key}"}, label="groq")
+
+    res = _post(json_mode=True)
+    # Server-side JSON validation is a convenience, not a requirement:
+    # extract_json() parses fenced/loose output defensively. One retry in
+    # free-text mode turns a validator hiccup into a usable answer.
+    if not res.ok and "json_validate_failed" in str(res.error):
+        log.warning(f"  groq {spec['model']}: json_validate_failed - retrying without JSON mode")
+        res = _post(json_mode=False)
     if not res.ok:
-        raise LLMUnavailable(f"groq: {res.error}")
+        raise LLMUnavailable(f"groq {spec['model']}: {res.error}")
     try:
-        return res.data["choices"][0]["message"]["content"]
+        content = res.data["choices"][0]["message"]["content"]
     except Exception as e:                                       # noqa: BLE001
         raise LLMUnavailable(f"groq: unexpected response shape ({e})")
+    if not (content or "").strip():
+        raise LLMUnavailable(f"groq {spec['model']}: empty completion")
+    return content
 
 
 _CALLERS = {"gemini": _call_gemini, "groq": _call_groq}

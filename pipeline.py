@@ -276,6 +276,10 @@ def run(args: argparse.Namespace) -> int:
             _record_run("rendered", "upload", str(e),
                         {"video": str(video), **drive_mod.run_log_extra(drive_info)})
             notify.rendered_only(snapshot, script, str(video), str(e), drive_info)
+            # The call itself is verified and committed; only YouTube failed.
+            # Tying the blog to the upload silently emptied it for six weeks
+            # (Sep 29 – Nov 13) while the OAuth token was revoked.
+            daily_blogpost.publish(snapshot, script, score, None)
             return 0
 
         visibility = config()["upload"]["visibility"]

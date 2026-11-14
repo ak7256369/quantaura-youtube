@@ -1,0 +1,60 @@
+{
+  "slug": "bitcoin-daily-2026-10-21",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 43,
+  "title": "Bitcoin AI Call — 2026-10-21: BUY at 84% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-10-21: BUY at 84% confidence. BTC at $84,139. Record: 39% over 77 public calls.",
+  "published_at": "2026-10-21T23:55:13+00:00",
+  "updated_at": "2026-11-14T08:41:42+00:00",
+  "date_range": "2026-10-21",
+  "signal": "BUY",
+  "signal_raw": "BUY",
+  "confidence_pct": 84.1,
+  "gated": false,
+  "change_pct": -3.23,
+  "correct": false,
+  "per_model": null,
+  "weights": null,
+  "fear_greed": null,
+  "narrative": {
+    "intro": [
+      "On October 21, 2026 the QuantAura four-model ensemble published a BUY call on Bitcoin at 84.1 percent confidence.",
+      "Bitcoin was trading at $84,139 when the call was made."
+    ],
+    "days": [
+      "Twenty-four hours later the price had moved -3.23 percent, so the call was graded incorrect.",
+      "A BUY call needs price to move more than 1 percent in its direction within 24 hours to be graded correct."
+    ],
+    "trend": [
+      "Going into the day, the public record stood at 30 hits and 47 misses over 77 graded calls, an accuracy of 39.0 percent.",
+      "Over the preceding thirty days accuracy was 37.9 percent.",
+      "This post was rebuilt from the committed prediction log while the daily video pipeline was offline, so there is no video for this day."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 77,
+    "hits": 30,
+    "misses": 47,
+    "accuracy_pct": 39.0
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null,
+  "backfilled": true
+}
