@@ -1,0 +1,71 @@
+{
+  "slug": "bitcoin-daily-2026-11-14",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 46,
+  "title": "Bitcoin AI Call — 2026-11-14: SELL at 97% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-14: SELL at 97% confidence. BTC trading at $64,279. All-time record: 38% over 95 public calls.",
+  "published_at": "2026-11-14T22:16:17+00:00",
+  "updated_at": "2026-11-14T22:16:17+00:00",
+  "date_range": "2026-11-14",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 97,
+  "gated": false,
+  "change_pct": -5.82,
+  "per_model": {
+    "lstm": "SELL",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.2974,
+    "lstm": 0.1654,
+    "transformer": 0.2386,
+    "xgboost": 0.2987
+  },
+  "fear_greed": {
+    "value": 13,
+    "classification": "Extreme Fear"
+  },
+  "narrative": {
+    "intro": [
+      "All four sub-models reached a unanimous consensus to sell Bitcoin this morning.",
+      "The primary system output a directional sell signal with a confidence of 97 percent.",
+      "Bitcoin sits at a price of 64,279 dollars after recording a 24-hour move of minus 5.82 percent."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, the transformer, and the K A N aligned completely on sell, leaving hold probability at 1.9 percent and buy probability at 1.1 percent.",
+      "These model outputs sat alongside a 7-day asset decline of minus 15.27 percent and an Extreme Fear metric of 13."
+    ],
+    "trend": [
+      "The model's previous graded outcome from 2026-11-12 was a correct sell call as price moved minus 4.91 percent.",
+      "Across 95 resolved calls, the model has logged 36 hits and 59 misses, bringing overall accuracy to 37.9 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 95,
+    "hits": 36,
+    "misses": 59,
+    "accuracy_pct": 37.9
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null
+}
