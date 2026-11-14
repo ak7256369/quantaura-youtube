@@ -4,7 +4,10 @@ Run this ONCE on your own machine. It opens a browser, you approve the channel,
 and it prints a refresh token to paste into the GitHub secret YT_REFRESH_TOKEN.
 CI never runs this — a consent screen cannot be answered by a cron job.
 
-    python get_youtube_token.py path/to/client_secret.json
+    python get_youtube_token.py path/to/client_secret.json [--set-secrets]
+
+--set-secrets writes YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN straight
+into the repo's GitHub secrets with the gh CLI instead of printing them.
 
 The client_secret.json comes from Google Cloud Console:
     APIs & Services → Credentials → Create credentials → OAuth client ID
