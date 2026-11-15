@@ -1,0 +1,72 @@
+{
+  "slug": "bitcoin-daily-2026-11-15",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 46,
+  "title": "Bitcoin AI Call — 2026-11-15: SELL at 98% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-15: SELL at 98% confidence. BTC trading at $63,646. All-time record: 38% over 96 public calls.",
+  "published_at": "2026-11-15T00:55:40+00:00",
+  "updated_at": "2026-11-15T00:55:40+00:00",
+  "date_range": "2026-11-15",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 97.5,
+  "gated": false,
+  "change_pct": -6.87,
+  "per_model": {
+    "lstm": "SELL",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.2974,
+    "lstm": 0.1654,
+    "transformer": 0.2386,
+    "xgboost": 0.2987
+  },
+  "fear_greed": {
+    "value": 10,
+    "classification": "Extreme Fear"
+  },
+  "narrative": {
+    "intro": [
+      "All four sub-models reached a unanimous consensus today with a 97.5 percent sell probability.",
+      "The primary model issued an active sell signal for Bitcoin at a price of 63,646 dollars.",
+      "That call comes as the asset has fallen 6.87 percent over the last 24 hours."
+    ],
+    "days": [
+      "The probability breakdown shows buy at 1.1 percent and hold at 1.4 percent while the L S T M, the gradient boosted model, the transformer, and the K A N all voted to sell.",
+      "This unified bearish stance correlates with a 7-day drop of 15.98 percent and a fear and greed index reading of 10."
+    ],
+    "trend": [
+      "The last resolved model call from November 13th was a sell that logged a hit when price dropped 6.0 percent.",
+      "That result extends the model's current streak to 2 consecutive hits.",
+      "Overall, the system holds 37 hits and 59 misses, giving a 38.5 percent accuracy rate across 96 resolved calls."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 96,
+    "hits": 37,
+    "misses": 59,
+    "accuracy_pct": 38.5
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null
+}
