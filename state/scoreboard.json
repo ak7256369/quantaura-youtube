@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-11-15T00:48:02+00:00",
+  "updated_at": "2026-11-15T22:34:59+00:00",
   "total_calls": 98,
-  "resolved_calls": 96,
-  "pending_calls": 2,
+  "resolved_calls": 97,
+  "pending_calls": 1,
   "hits": 37,
-  "misses": 59,
-  "accuracy_pct": 38.5,
-  "accuracy_30d_pct": 33.3,
-  "resolved_30d": 24,
+  "misses": 60,
+  "accuracy_pct": 38.1,
+  "accuracy_30d_pct": 32.0,
+  "resolved_30d": 25,
   "streak": {
-    "kind": "hit",
-    "length": 2
+    "kind": "miss",
+    "length": 1
   },
   "by_signal": {
     "BUY": {
@@ -22,27 +22,27 @@
       "accuracy_pct": 63.2
     },
     "SELL": {
-      "n": 38,
-      "accuracy_pct": 18.4
+      "n": 39,
+      "accuracy_pct": 17.9
     }
   },
   "last_resolved": {
-    "date": "2026-11-13",
-    "made_at": "2026-11-13T23:20:41+00:00",
-    "made_at_ms": 1794612041000,
+    "date": "2026-11-14",
+    "made_at": "2026-11-14T22:04:02+00:00",
+    "made_at_ms": 1794693842000,
     "symbol": "BTCUSDT",
     "signal": "SELL",
     "signal_raw": "SELL",
     "gated": false,
-    "confidence": 92.2,
-    "price": 67915.83,
+    "confidence": 97,
+    "price": 64279.02,
     "horizon_hours": 24,
     "flat_band_pct": 1.0,
     "resolved": true,
-    "resolved_at": "2026-11-15T00:48:02+00:00",
-    "price_then": 63843.56,
-    "change_pct": -6.0,
-    "correct": true
+    "resolved_at": "2026-11-15T22:34:59+00:00",
+    "price_then": 65090.0,
+    "change_pct": 1.26,
+    "correct": false
   },
   "flat_band_pct": 1.0,
   "horizon_hours": 24,
@@ -54,9 +54,9 @@
     "days": 98,
     "value_usd": 11014.61,
     "return_pct": 10.15,
-    "hold_value_usd": 9833.6,
-    "hold_return_pct": -1.66,
-    "vs_hold_pct": 11.81,
+    "hold_value_usd": 10077.04,
+    "hold_return_pct": 0.77,
+    "vs_hold_pct": 9.38,
     "fees_paid_usd": 163.2,
     "trades": 10,
     "position": "cash",
@@ -743,8 +743,8 @@
       {
         "date": "2026-11-15",
         "value": 11014.61,
-        "hold": 9833.6,
-        "price": 63646.45,
+        "hold": 10077.04,
+        "price": 65222.04,
         "signal": "SELL"
       }
     ]
