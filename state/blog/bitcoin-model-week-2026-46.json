@@ -1,0 +1,132 @@
+{
+  "slug": "bitcoin-model-week-2026-46",
+  "iso_year": 2026,
+  "iso_week": 46,
+  "title": "Bitcoin AI Model Review — Week 46: 2 of 5 Calls Correct",
+  "meta_description": "Week 46 graded: 2 of 5 Bitcoin calls correct (40%). All-time: 38.1% over 97 public calls. Paper portfolio +10.2% vs holding.",
+  "published_at": "2026-11-16T00:02:00+00:00",
+  "updated_at": "2026-11-16T00:02:00+00:00",
+  "date_range": "2026-11-10 to 2026-11-14",
+  "week": {
+    "resolved": 5,
+    "hits": 2,
+    "misses": 3,
+    "accuracy_pct": 40.0,
+    "days": [
+      {
+        "weekday": "Tuesday",
+        "date": "2026-11-10",
+        "signal": "SELL",
+        "confidence_pct": 86.2,
+        "gated": false,
+        "change_pct": 0.26,
+        "correct": false
+      },
+      {
+        "weekday": "Wednesday",
+        "date": "2026-11-11",
+        "signal": "SELL",
+        "confidence_pct": 84.5,
+        "gated": false,
+        "change_pct": 0.62,
+        "correct": false
+      },
+      {
+        "weekday": "Thursday",
+        "date": "2026-11-12",
+        "signal": "SELL",
+        "confidence_pct": 93.2,
+        "gated": false,
+        "change_pct": -4.91,
+        "correct": true
+      },
+      {
+        "weekday": "Friday",
+        "date": "2026-11-13",
+        "signal": "SELL",
+        "confidence_pct": 92.2,
+        "gated": false,
+        "change_pct": -6.0,
+        "correct": true
+      },
+      {
+        "weekday": "Saturday",
+        "date": "2026-11-14",
+        "signal": "SELL",
+        "confidence_pct": 97,
+        "gated": false,
+        "change_pct": 1.26,
+        "correct": false
+      }
+    ]
+  },
+  "alltime": {
+    "resolved": 97,
+    "hits": 37,
+    "misses": 60,
+    "accuracy_pct": 38.1
+  },
+  "portfolio": {
+    "value_usd": 11014.61,
+    "return_pct": 10.15,
+    "hold_return_pct": 0.77,
+    "vs_hold_pct": 9.38,
+    "fees_paid_usd": 163.2,
+    "trades": 10,
+    "position": "cash"
+  },
+  "narrative": {
+    "intro": [
+      "Welcome to the QuantAura Signals weekly recap covering November 10 2026 to November 14 2026.",
+      "This week, the model achieved 2 hits out of 5 resolved calls, finishing with a 40.0 percent accuracy rate.",
+      "The model issued sell signals for five consecutive trading sessions during this review period."
+    ],
+    "days": [
+      "On Tuesday, the model issued a sell signal with 86.2 percent confidence, but price rose 0.26 percent for an incorrect grade.",
+      "Wednesday brought another sell call at 84.5 percent confidence, which missed when price gained 0.62 percent.",
+      "Momentum shifted on Thursday as a sell signal at 93.2 percent confidence landed correctly when price dropped 4.91 percent.",
+      "Friday followed with another hit on a sell signal at 92.2 percent confidence as price dropped 6.0 percent."
+    ],
+    "spotlight": [
+      "The notable call of the week occurred on Saturday, November 14 2026.",
+      "The model called for a sell with its highest confidence of the week at 97 percent.",
+      "Market price actually increased by 1.26 percent instead of falling.",
+      "That call was flatly wrong, ending the week on a 1 call miss streak."
+    ],
+    "trend": [
+      "The market experienced small upward moves early, deep downward movements mid week, and a minor bump at the end.",
+      "All five model signals were sell calls evaluated on a 24 hour horizon using a 1.0 percent flat band.",
+      "The signals captured the sharp mid week decline but failed to account for the slight gains on either side of it."
+    ],
+    "portfolio": [
+      "The paper portfolio began with 10000.0 dollars 98 days ago and executed 10 trades to reach a value of 11014.61 dollars.",
+      "That total reflects a 10.15 percent return after accounting for 163.2 dollars in total fees at 0.15 percent per side.",
+      "By comparison, a buy and hold strategy reached 10077.04 dollars, yielding a 0.77 percent return.",
+      "The model portfolio outperformed buy and hold by 9.38 percent and currently holds its entire balance in cash."
+    ],
+    "record": [
+      "The all time model record stands at 37 hits out of 97 resolved calls, which equals a 38.1 percent accuracy rate.",
+      "Over the last 30 days across 24 resolved calls, performance is lower at 33.3 percent accuracy.",
+      "Broken down by signal type across all time, sell calls sit at 17.9 percent accuracy across 39 calls, buy calls sit at 30.0 percent across 20 calls, and hold calls lead at 63.2 percent across 38 calls.",
+      "With only 97 resolved calls in total, this dataset remains a limited sample size."
+    ]
+  },
+  "research": {
+    "title": "How the models keep learning without forgetting",
+    "bullets": [
+      "Continuous fine-tuning",
+      "Replay buffers anchor history",
+      "A gate blocks regressions"
+    ],
+    "paragraphs": [
+      "The models fine tune on fresh market data around the clock. A replay buffer keeps old training data in the mix, so adapting to this month cannot erase what two years of history taught them.",
+      "Any update that scores worse than the current model is rejected outright.",
+      "Catastrophic forgetting is the failure that guards against. A model tuned only on the last month becomes an expert on the last month and a novice everywhere else."
+    ]
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": null
+}

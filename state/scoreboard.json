@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-15T22:34:59+00:00",
+  "updated_at": "2026-11-15T23:49:34+00:00",
   "total_calls": 98,
   "resolved_calls": 97,
   "pending_calls": 1,
   "hits": 37,
   "misses": 60,
   "accuracy_pct": 38.1,
-  "accuracy_30d_pct": 32.0,
-  "resolved_30d": 25,
+  "accuracy_30d_pct": 33.3,
+  "resolved_30d": 24,
   "streak": {
     "kind": "miss",
     "length": 1
