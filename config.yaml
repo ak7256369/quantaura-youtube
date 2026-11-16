@@ -204,6 +204,22 @@ weekly:
   caption_margin_v: 84
   # Research segments rotate by ISO week number — content lives in weekly.py.
 
+comments:
+  # Viewer comments on the channel's own videos (comments.py). Read with the
+  # YT_API_KEY secret; without it the whole feature is a no-op.
+  enabled: true
+  # Videos published within this many days are checked for new comments.
+  lookback_days: 14
+  max_per_video: 100
+  # Cap on comments quoted in one operator digest; the rest are counted.
+  digest_max: 20
+  # The weekly recap's "from the comments" segment: one filtered viewer
+  # question shown on screen and answered with prepared prose. Set false to
+  # keep the digest and drop the segment.
+  use_in_weekly: true
+  question_min_chars: 15
+  question_max_chars: 160
+
 portfolio:
   # The paper portfolio: a virtual $10,000 traded mechanically on the model's
   # own committed calls, fees included, next to buy-and-hold. Published even

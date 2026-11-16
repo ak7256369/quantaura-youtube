@@ -5,13 +5,14 @@
     python weekly.py --no-voice      # silent placeholder audio (layout work)
     python weekly.py --dry-run       # synthetic week, no API calls, no upload
 
-Format: 1920x1080, ~4 minutes. Ten scenes:
+Format: 1920x1080, ~4 minutes. Ten scenes, eleven in a week with a question:
     title     → the week's record, huge
     days      → the call-by-call table
     spotlight → the one call that defined the week, reviewed on its own
     trend     → week price chart with each call marked, hit or miss
     portfolio → the paper $10k traded on those calls, next to buy-and-hold
     record    → where the all-time scoreboard stands after this week
+    question  → one viewer question from the comments, answered (optional, fixed)
     method    → how a call is made and graded (fixed)
     research  → one rotating segment on how the model actually works (fixed)
     watchlist → the other symbols the ensemble covers (CTA, no calls shown)
@@ -48,6 +49,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import comments as comments_mod                                    # noqa: E402
 import drive as drive_mod                                          # noqa: E402
 import factcheck                                                   # noqa: E402
 import notify                                                      # noqa: E402
@@ -61,12 +63,17 @@ from llm import complete_json                                      # noqa: E402
 from common import prompt as load_prompt                           # noqa: E402
 
 LLM_SECTIONS = ("intro", "days", "spotlight", "trend", "portfolio", "record")
-FIXED_SECTIONS = ("method", "research", "watchlist", "outro")
+FIXED_SECTIONS = ("question", "method", "research", "watchlist", "outro")
 # Dropped from both the script and the scene list when the facts cannot support
 # them. The paper portfolio needs priced rows; a week that somehow has none
 # should lose the segment, not stall the recap on a section the model cannot
 # write honestly.
 OPTIONAL_LLM_SECTIONS = ("portfolio",)
+# The viewer-question segment only exists in a week where a comment survived
+# comments.clean_question and landed on a topic with a prepared answer. Most
+# weeks it will not, and the recap is simply ten scenes long.
+OPTIONAL_FIXED_SECTIONS = ("question",)
+OPTIONAL_SECTIONS = OPTIONAL_LLM_SECTIONS + OPTIONAL_FIXED_SECTIONS
 
 # Scene order, derived rather than written out a third time. The narration, the
 # scene builders and section_spans all read this list, so a hand-kept copy is
@@ -141,6 +148,18 @@ RESEARCH_SEGMENTS: list[tuple[str, list[str], list[str]]] = [
       "The harsher rule is the one worth publishing. The kinder one would only "
       "measure how generous we were with ourselves."]),
 ]
+
+
+# Research segments that explain the same thing as one of comments.FAQ's
+# prepared answers. In a week whose rotating segment is listed here, a viewer
+# question on that topic is passed over — otherwise the recap would answer the
+# question and then, two scenes later, explain it again.
+RESEARCH_FAQ_TOPIC = {
+    "High accuracy still is not a trading edge": "portfolio",
+    "Why the model sometimes refuses to call a direction": "hold",
+    "Four architectures, one vote": "models",
+    "How the models keep learning without forgetting": "training",
+}
 
 
 # ── The method segment (fixed) ────────────────────────────────────────────────
@@ -277,7 +296,7 @@ def active_sections(facts: dict) -> list[str]:
     support. Narration, scenes and `section_spans` all read this one list, so
     they cannot drift out of agreement."""
     return [s for s in SECTIONS
-            if s not in OPTIONAL_LLM_SECTIONS or facts.get(s) is not None]
+            if s not in OPTIONAL_SECTIONS or facts.get(s) is not None]
 
 
 # ── Script ────────────────────────────────────────────────────────────────────
@@ -790,6 +809,39 @@ def scene_research(segment: tuple[str, list[str], list[str]], week_no: int,
     return R._save(fig, path)
 
 
+def scene_question(question: dict, week_no: int, path: Path) -> Path:
+    """One viewer question, quoted, over the heading of its prepared answer.
+
+    The author is not named: the segment is about the question, and putting a
+    stranger's handle in a permanent video is a decision they never made. The
+    text itself has already been through comments.clean_question, which is what
+    makes it safe to draw — plain ASCII, no links, no digits, bounded length.
+    """
+    w, h = _wh()
+    t = R._theme()
+    fig, ax = R._canvas(w, h)
+    _lheader(ax, w, "from the comments", week_no)
+
+    R._text(ax, w / 2, 290, "A VIEWER ASKED", size=40, weight="bold",
+            color=t["muted"], ha="center")
+    # Wrap width and type size move together, by question length. Bold DejaVu
+    # runs about 0.83 x the point size per character at this canvas scale, so
+    # each pairing below keeps the widest line inside the 1620px panel; the
+    # longest question the filter admits (160 chars) still fits in four lines.
+    quoted = f"\u201c{question['question']}\u201d"
+    size, wrap = (64, 28) if len(quoted) <= 58 else (52, 35) if len(quoted) <= 108 else (44, 42)
+    lines = R._wrap(quoted, wrap)[:4]
+    pitch = size * 1.45
+    top = 505 - (len(lines) - 1) * pitch / 2
+    R._panel(ax, 150, top - pitch * 0.8, w - 300, len(lines) * pitch + pitch * 0.6,
+             color=t["panel"])
+    for i, line in enumerate(lines):
+        R._text(ax, w / 2, top + i * pitch, line, size=size, weight="bold", ha="center")
+    R._fit_text(fig, ax, _safe_bottom(h) - 40, question["heading"], 52,
+                max_w=w - 240, x=w / 2, color=t["accent"], weight="bold")
+    return R._save(fig, path)
+
+
 def scene_watchlist(week_no: int, path: Path) -> Path:
     w, h = _wh()
     t = R._theme()
@@ -835,8 +887,15 @@ def scene_outro_wide(week_no: int, path: Path) -> Path:
 
 # ── Fixed narration ───────────────────────────────────────────────────────────
 
-def fixed_sentences(segment: tuple[str, list[str], list[str]]) -> list[tuple[str, str]]:
-    pairs = [("method", s) for s in METHOD_SENTENCES]
+def fixed_sentences(segment: tuple[str, list[str], list[str]],
+                    question: dict | None = None) -> list[tuple[str, str]]:
+    pairs = []
+    if question:
+        # The question is shown, never spoken: the voice reads only the lead-in
+        # and the prepared answer. A commenter's words do not reach the TTS.
+        pairs.append(("question", "One question from the comments this week."))
+        pairs += [("question", s) for s in question["answer"]]
+    pairs += [("method", s) for s in METHOD_SENTENCES]
     pairs += [("research", s) for s in segment[2]]
     pairs += [("watchlist",
                "The ensemble does not only watch Bitcoin. It covers Ethereum, "
@@ -924,7 +983,7 @@ def _stage_pngs(facts: dict, segment, wk: int) -> dict[str, list[Path]]:
     days = facts["days"]
     curve = facts.get("_portfolio_curve") or []
     port_steps = min(5, max(len(curve), 1))
-    return {
+    stages = {
         "intro": [scene_title(facts, FRAMES_DIR / "title.png")],
         "days": [scene_days(facts, FRAMES_DIR / f"days_{i}.png", rows_shown=i + 1)
                  for i in range(len(days))],
@@ -944,6 +1003,10 @@ def _stage_pngs(facts: dict, segment, wk: int) -> dict[str, list[Path]]:
         "watchlist": [scene_watchlist(wk, FRAMES_DIR / "watchlist.png")],
         "outro": [scene_outro_wide(wk, FRAMES_DIR / "outro.png")],
     }
+    if facts.get("question"):
+        stages["question"] = [scene_question(facts["question"], wk,
+                                             FRAMES_DIR / "question.png")]
+    return stages
 
 
 def assemble(facts: dict, script: dict, candles: list[list] | None,
@@ -1207,10 +1270,36 @@ def run(args: argparse.Namespace) -> int:
                   else write_script(facts, required))
         write_json(BUILD_DIR / "weekly_script.json", script)
 
-        stage = "voice"
         segment = RESEARCH_SEGMENTS[facts["week_number"] % len(RESEARCH_SEGMENTS)]
+
+        # ── the viewer question ──
+        # Attached only now, after the script has been written and verified:
+        # everything in `facts` is shown to the scriptwriter and widens the
+        # fact-checker's allow-list, and a commenter's sentence belongs in
+        # neither. It is drawn on screen and answered with prose from
+        # comments.FAQ; no model ever reads it. Any failure here costs the
+        # segment, never the recap.
+        stage = "comments"
+        facts["question"] = None
+        try:
+            pool = (comments_mod._dry_comments() if args.dry_run
+                    else comments_mod.fetch_all(days=8))
+            overlap = RESEARCH_FAQ_TOPIC.get(segment[0])
+            facts["question"] = comments_mod.pick_question(
+                pool, avoid_topics=(overlap,) if overlap else ())
+        except Exception as e:                                   # noqa: BLE001
+            log.warning(f"  Viewer question unavailable ({type(e).__name__}: {e})")
+        if facts["question"]:
+            log.info(f"  Viewer question: \"{facts['question']['question']}\" "
+                     f"→ {facts['question']['heading']}")
+        else:
+            log.info("  No eligible viewer question this week — segment omitted.")
+        sections = active_sections(facts)
+        write_json(BUILD_DIR / "weekly_facts.json", facts)
+
+        stage = "voice"
         sentences = [(sec, s) for sec in required for s in script["sections"][sec]]
-        sentences += fixed_sentences(segment)
+        sentences += fixed_sentences(segment, facts["question"])
         narration = V.synthesize(sentences, out_name="weekly_narration.wav",
                                  silent=args.no_voice or args.dry_run)
 
@@ -1310,6 +1399,10 @@ def run(args: argparse.Namespace) -> int:
                     "duration_s": round(duration or 0, 1),
                     "run_id": os.environ.get("GITHUB_RUN_ID"),
                     **drive_mod.run_log_extra(drive_info)}, kind="weekly")
+        # Only now, with the recap public, is the question spent. A build that
+        # was never published should be free to use it next week.
+        if facts.get("question"):
+            comments_mod.mark_answered(facts["question"]["comment_id"])
         notify.weekly_published(script["title"], url, facts,
                                 config()["upload"]["visibility"], drive_info)
         log.info(f"Done: {url}")

@@ -177,6 +177,22 @@ jobs:
           [ "${{ inputs.drive_only }}"  = "true" ] && ARGS="$ARGS --drive-only"
           python pipeline.py $ARGS
 
+      - name: Read viewer comments
+        # After the pipeline, so today's video is already in the run log, and
+        # before the commit, so the seen-ids file rides the same push. Runs on
+        # a skipped day too: viewers still comment on yesterday's video.
+        # comments.py exits 0 on every failure by design; continue-on-error is
+        # the second belt, so nothing here can turn a published day red.
+        if: always() && inputs.check_drive != true && inputs.dry_run != true && inputs.drive_only != true
+        continue-on-error: true
+        env:
+          # A plain API key (public data only) rather than the upload OAuth
+          # token, so the audited consent keeps exactly its approved scopes.
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python comments.py
+
       - name: Commit scoreboard
         # Runs even when the pipeline skipped the day: a graded outcome and the
         # run log are worth keeping regardless of whether a video shipped.

@@ -11,6 +11,11 @@ Generates and publishes the channel's content automatically:
   if fewer than `weekly.min_resolved_calls` calls were graded — a recap of one
   call is filler. Run locally with `python weekly.py --dry-run`.
 
+- **Viewer comments** (`comments.py`, a step in the daily workflow) — new
+  comments on the last two weeks of videos are sent to the operator's Telegram
+  chat, and the weekly recap can answer one viewer question in a short "from the
+  comments" segment. See [Viewer comments](#viewer-comments).
+
 Both share one publish path (`upload.publish`), one voice, one theme, and one
 state log, and their workflows share a concurrency group so state commits never
 race.
@@ -86,6 +91,7 @@ secrets (Settings → Secrets and variables → Actions).
 | `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` | Upload | See below |
 | `GDRIVE_REFRESH_TOKEN` | Drive mirror for the manual X post | See below |
 | `GDRIVE_FOLDER_ID` | *Optional* — pins the Drive folder | Printed by `get_drive_token.py` |
+| `YT_API_KEY` | *Optional* — reading comments | Google Cloud Console → the same project → Credentials → Create credentials → **API key**. Restrict it to *YouTube Data API v3*. Without it comment reading is skipped. |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Notifications | `@BotFather` → `/newbot`; get the chat id from `@userinfobot` |
 
 Only the Gemini key is needed to try the pipeline. Everything else degrades
@@ -162,6 +168,27 @@ link, which is the intended workflow: tap, download, copy, post. A Drive failure
 never fails the day — the video still goes to YouTube and the mp4 is still in
 the workflow artifact.
 
+## Viewer comments
+
+```bash
+python comments.py --dry-run    # synthetic comments, no network, nothing saved
+python comments.py              # read, send the digest, remember what was seen
+python test_comments.py         # the filter's test cases
+```
+
+| Decision | Reason |
+|---|---|
+| Read with an API key, not the upload token | Public comments are public data. An API key reads them, so the audited OAuth consent keeps exactly the scopes it was approved with. |
+| Video ids come from `state/runs.jsonl` | Every published row already records its watch URL. No channel lookup, no playlist walk. |
+| Only comment **ids** are committed | This repo is public. A comment's text and its author's name stay on YouTube, where the author can still edit or delete them. |
+| It can never fail the day | A missing key, a quota error or disabled comments is a log line. |
+| The weekly question is shown, never spoken, and never sent to an LLM | A commenter's sentence is untrusted input. It is drawn on screen after a strict filter; the answer is prose written in advance (`comments.FAQ`). |
+| The filter rejects anything doubtful | Links, mentions, digits, non-ASCII, shouting, solicitations, banned phrases, or a topic with no prepared answer. A rejected good question costs one optional segment; a bad one on screen is permanent. |
+
+Most weeks no comment qualifies and the recap is simply one scene shorter.
+`comments.use_in_weekly: false` in `config.yaml` keeps the digest and drops the
+segment.
+
 ## YouTube Studio settings (one-time)
 
 - Settings → Channel → Advanced → set the channel default for **altered or
@@ -184,6 +211,7 @@ the workflow artifact.
 | `thumbnail.py` | Pillow text over an optional AI background |
 | `upload.py` | YouTube Data API v3 |
 | `drive.py` | Drive mirror + X caption, for posting to X by hand |
+| `comments.py` | Viewer comments: operator digest + the weekly question |
 | `notify.py` | Telegram operator messages |
 | `state/` | The scoreboard. Committed after every run. |
 

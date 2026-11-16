@@ -128,6 +128,8 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          # Reads the week's comments for the optional viewer-question segment.
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
           # Drive mirror — the recap lands beside the dailies. It is landscape
           # and minutes long, so it is over X's 140s cap for non-Premium
           # accounts: mirrored for trimming or for posting elsewhere.
