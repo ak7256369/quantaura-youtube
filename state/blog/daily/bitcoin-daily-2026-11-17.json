@@ -4,15 +4,15 @@
   "iso_year": 2026,
   "iso_week": 47,
   "title": "Bitcoin AI Call — 2026-11-17: SELL at 84% Confidence",
-  "meta_description": "Bitcoin AI model call for 2026-11-17: SELL at 84% confidence. BTC trading at $64,809. All-time record: 37% over 99 public calls.",
+  "meta_description": "Bitcoin AI model call for 2026-11-17: SELL at 84% confidence. BTC trading at $64,844. All-time record: 37% over 99 public calls.",
   "published_at": "2026-11-17T01:50:15+00:00",
-  "updated_at": "2026-11-17T01:50:15+00:00",
+  "updated_at": "2026-11-17T03:30:22+00:00",
   "date_range": "2026-11-17",
   "signal": "SELL",
   "signal_raw": "SELL",
-  "confidence_pct": 83.7,
+  "confidence_pct": 83.8,
   "gated": false,
-  "change_pct": 0.37,
+  "change_pct": -0.41,
   "per_model": {
     "lstm": "SELL",
     "xgboost": "SELL",
@@ -31,17 +31,20 @@
   },
   "narrative": {
     "intro": [
-      "The L S T M, the gradient boosted model, the transformer, and the K A N all voted unanimously to issue a sell signal today.",
-      "The overall model produced a sell signal backed by 83.7 percent confidence across a 24 hour forecast horizon.",
-      "Bitcoin is currently priced at 64,809 dollars, following a 0.37 percent price move over the previous day."
+      "Buy probability collapsed to just 1.8 percent this morning as every model turned bearish.",
+      "The model issues an ungated sell signal with 83.8 percent confidence over the next 24 hours.",
+      "Bitcoin trades at 64,844 dollars after falling 0.41 percent on the day.",
+      "That confidence level easily clears the 55.0 percent gating threshold."
     ],
     "days": [
-      "In the underlying probability breakdown, hold accounted for 14.5 percent while buy captured just 1.8 percent.",
-      "The model processed these directional inputs while market sentiment registered extreme fear at 12 alongside a weekly drop of 13.43 percent."
+      "The vote is unanimous across the L S T M, the gradient boosted model, the transformer, and the K A N.",
+      "Looking at the remaining probability distribution, hold accounts for 14.4 percent.",
+      "The model is reacting to heavy downside momentum, including a 7-day drop of 13.29 percent and market sentiment sitting in Extreme Fear at 12."
     ],
     "trend": [
-      "Looking at past performance, the last resolved sell call failed after a negative 0.38 percent price change, extending the current streak to 3 misses.",
-      "Across 99 total resolved calls, the system has recorded 37 hits and 62 misses, resulting in an overall accuracy of 37.4 percent."
+      "Yesterday the model also called sell, but Bitcoin moved minus 0.38 percent, which was swallowed by the 1.0 percent flat band and graded as a miss.",
+      "That extends the current streak to 3 failed calls in a row.",
+      "Across 99 resolved calls, the model has recorded 37 hits and 62 misses, leaving its running accuracy at 37.4 percent."
     ]
   },
   "week": {
