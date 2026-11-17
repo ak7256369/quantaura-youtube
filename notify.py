@@ -112,6 +112,51 @@ def rendered_only(snapshot: dict, script: dict, path: str, reason: str,
     ] + _x_block(drive)))
 
 
+def comments_digest(comments: list[dict], dry_run: bool = False):
+    """New viewer comments, to the operator chat.
+
+    Returns True when the digest was delivered (or there was nothing to send),
+    False when it was not — comments.py leaves the comments unread in that
+    case so the next run tries again. With dry_run it returns the rendered
+    text instead of sending it.
+
+    Built to stay under Telegram's 4096-character limit by dropping whole
+    comments, never by slicing the string: a cut that lands inside a tag makes
+    Telegram reject the entire message.
+    """
+    from common import config
+    cap = int((config().get("comments") or {}).get("digest_max", 20))
+    if not comments:
+        return "" if dry_run else True
+
+    head = f"💬 <b>{len(comments)} new comment{'s' if len(comments) != 1 else ''}</b>"
+    blocks, used = [], len(head)
+    for c in comments[:cap]:
+        text = " ".join(str(c.get("text", "")).split())
+        if len(text) > 400:
+            text = text[:397] + "..."
+        meta = [f"{_esc(c.get('video_kind') or 'video')} {_esc(c.get('video_date') or '')}".strip()]
+        if c.get("likes"):
+            meta.append(f"{int(c['likes'])} like{'s' if c['likes'] != 1 else ''}")
+        if c.get("replies"):
+            meta.append(f"{int(c['replies'])} repl{'ies' if c['replies'] != 1 else 'y'}")
+        block = (f"<b>{_esc(c.get('author') or 'Someone')}</b> · {' · '.join(meta)}\n"
+                 f"{_esc(text)}\n"
+                 f"<a href=\"{_esc(c.get('url', ''))}\">Open on YouTube</a>")
+        if used + len(block) + 2 > 3600:
+            break
+        blocks.append(block)
+        used += len(block) + 2
+    lines = [head, ""] + ["\n\n".join(blocks)]
+    left = len(comments) - len(blocks)
+    if left > 0:
+        lines += ["", f"<i>+{left} more in YouTube Studio.</i>"]
+    body = "\n".join(lines)
+    if dry_run:
+        return body
+    return _send(body)
+
+
 def skipped(reason: str, stage: str = "") -> None:
     _send("\n".join([
         "<b>🚫 No video today</b>",
