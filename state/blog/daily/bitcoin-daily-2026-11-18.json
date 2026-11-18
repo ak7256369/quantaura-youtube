@@ -4,15 +4,15 @@
   "iso_year": 2026,
   "iso_week": 47,
   "title": "Bitcoin AI Call — 2026-11-18: SELL at 82% Confidence",
-  "meta_description": "Bitcoin AI model call for 2026-11-18: SELL at 82% confidence. BTC trading at $64,788. All-time record: 37% over 99 public calls.",
+  "meta_description": "Bitcoin AI model call for 2026-11-18: SELL at 82% confidence. BTC trading at $64,316. All-time record: 37% over 99 public calls.",
   "published_at": "2026-11-18T00:48:56+00:00",
-  "updated_at": "2026-11-18T00:48:56+00:00",
+  "updated_at": "2026-11-18T02:52:44+00:00",
   "date_range": "2026-11-18",
   "signal": "SELL",
   "signal_raw": "SELL",
-  "confidence_pct": 82,
+  "confidence_pct": 82.3,
   "gated": false,
-  "change_pct": 0.24,
+  "change_pct": -0.29,
   "per_model": {
     "lstm": "SELL",
     "xgboost": "SELL",
@@ -31,18 +31,18 @@
   },
   "narrative": {
     "intro": [
-      "All four models voted SELL.",
-      "The model output a SELL signal with eighty‑two percent confidence.",
-      "Bitcoin is priced at sixty‑four thousand seven hundred eighty‑eight dollars, up zero point two four percent over the past twenty‑four hours."
+      "All four models voted SELL, extending a three call losing streak.",
+      "The model output a SELL signal with eighty two point three percent confidence.",
+      "Current price is sixty four thousand three hundred sixteen dollars, down zero point two nine percent over the past twenty four hours."
     ],
     "days": [
-      "Each of the four sub‑models— the L S T M, the gradient boosted model, the transformer, and the K A N— voted SELL.",
-      "The probability split shows a dominant sell share, with hold at thirteen point seven percent and buy at four point three percent.",
-      "Fear and greed sits at eleven, labeled Extreme Fear, while the seven‑day move is down eleven point nine eight percent."
+      "Probability split is four point two percent BUY, thirteen point five percent HOLD and eighty two point three percent SELL.",
+      "Fear and greed index reads eleven, labeled Extreme Fear.",
+      "Seven day move is minus twelve point eight two percent."
     ],
     "trend": [
-      "The last resolved call on November sixteenth was a SELL that moved down zero point three eight percent and was marked incorrect.",
-      "The running record stands at thirty‑seven point four percent accuracy over ninety‑nine resolved calls, currently on a three‑call miss streak."
+      "The last resolved call on November sixteen was SELL and moved minus zero point three eight percent, which was incorrect.",
+      "Overall record is thirty seven correct of ninety nine resolved calls, giving thirty seven point four percent accuracy and a three miss streak."
     ]
   },
   "week": {
