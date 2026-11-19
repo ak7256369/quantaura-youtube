@@ -77,6 +77,19 @@ def main() -> int:
         print(f"\nCould not create or confirm the Drive folder: {e}")
         print("Not fatal — the first pipeline run will create it.")
 
+    if "--set-secrets" in sys.argv:
+        import subprocess
+        repo = "ak7256369/quantaura-youtube"
+        pairs = [("GDRIVE_REFRESH_TOKEN", creds.refresh_token)]
+        if folder_id:
+            pairs.append(("GDRIVE_FOLDER_ID", folder_id))
+        for name, value in pairs:
+            r = subprocess.run(["gh", "secret", "set", name, "--repo", repo],
+                               input=value, text=True, capture_output=True)
+            print(f"{name}: {'set' if r.returncode == 0 else 'FAILED ' + r.stderr.strip()}")
+        print("\nSecrets updated - nothing to paste.")
+        return 0
+
     print("\n" + "=" * 66)
     print("Add these GitHub repository secrets:\n")
     print(f"GDRIVE_REFRESH_TOKEN = {creds.refresh_token}")
