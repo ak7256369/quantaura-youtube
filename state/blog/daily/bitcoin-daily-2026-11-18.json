@@ -3,16 +3,16 @@
   "post_type": "daily",
   "iso_year": 2026,
   "iso_week": 47,
-  "title": "Bitcoin AI Call — 2026-11-18: SELL at 82% Confidence",
-  "meta_description": "Bitcoin AI model call for 2026-11-18: SELL at 82% confidence. BTC trading at $64,316. All-time record: 37% over 99 public calls.",
+  "title": "Bitcoin AI Call — 2026-11-18: SELL at 92% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-18: SELL at 92% confidence. BTC trading at $63,097. All-time record: 37% over 100 public calls.",
   "published_at": "2026-11-18T00:48:56+00:00",
-  "updated_at": "2026-11-18T02:52:44+00:00",
+  "updated_at": "2026-11-19T00:05:07+00:00",
   "date_range": "2026-11-18",
   "signal": "SELL",
   "signal_raw": "SELL",
-  "confidence_pct": 82.3,
+  "confidence_pct": 91.9,
   "gated": false,
-  "change_pct": -0.29,
+  "change_pct": -2.85,
   "per_model": {
     "lstm": "SELL",
     "xgboost": "SELL",
@@ -20,10 +20,10 @@
     "kan": "SELL"
   },
   "weights": {
-    "kan": 0.3554,
-    "lstm": 0.1613,
-    "transformer": 0.1919,
-    "xgboost": 0.2914
+    "kan": 0.3674,
+    "lstm": 0.1583,
+    "transformer": 0.1884,
+    "xgboost": 0.286
   },
   "fear_greed": {
     "value": 11,
@@ -31,18 +31,18 @@
   },
   "narrative": {
     "intro": [
-      "All four models voted SELL, extending a three call losing streak.",
-      "The model output a SELL signal with eighty two point three percent confidence.",
-      "Current price is sixty four thousand three hundred sixteen dollars, down zero point two nine percent over the past twenty four hours."
+      "The L S T M, the gradient boosted model, the transformer, and the K A N all reached a unanimous sell decision today.",
+      "The integrated model output a sell signal with 91.9 percent confidence for the upcoming 24 hour window.",
+      "Bitcoin currently trades at 63,097 dollars following a 2.85 percent price drop over the past day."
     ],
     "days": [
-      "Probability split is four point two percent BUY, thirteen point five percent HOLD and eighty two point three percent SELL.",
-      "Fear and greed index reads eleven, labeled Extreme Fear.",
-      "Seven day move is minus twelve point eight two percent."
+      "Behind this decision, the model assigned 1.6 percent probability to buy and 6.5 percent to hold.",
+      "The system observed this breakdown alongside a 14.84 percent weekly decline and an Extreme Fear market value of 11."
     ],
     "trend": [
-      "The last resolved call on November sixteen was SELL and moved minus zero point three eight percent, which was incorrect.",
-      "Overall record is thirty seven correct of ninety nine resolved calls, giving thirty seven point four percent accuracy and a three miss streak."
+      "The previous sell call from November 17, 2026 was graded incorrect because Bitcoin moved down 0.64 percent, remaining inside the 1.0 percent flat threshold.",
+      "That brings the current model performance to 4 misses in a row.",
+      "Over 100 total resolved calls, the system maintains an overall accuracy rate of 37.0 percent."
     ]
   },
   "week": {
@@ -53,10 +53,10 @@
     "days": []
   },
   "alltime": {
-    "resolved": 99,
+    "resolved": 100,
     "hits": 37,
-    "misses": 62,
-    "accuracy_pct": 37.4
+    "misses": 63,
+    "accuracy_pct": 37.0
   },
   "portfolio": null,
   "research": {
