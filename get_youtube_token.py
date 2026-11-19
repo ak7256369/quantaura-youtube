@@ -74,6 +74,18 @@ def main() -> int:
         print(f"\nCould not confirm the bound channel: {e}")
 
     print("\n" + "=" * 66)
+    if "--set-secrets" in sys.argv:
+        import subprocess
+        repo = "ak7256369/quantaura-youtube"
+        for name, value in (("YT_CLIENT_ID", creds.client_id),
+                            ("YT_CLIENT_SECRET", creds.client_secret),
+                            ("YT_REFRESH_TOKEN", creds.refresh_token)):
+            r = subprocess.run(["gh", "secret", "set", name, "--repo", repo],
+                               input=value, text=True, capture_output=True)
+            print(f"{name}: {'set' if r.returncode == 0 else 'FAILED ' + r.stderr.strip()}")
+        print("\nSecrets updated - nothing to paste.")
+        return 0
+
     print("Add these three GitHub repository secrets:\n")
     print(f"YT_CLIENT_ID     = {creds.client_id}")
     print(f"YT_CLIENT_SECRET = {creds.client_secret}")
