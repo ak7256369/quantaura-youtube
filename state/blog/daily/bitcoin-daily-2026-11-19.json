@@ -4,15 +4,15 @@
   "iso_year": 2026,
   "iso_week": 47,
   "title": "Bitcoin AI Call — 2026-11-19: SELL at 91% Confidence",
-  "meta_description": "Bitcoin AI model call for 2026-11-19: SELL at 91% confidence. BTC trading at $63,748. All-time record: 37% over 100 public calls.",
+  "meta_description": "Bitcoin AI model call for 2026-11-19: SELL at 91% confidence. BTC trading at $63,685. All-time record: 37% over 100 public calls.",
   "published_at": "2026-11-19T02:22:54+00:00",
-  "updated_at": "2026-11-19T08:18:55+00:00",
+  "updated_at": "2026-11-19T08:47:22+00:00",
   "date_range": "2026-11-19",
   "signal": "SELL",
   "signal_raw": "SELL",
   "confidence_pct": 90.8,
   "gated": false,
-  "change_pct": -1.45,
+  "change_pct": -1.55,
   "per_model": {
     "lstm": "SELL",
     "xgboost": "SELL",
@@ -31,19 +31,18 @@
   },
   "narrative": {
     "intro": [
-      "Every sub model aligned today to issue a sell signal while the system sits on a miss streak of 4 calls.",
-      "The system output a sell signal for Bitcoin with a confidence of 90.8 percent.",
-      "Bitcoin is currently priced at 63,748 dollars following a 24-hour move of minus 1.45 percent.",
-      "The output easily passed the 55.0 percent threshold, so it was not gated."
+      "All four models voted SELL and the model confidence sits at ninety point eight percent.",
+      "The model output a SELL signal with ninety point eight percent confidence.",
+      "Bitcoin is priced at sixty three thousand six hundred eighty five dollars and is down one point five five percent over the past twenty four hours."
     ],
     "days": [
-      "The L S T M, the gradient boosted model, the transformer, and the K A N each returned a sell vote.",
-      "The probability split allocated 7.8 percent to hold and 1.4 percent to buy.",
-      "This occurs alongside a seven-day price change of minus 13.26 percent and a fear and greed reading of 10."
+      "Each of the L S T M, the gradient boosted model, the transformer and the K A N voted SELL.",
+      "The probability split reads one point four percent BUY, seven point eight percent HOLD, and ninety point eight percent SELL.",
+      "Fear and greed sits at ten, labeled Extreme Fear, and the seven‑day move is minus thirteen point three five percent."
     ],
     "trend": [
-      "The last graded call from 2026-11-17 was an incorrect sell signal after price moved minus 0.64 percent.",
-      "Across 100 resolved calls, the system has 37 hits and 63 misses, placing lifetime accuracy at 37.0 percent."
+      "The last resolved call on November seventeen was a SELL that moved minus zero point six four percent and was incorrect.",
+      "The model has thirty seven hits out of one hundred resolved calls, a thirty seven percent accuracy, and is on a four‑call miss streak."
     ]
   },
   "week": {
@@ -69,5 +68,5 @@
     "horizon_hours": 24,
     "flat_band_pct": 1.0
   },
-  "video_url": "https://www.youtube.com/watch?v=9n7EZ2wweq8"
+  "video_url": "https://www.youtube.com/watch?v=PrbotQTVUVY"
 }
