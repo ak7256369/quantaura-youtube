@@ -3,16 +3,16 @@
   "post_type": "daily",
   "iso_year": 2026,
   "iso_week": 47,
-  "title": "Bitcoin AI Call — 2026-11-19: SELL at 94% Confidence",
-  "meta_description": "Bitcoin AI model call for 2026-11-19: SELL at 94% confidence. BTC trading at $62,806. All-time record: 37% over 100 public calls.",
+  "title": "Bitcoin AI Call — 2026-11-19: SELL at 93% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-19: SELL at 93% confidence. BTC trading at $63,596. All-time record: 37% over 100 public calls.",
   "published_at": "2026-11-19T02:22:54+00:00",
-  "updated_at": "2026-11-19T02:22:54+00:00",
+  "updated_at": "2026-11-19T07:33:24+00:00",
   "date_range": "2026-11-19",
   "signal": "SELL",
   "signal_raw": "SELL",
-  "confidence_pct": 94.2,
+  "confidence_pct": 92.7,
   "gated": false,
-  "change_pct": -2.36,
+  "change_pct": -1.98,
   "per_model": {
     "lstm": "SELL",
     "xgboost": "SELL",
@@ -32,17 +32,17 @@
   "narrative": {
     "intro": [
       "All four models voted SELL and the model issued a SELL call.",
-      "The model signals SELL with ninety four point two percent confidence.",
-      "Bitcoin trades at sixty two thousand eight hundred six dollars, down two point three six percent in the past twenty four hours."
+      "The model signals SELL with ninety two point seven percent confidence.",
+      "Bitcoin is at sixty three thousand five hundred ninety six dollars, down one point nine eight percent in the past twenty four hours."
     ],
     "days": [
-      "Each of the four models – the L S T M, the gradient boosted model, the transformer, and the K A N – voted SELL.",
-      "The probability split is one point four percent BUY, four point four percent HOLD, and ninety four point two percent SELL.",
-      "Fear and greed sits at ten, labeled Extreme Fear, and the seven‑day move is minus fourteen point ninety one percent."
+      "All four models— the L S T M, the gradient boosted model, the transformer, and the K A N — voted SELL.",
+      "The probability split is ninety two point seven percent SELL, six point two percent HOLD, and one point one percent BUY.",
+      "Fear and greed index reads ten, labelled Extreme Fear, and the seven‑day move is minus thirteen point five nine percent."
     ],
     "trend": [
-      "The last resolved call on Nov seventeen was SELL, moved minus zero point six four percent and was incorrect.",
-      "The record stands at thirty seven hits and sixty three misses, thirty seven percent accuracy over one hundred resolved calls, with a four miss streak."
+      "The last resolved call on Nov seventeen was a SELL that moved minus zero point six four percent and was incorrect.",
+      "Overall the model has thirty seven hits and sixty three misses, a thirty seven percent accuracy over one hundred resolved calls, currently on a four miss streak."
     ]
   },
   "week": {
