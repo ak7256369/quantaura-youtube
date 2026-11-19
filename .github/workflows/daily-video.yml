@@ -42,6 +42,10 @@ on:
         description: 'Synthetic data, no API calls, no upload'
         type: boolean
         default: false
+      include_own_comments:
+        description: "Demo: allow the channel's own comment as the viewer question"
+        type: boolean
+        default: false
 
 # The scoreboard is append-only state in git. Two concurrent runs would race
 # on the same file and one would lose its call.
@@ -166,8 +170,11 @@ jobs:
           # Operator notifications
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Reading comments for the optional viewer-question segment
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
         run: |
           ARGS=""
+          [ "${{ inputs.include_own_comments }}" = "true" ] && ARGS="$ARGS --include-own-comments"
           [ "${{ inputs.no_upload }}" = "true" ] && ARGS="$ARGS --no-upload"
           [ "${{ inputs.no_voice }}"  = "true" ] && ARGS="$ARGS --no-voice"
           [ "${{ inputs.dry_run }}"   = "true" ] && ARGS="$ARGS --dry-run"

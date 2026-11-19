@@ -201,5 +201,8 @@ def sentences_from_script(script: dict, disclaimer: str) -> list[tuple[str, str]
     """
     from scriptwriter import SECTIONS
     pairs = [(sec, s) for sec in SECTIONS for s in script["sections"][sec]]
+    # Optional viewer-question segment: fixed, prepared text (comments.FAQ),
+    # never the commenter's own words.
+    pairs += [("question", s) for s in script["sections"].get("question", [])]
     pairs.append(("outro", disclaimer))
     return pairs

@@ -31,6 +31,7 @@ import scoreboard
 import scriptwriter
 import thumbnail as thumb_mod
 import voice as voice_mod
+import comments as comments_mod                                    # noqa: E402
 import daily_blogpost
 from common import (BUILD_DIR, PipelineAbort, config, log, published_today,
                     read_json, record_run as _record_run, write_json)
@@ -142,6 +143,27 @@ def _prior_build() -> tuple[dict, dict, Path] | None:
 
 
 
+def _attach_question(script: dict, include_own: bool = False) -> None:
+    """Add a "from the comments" segment when a recent comment asks something
+    with a prepared answer. Never fails the day: no key, no comments or no
+    eligible question just means no segment."""
+    try:
+        cfg = config().get("comments") or {}
+        found = comments_mod.fetch_all()
+        q = comments_mod.pick_question(found, days=int(cfg.get("daily_days", 3)),
+                                       setting="use_in_daily",
+                                       include_own=include_own)
+    except Exception as e:                                       # noqa: BLE001
+        log.warning(f"  Viewer question skipped: {e}")
+        return
+    if not q:
+        log.info("  No eligible viewer question today.")
+        return
+    script["question"] = q
+    script["sections"]["question"] = [f"From the comments: {q['heading']}", *q["answer"]]
+    log.info(f"  Viewer question added: topic={q['topic']}")
+
+
 def run(args: argparse.Namespace) -> int:
     stage = "startup"
     try:
@@ -202,6 +224,10 @@ def run(args: argparse.Namespace) -> int:
         # ── script ──
         stage = "script"
         script = _dry_script() if args.dry_run else build_script(snapshot, score)
+
+        # ── optional viewer question (comments.FAQ answer, never generated) ──
+        if not args.dry_run and not args.no_question:
+            _attach_question(script, include_own=args.include_own_comments)
 
         # ── voice ──
         stage = "voice"
@@ -293,6 +319,8 @@ def run(args: argparse.Namespace) -> int:
                      "run_id": os.environ.get("GITHUB_RUN_ID"),
                      **drive_mod.run_log_extra(drive_info)})
         notify.success(snapshot, score, script, url, visibility, drive_info)
+        if script.get("question"):
+            comments_mod.mark_answered(script["question"]["comment_id"])
         # Write the daily blog post from the verified script + snapshot.
         # video_url is the YouTube URL so readers can watch the same call.
         daily_blogpost.publish(snapshot, script, score, url)
@@ -331,6 +359,10 @@ def main() -> int:
                    help="synthetic data, no API calls, no upload")
     p.add_argument("--force", action="store_true",
                    help="publish even if a video already went out today")
+    p.add_argument("--no-question", action="store_true",
+                   help="never add the viewer-question segment")
+    p.add_argument("--include-own-comments", action="store_true",
+                   help="manual demo only: let the channel's own comment be picked")
     args = p.parse_args()
 
     log.info("=" * 60)

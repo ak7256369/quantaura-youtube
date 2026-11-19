@@ -208,6 +208,10 @@ comments:
   # Viewer comments on the channel's own videos (comments.py). Read with the
   # YT_API_KEY secret; without it the whole feature is a no-op.
   enabled: true
+  # Daily Short: answer one recent viewer question (asked within daily_days)
+  # when it matches a prepared FAQ answer.
+  use_in_daily: true
+  daily_days: 3
   # Videos published within this many days are checked for new comments.
   lookback_days: 14
   max_per_video: 100

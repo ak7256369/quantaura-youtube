@@ -403,6 +403,35 @@ def scene_score(snapshot: dict, script: dict, score: dict, path: Path) -> Path:
     return _save(fig, path)
 
 
+def scene_question(snapshot: dict, question: dict, path: Path) -> Path:
+    """One viewer question, quoted, over the heading of its prepared answer.
+
+    Same rules as the weekly recap's segment: the author is not named, and the
+    text has already passed comments.clean_question (plain ASCII, no links, no
+    digits, bounded length), which is what makes it safe to draw.
+    """
+    t = _theme()
+    fig, ax = _canvas()
+    _header(ax, snapshot, "from the comments")
+    _text(ax, W / 2, 420, "A VIEWER ASKED", size=40, weight="bold",
+          color=t["muted"], ha="center")
+    quoted = f"\u201c{question['question']}\u201d"
+    # Bold DejaVu runs ~0.83 x the point size per character, so each pairing
+    # keeps a line inside the ~860px panel; _fit_text below is the backstop.
+    size, wrap = (54, 18) if len(quoted) <= 60 else (46, 22) if len(quoted) <= 110 else (40, 26)
+    lines = _wrap(quoted, wrap)[:7]
+    pitch = size * 1.5
+    top = 780 - (len(lines) - 1) * pitch / 2
+    _panel(ax, 80, top - pitch * 0.85, W - 160, len(lines) * pitch + pitch * 0.7,
+           color=t["panel"])
+    for i, line in enumerate(lines):
+        _fit_text(fig, ax, top + i * pitch, line, size, max_w=W - 220, weight="bold")
+    _fit_text(fig, ax, 1250, question["heading"], 58, max_w=W - 160,
+              color=t["accent"], weight="bold")
+    _text(ax, W / 2, 1360, "Our answer", size=34, color=t["muted"], ha="center")
+    return _save(fig, path)
+
+
 def scene_outro(snapshot: dict, path: Path) -> Path:
     """Fallback end card, used when no Veo outro asset is present."""
     t = _theme()
@@ -604,7 +633,7 @@ def render(snapshot: dict, script: dict, score: dict, narration: Narration,
     xf = float(cfg["transition_seconds"])
     # Spans tile the entire narration, so the picture never ends before the
     # voice does — see Narration.section_spans.
-    spans = narration.section_spans(["hook", "call", "why", "score", "outro"])
+    spans = narration.section_spans(["hook", "call", "why", "score", "question", "outro"])
     clips: list[Path] = []
     durations: list[float] = []
 
@@ -646,6 +675,12 @@ def render(snapshot: dict, script: dict, score: dict, narration: Narration,
     d = max(spans.get("score", 0.0), 3.0)
     png = scene_score(snapshot, script, score, BUILD_DIR / "scene_score.png")
     add(_still_clip(png, d + xf, BUILD_DIR / "clip_3_score.mp4"), d)
+
+    # ── question (optional: only when a viewer question was picked) ──
+    if script.get("question") and script["sections"].get("question"):
+        d = max(spans.get("question", 0.0), 4.0)
+        png = scene_question(snapshot, script["question"], BUILD_DIR / "scene_question.png")
+        add(_still_clip(png, d + xf, BUILD_DIR / "clip_3q_question.mp4"), d)
 
     # ── outro (drawn card; a Veo asset, if present, is appended after) ──
     d = max(spans.get("outro", 0.0), 2.5)

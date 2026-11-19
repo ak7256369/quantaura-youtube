@@ -208,6 +208,18 @@ def mark_answered(comment_id: str) -> None:
 # explanation twice within a minute.
 
 FAQ: list[tuple[str, tuple[str, ...], str, list[str]]] = [
+    # First on purpose: "should I buy?" is the most common question a market
+    # channel gets and the one that most needs a careful, fixed answer.
+    ("advice",
+     ("should i buy", "should i sell", "should i invest", "should we buy", "should we sell",
+      "buy or not", "sell or not", "buy or sell", "good time to buy", "time to buy",
+      "worth buying", "is it safe to buy", "should i hold"),
+     "Should I buy today?",
+     ["Nobody on this channel can tell you whether to buy, and the model cannot either.",
+      "Each call is a research output from an automated model, published so its "
+      "record can be checked, and it is often wrong.",
+      "Treat it as one data point, not as a reason to trade, and never risk money "
+      "you cannot afford to lose."]),
     ("hold",
      ("hold", "confidence", "gate", "threshold", "no signal", "never buy", "never sell"),
      "Why so many holds?",
@@ -310,7 +322,9 @@ def clean_question(text: str) -> str | None:
 
 def pick_question(comments: list[dict] | None, *, days: int = 8,
                   avoid_topics: tuple[str, ...] = (),
-                  now: datetime | None = None) -> dict | None:
+                  now: datetime | None = None,
+                  setting: str = "use_in_weekly",
+                  include_own: bool = False) -> dict | None:
     """The one viewer question this week's recap answers, or None.
 
     Most-liked eligible question wins; ties go to the earliest. `avoid_topics`
@@ -318,14 +332,16 @@ def pick_question(comments: list[dict] | None, *, days: int = 8,
     already covers this week, so the recap does not explain the same thing
     twice, two scenes apart.
     """
-    if not comments or not _cfg().get("use_in_weekly", True):
+    # include_own exists for a manual demo run only: the channel's own comment
+    # is never a "viewer" in normal operation.
+    if not comments or not _cfg().get(setting, True):
         return None
     now = now or datetime.now(timezone.utc)
     cutoff = (now - timedelta(days=days)).isoformat()
     answered = set(_load_state()["answered"])
     candidates = []
     for c in comments:
-        if c.get("own") or c["id"] in answered or (c.get("published_at") or "") < cutoff:
+        if (c.get("own") and not include_own) or c["id"] in answered or (c.get("published_at") or "") < cutoff:
             continue
         q = clean_question(c.get("text", ""))
         topic = topic_for(q) if q else None
