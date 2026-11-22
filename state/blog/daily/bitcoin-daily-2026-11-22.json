@@ -1,0 +1,71 @@
+{
+  "slug": "bitcoin-daily-2026-11-22",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 47,
+  "title": "Bitcoin AI Call — 2026-11-22: SELL at 89% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-22: SELL at 89% confidence. BTC trading at $60,206. All-time record: 39% over 103 public calls.",
+  "published_at": "2026-11-22T01:05:33+00:00",
+  "updated_at": "2026-11-22T01:05:33+00:00",
+  "date_range": "2026-11-22",
+  "signal": "SELL",
+  "signal_raw": "SELL",
+  "confidence_pct": 88.9,
+  "gated": false,
+  "change_pct": 1.98,
+  "per_model": {
+    "lstm": "SELL",
+    "xgboost": "SELL",
+    "transformer": "SELL",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.3264,
+    "lstm": 0.1936,
+    "transformer": 0.1864,
+    "xgboost": 0.2936
+  },
+  "fear_greed": {
+    "value": 11,
+    "classification": "Extreme Fear"
+  },
+  "narrative": {
+    "intro": [
+      "All four sub-models inside the system reached complete unanimity this morning to issue a strong call.",
+      "The system generated a SELL call with 88.9 percent confidence for the 24 hour forecast horizon.",
+      "Bitcoin is currently sitting at 60,206 dollars following a 24 hour gain of 1.98 percent."
+    ],
+    "days": [
+      "The L S T M, the gradient boosted model, the transformer, and the K A N all voted SELL, assigning a 1.8 percent probability to BUY and 9.3 percent to HOLD.",
+      "The model evaluated these votes against a 7 day change of minus 3.86 percent and an Extreme Fear metric of 11."
+    ],
+    "trend": [
+      "The model's last resolved call on 2026-11-20 hit when price dropped 5.15 percent, extending the current winning streak to 3.",
+      "Across 103 total resolved calls, the system has 40 hits and 63 misses for a lifetime accuracy of 38.8 percent."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 103,
+    "hits": 40,
+    "misses": 63,
+    "accuracy_pct": 38.8
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=YC7m23Pb6u4"
+}
