@@ -1,0 +1,72 @@
+{
+  "slug": "bitcoin-daily-2026-11-26",
+  "post_type": "daily",
+  "iso_year": 2026,
+  "iso_week": 48,
+  "title": "Bitcoin AI Call — 2026-11-26: HOLD at 61% Confidence",
+  "meta_description": "Bitcoin AI model call for 2026-11-26: HOLD at 61% confidence. BTC trading at $60,705. All-time record: 38% over 108 public calls.",
+  "published_at": "2026-11-26T02:03:22+00:00",
+  "updated_at": "2026-11-26T02:03:22+00:00",
+  "date_range": "2026-11-26",
+  "signal": "HOLD",
+  "signal_raw": "HOLD",
+  "confidence_pct": 61,
+  "gated": false,
+  "change_pct": 2.42,
+  "per_model": {
+    "lstm": "HOLD",
+    "xgboost": "HOLD",
+    "transformer": "HOLD",
+    "kan": "SELL"
+  },
+  "weights": {
+    "kan": 0.2328,
+    "lstm": 0.2086,
+    "transformer": 0.251,
+    "xgboost": 0.3075
+  },
+  "fear_greed": {
+    "value": 11,
+    "classification": "Extreme Fear"
+  },
+  "narrative": {
+    "intro": [
+      "Three of the four models voted HOLD while the K A N voted SELL.",
+      "The model output a HOLD signal with sixty one percent confidence.",
+      "Bitcoin is priced at sixty thousand seven hundred five dollars and has risen two point four two percent in the past twenty four hours."
+    ],
+    "days": [
+      "The probability split is thirteen point one percent BUY, sixty one percent HOLD, twenty six percent SELL.",
+      "The fear and greed index reads eleven, labeled Extreme Fear.",
+      "The seven day move is negative three point zero two percent."
+    ],
+    "trend": [
+      "Yesterday the model called SELL and was incorrect.",
+      "Overall accuracy is thirty eight percent over one hundred eight resolved calls, with a two call miss streak."
+    ]
+  },
+  "week": {
+    "resolved": 0,
+    "hits": 0,
+    "misses": 0,
+    "accuracy_pct": null,
+    "days": []
+  },
+  "alltime": {
+    "resolved": 108,
+    "hits": 41,
+    "misses": 67,
+    "accuracy_pct": 38.0
+  },
+  "portfolio": null,
+  "research": {
+    "title": "",
+    "bullets": [],
+    "paragraphs": []
+  },
+  "scoring": {
+    "horizon_hours": 24,
+    "flat_band_pct": 1.0
+  },
+  "video_url": "https://www.youtube.com/watch?v=MtWSkv_lxCc"
+}
