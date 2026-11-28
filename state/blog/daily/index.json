@@ -1,6 +1,19 @@
 {
-  "updated_at": "2026-11-27T01:47:33+00:00",
+  "updated_at": "2026-11-28T01:39:23+00:00",
   "posts": [
+    {
+      "slug": "bitcoin-daily-2026-11-28",
+      "post_type": "daily",
+      "title": "Bitcoin AI Call — 2026-11-28: HOLD at 67% Confidence",
+      "meta_description": "Bitcoin AI model call for 2026-11-28: HOLD at 67% confidence. BTC trading at $60,083. All-time record: 39% over 110 public calls.",
+      "published_at": "2026-11-28T01:39:23+00:00",
+      "updated_at": "2026-11-28T01:39:23+00:00",
+      "iso_year": 2026,
+      "iso_week": 48,
+      "week_resolved": 1,
+      "week_hits": 0,
+      "week_accuracy_pct": null
+    },
     {
       "slug": "bitcoin-daily-2026-11-27",
       "post_type": "daily",
